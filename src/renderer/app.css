@@ -1,0 +1,49 @@
+html {
+    height: 100vh;
+}
+
+body {
+    position: relative;
+    color: black;
+    height: 100vh;
+    background-color: #f6d25f;
+    font-family: sans-serif;
+    margin: 0;
+}
+
+/*
+NAVBAR
+*/
+#navbar {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.navbar-content {
+    background-color: white;
+    color: black;
+    border: 8px solid #bf272d;
+    border-left: 0px;
+    border-right: 0px;
+    margin-top: 80px;
+    width: 50vw;
+    height: 77.5px;
+}
+
+h1 {
+    font-size: 28px;
+    height: 100%;
+    margin-top: 22px
+}
+
+#navbar-left {
+    text-align: right;
+    margin-right: 150px;
+    margin-left: 50px
+}
+
+#navbar-right {
+    text-align: left;
+    margin-left: 150px
+}
