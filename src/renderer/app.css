@@ -47,3 +47,8 @@ h1 {
     text-align: left;
     margin-left: 150px
 }
+
+#logo {
+    position: fixed;
+    left: calc(50vw - 99.5px);
+}
