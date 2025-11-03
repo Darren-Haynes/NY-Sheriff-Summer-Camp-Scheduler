@@ -149,6 +149,31 @@ button:hover {
 }
 
 /*
+Media Queries for responsiveness
+*/
+
+@media only screen and (min-width: 650px) and (min-height: 825px) {
+    #input-box {
+        /* margin-top: 3vh; */
+        margin-top: calc((100vh - 790px) / 2);
+        margin-bottom: 1vh;
+        height: 500px
+    }
+
+    #camp-sign {
+        display: block;
+    }
+}
+
+@media only screen and (min-width: 650px) and (min-height: 1200px) {
+
+    #input-box {
+        margin-top: calc((100vh - 1200px) / 2);
+        margin-bottom: 0;
+    }
+}
+
+/*
 FOOTER
 */
 footer {
