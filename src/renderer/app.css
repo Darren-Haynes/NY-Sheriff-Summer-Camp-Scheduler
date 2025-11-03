@@ -54,6 +54,101 @@ h1 {
 }
 
 /*
+Main Background
+*/
+main {
+    height: calc(100vh - 173.5px)
+}
+
+.bg-image {
+    background-image: url(../../assets/water-activity.jpg);
+    background-position: left center;
+    background-repeat: no-repeat;
+    height: calc(100vh - 173.5px);
+    z-index: -1;
+}
+
+.overlay {
+    height: calc(100vh - 173.5px);
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/*
+Input Section
+*/
+#input-section {
+    position: absolute;
+    width: 100vw;
+    margin-top: 66px;
+    margin-bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+#raft {
+    background-image: url(../../assets/water-raft.jpg);
+    width: 500px;
+    height: 300px;
+    margin: 50px;
+    border-radius: 40px;
+    /* border: 5px solid #f6d25f; */
+    display: none;
+    order: 2
+}
+
+#input-box {
+    background: linear-gradient(338deg, rgba(101, 165, 204, 0.8) 0%, rgba(0, 108, 120, 0.8) 50%, rgba(176, 193, 205, 1) 100%);
+    width: 500px;
+    height: 300px;
+    border-radius: 40px;
+    /* border: 5px solid #f6d25f; */
+    /* border: 3px solid white; */
+    margin-top: calc(((100vh - 267px) - 310px) / 2);
+    text-align: center;
+    color: white;
+}
+
+#input-box>p:first-child {
+    margin-top: 55px;
+}
+
+button {
+    background-color: rgba(246, 210, 95, 1);
+    color: rgba(0, 0, 0, 1);
+    margin-top: 0;
+    padding: 10px 20px;
+    width: 185px;
+    border-radius: 20px;
+    border: none;
+    appearance: none;
+    font-size: 1.3rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+button:hover {
+    transform: scale(1.05);
+    opacity: 1;
+}
+
+#close-btn {
+    opacity: 0;
+    display: none;
+}
+
+#camp-sign {
+    margin-left: 20px;
+    display: none;
+}
+
+.break {
+    flex-basis: 100%;
+    height: 0;
+}
+
+/*
 FOOTER
 */
 footer {
