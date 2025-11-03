@@ -2,7 +2,7 @@
   "name": "ny-sheriff-summer-camp-scheduler",
   "productName": "ny-sheriff-summer-camp-scheduler",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "Schedule attendees to sports activity time-slots",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",
@@ -27,6 +27,8 @@
     "@electron-forge/plugin-fuses": "^7.10.2",
     "@electron-forge/plugin-webpack": "^7.10.2",
     "@electron/fuses": "^1.8.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "@vercel/webpack-asset-relocator-loader": "^1.7.3",
@@ -36,6 +38,8 @@
     "eslint-plugin-import": "^2.32.0",
     "fork-ts-checker-webpack-plugin": "^7.3.0",
     "node-loader": "^2.1.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "style-loader": "^3.3.4",
     "ts-loader": "^9.5.4",
     "typescript": "~4.5.4"
