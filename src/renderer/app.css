@@ -52,3 +52,23 @@ h1 {
     position: fixed;
     left: calc(50vw - 99.5px);
 }
+
+/*
+FOOTER
+*/
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    background-color: black;
+    color: white;
+    height: 25px;
+    width: 100%;
+    text-align: center;
+}
+
+footer>p {
+    position: relative;
+    font-size: 14px;
+    top: -10px
+}
