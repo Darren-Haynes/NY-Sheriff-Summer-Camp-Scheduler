@@ -87,27 +87,15 @@ Input Section
     flex-wrap: wrap;
 }
 
-#raft {
-    background-image: url(../../assets/water-raft.jpg);
-    width: 500px;
-    height: 300px;
-    margin: 50px;
-    border-radius: 40px;
-    display: none;
-    order: 2
-}
-
-#input-box {
+#input-options {
     background: linear-gradient(338deg, rgba(101, 165, 204, 0.8) 0%, rgba(0, 108, 120, 0.8) 50%, rgba(176, 193, 205, 1) 100%);
     width: 500px;
-    height: 300px;
     border-radius: 40px;
-    margin-top: calc(((100vh - 267px) - 310px) / 2);
     text-align: center;
     color: white;
 }
 
-#input-box>p:first-child {
+#input-options>p:first-child {
     margin-top: 55px;
 }
 
@@ -130,19 +118,13 @@ button:hover {
     opacity: 1;
 }
 
-#close-btn {
+/* #close-btn {
     opacity: 0;
     display: none;
-}
+} */
 
 #camp-sign {
     margin-left: 20px;
-    display: none;
-}
-
-.break {
-    flex-basis: 100%;
-    height: 0;
 }
 
 #texty-boxy {
@@ -205,30 +187,6 @@ Input Box Transitions
 
     to {
         opacity: 0.5;
-    }
-}
-
-/*
-Media Queries for responsiveness
-*/
-
-@media only screen and (min-width: 650px) and (min-height: 825px) {
-    #input-box {
-        /* margin-top: 3vh; */
-        margin-top: calc((100vh - 790px) / 2);
-        margin-bottom: 1vh;
-        height: 500px
-    }
-
-    #camp-sign {
-        display: block;
-    }
-}
-
-@media only screen and (min-width: 650px) and (min-height: 1200px) {
-    #input-box {
-        margin-top: calc((100vh - 1200px) / 2);
-        margin-bottom: 0;
     }
 }
 
