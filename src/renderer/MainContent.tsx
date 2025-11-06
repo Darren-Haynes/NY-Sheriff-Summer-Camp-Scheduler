@@ -60,8 +60,6 @@ const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
 
 const PasteBox: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
   if (!isVisible) {
-    console.log(typeof isVisible);
-    console.log(typeof onToggle);
     return null;
   }
   return (
