@@ -1,4 +1,5 @@
 import CampSign from "../../assets/its-all-about-the-kids.png";
+import { openTxtBox, closeTxtBox } from "./paste-box";
 
 export default function MainContent() {
   return (
@@ -15,13 +16,19 @@ export default function MainContent() {
               </button>
               <p>or paste sheet content</p>
               <button
+                onClick={openTxtBox}
                 type="button"
                 id="paste-btn"
                 className="paste-btn-txt btn-margin"
               >
                 Paste Sheet
               </button>
-              <button type="button" id="close-btn" className="btn-margin">
+              <button
+                onClick={closeTxtBox}
+                type="button"
+                id="close-btn"
+                className="btn-margin"
+              >
                 Close
               </button>
 
