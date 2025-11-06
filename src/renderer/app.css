@@ -87,16 +87,6 @@ Input Section
     flex-wrap: wrap;
 }
 
-#raft {
-    background-image: url(../../assets/water-raft.jpg);
-    width: 500px;
-    height: 300px;
-    margin: 50px;
-    border-radius: 40px;
-    display: none;
-    order: 2
-}
-
 #input-box {
     background: linear-gradient(338deg, rgba(101, 165, 204, 0.8) 0%, rgba(0, 108, 120, 0.8) 50%, rgba(176, 193, 205, 1) 100%);
     width: 500px;
@@ -138,11 +128,6 @@ button:hover {
 #camp-sign {
     margin-left: 20px;
     display: none;
-}
-
-.break {
-    flex-basis: 100%;
-    height: 0;
 }
 
 #texty-boxy {

@@ -7,7 +7,6 @@ export default function MainContent() {
       <div className="bg-image">
         <div className="overlay">
           <div id="input-section">
-            <div id="raft"></div>
             <div id="input-box">
               <p>Upload a spreadsheet</p>
 
@@ -36,7 +35,6 @@ export default function MainContent() {
                 <img width="400" alt="icon" src={CampSign} />
               </div>
             </div>
-            <div className="break"></div>
           </div>
         </div>
       </div>
