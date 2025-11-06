@@ -93,7 +93,6 @@ Input Section
     height: 300px;
     margin: 50px;
     border-radius: 40px;
-    /* border: 5px solid #f6d25f; */
     display: none;
     order: 2
 }
@@ -103,8 +102,6 @@ Input Section
     width: 500px;
     height: 300px;
     border-radius: 40px;
-    /* border: 5px solid #f6d25f; */
-    /* border: 3px solid white; */
     margin-top: calc(((100vh - 267px) - 310px) / 2);
     text-align: center;
     color: white;
@@ -148,6 +145,69 @@ button:hover {
     height: 0;
 }
 
+#texty-boxy {
+    width: 90%;
+    height: 32vh;
+    margin-left: 5%;
+    margin-top: 5%;
+    margin-bottom: 5%;
+    opacity: 0.5;
+    resize: none;
+    box-sizing: border-box;
+    border: 15px solid #fff;
+    border-radius: 8px;
+}
+
+/*
+Input Box Transitions
+*/
+
+.fade-out {
+    animation-name: fade-out;
+    animation-duration: 1.0s;
+}
+
+.fade-in {
+    animation-name: fade-in;
+    animation-duration: 2.0s;
+}
+
+.fade-in-50 {
+    animation-name: fade-in-50;
+    animation-duration: 2.0s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fade-out {
+    from {
+        opacity: 1.0;
+    }
+
+    to {
+        opacity: 0.0;
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0.0;
+    }
+
+    to {
+        opacity: 1.0;
+    }
+}
+
+@keyframes fade-in-50 {
+    from {
+        opacity: 0.0;
+    }
+
+    to {
+        opacity: 0.5;
+    }
+}
+
 /*
 Media Queries for responsiveness
 */
@@ -166,7 +226,6 @@ Media Queries for responsiveness
 }
 
 @media only screen and (min-width: 650px) and (min-height: 1200px) {
-
     #input-box {
         margin-top: calc((100vh - 1200px) / 2);
         margin-bottom: 0;
