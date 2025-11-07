@@ -12,15 +12,12 @@ const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
   }
 
   const showCampSign = useMediaQuery({ query: "(min-height: 825px)" });
-  const showOnLargeScreen = useMediaQuery({ query: "(min-height: 1200px)" });
+  const showAbove1000 = useMediaQuery({ query: "(min-height: 1001px)" });
+  const showAbove1200 = useMediaQuery({ query: "(min-height: 1201px)" });
 
   const campSignStyles = {
     height: showCampSign ? "500px" : "300px",
-    marginTop: showOnLargeScreen
-      ? "calc((100vh - 1100px) / 2)"
-      : showCampSign
-        ? "calc((100vh - 790px) / 2)"
-        : "calc(((100vh - 267px) - 310px) / 2)",
+    marginTop: showAbove1000 ? "-100px" : showAbove1200 ? "-200px" : 0,
   };
 
   return (

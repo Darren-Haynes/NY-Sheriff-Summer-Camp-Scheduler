@@ -14,11 +14,13 @@ export default function MainContent() {
       <div className="bg-image">
         <div className="overlay">
           <div id="input-section">
-            <InputOptions
-              isVisible={showInputOptions}
-              onToggle={handleToggle}
-            />
-            <PasteBox isVisible={!showInputOptions} onToggle={handleToggle} />
+            <div id="central-container">
+              <InputOptions
+                isVisible={showInputOptions}
+                onToggle={handleToggle}
+              />
+              <PasteBox isVisible={!showInputOptions} onToggle={handleToggle} />
+            </div>
           </div>
         </div>
       </div>

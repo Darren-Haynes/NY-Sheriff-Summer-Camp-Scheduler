@@ -71,25 +71,28 @@ main {
 .overlay {
     height: calc(100vh - 173.5px);
     background-color: rgba(0, 0, 0, 0.8);
+    display: flex
 }
 
 /*
-Input Section
+Input Sections
 */
-#input-section {
-    position: absolute;
-    width: 100vw;
-    margin-top: 66px;
-    margin-bottom: 0;
+
+#central-container {
+    position: fixed;
+    width: 100%;
+    left: 0;
+    top: 240px;
+    bottom: 25px;
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-wrap: wrap;
 }
 
 #input-options {
     background: linear-gradient(338deg, rgba(101, 165, 204, 0.8) 0%, rgba(0, 108, 120, 0.8) 50%, rgba(176, 193, 205, 1) 100%);
     width: 500px;
+    min-height: 300px;
     border-radius: 40px;
     text-align: center;
     color: white;
@@ -97,6 +100,26 @@ Input Section
 
 #input-options>p:first-child {
     margin-top: 55px;
+}
+
+.input-box {
+    background: linear-gradient(338deg, rgba(101, 165, 204, 0.8) 0%, rgba(0, 108, 120, 0.8) 50%, rgba(176, 193, 205, 1) 100%);
+    width: 75%;
+    max-width: 1000px;
+    border-radius: 40px;
+    border: 5px solid #f6d25f;
+    transition: width 1.0s ease-in-out;
+}
+
+.input-box>p {
+    margin-top: 45px;
+    margin-bottom: 0px;
+    text-align: center;
+    color: white;
+}
+
+#pastebox-section {
+    height: 60%;
 }
 
 button {
@@ -118,10 +141,9 @@ button:hover {
     opacity: 1;
 }
 
-/* #close-btn {
-    opacity: 0;
-    display: none;
-} */
+.paste-box-btns {
+    margin-top: 5px;
+}
 
 #camp-sign {
     margin-left: 20px;
@@ -129,7 +151,7 @@ button:hover {
 
 #texty-boxy {
     width: 90%;
-    height: 32vh;
+    height: 100%;
     margin-left: 5%;
     margin-top: 5%;
     margin-bottom: 5%;
@@ -138,6 +160,10 @@ button:hover {
     box-sizing: border-box;
     border: 15px solid #fff;
     border-radius: 8px;
+}
+
+textarea {
+    height: 100%;
 }
 
 /*
@@ -194,6 +220,7 @@ Input Box Transitions
 FOOTER
 */
 footer {
+    display: block;
     position: fixed;
     bottom: 0;
     left: 0;
