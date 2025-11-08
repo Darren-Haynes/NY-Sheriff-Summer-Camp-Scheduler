@@ -10,7 +10,7 @@ const PasteBox: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
 
   return (
     <div id="input-box">
-      <div id="text-box">
+      <div id="text-box" className="fade-in-1s">
         <textarea>Paste text here...</textarea>
       </div>
 
@@ -19,14 +19,22 @@ const PasteBox: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
           onClick={onToggle}
           type="button"
           id="close-btn"
-          className="paste-box-btns"
+          className="paste-box-btns fade-in-1s"
         >
           Close ❌
         </button>
-        <button type="button" id="upload-btn-2" className="paste-box-btns">
+        <button
+          type="button"
+          id="upload-btn-2"
+          className="paste-box-btns fade-in-3s"
+        >
           Upload 📤
         </button>
-        <button type="button" id="submit-btn" className="paste-box-btns">
+        <button
+          type="button"
+          id="submit-btn"
+          className="paste-box-btns fade-in-5s"
+        >
           Submit ✅
         </button>
       </div>
