@@ -102,24 +102,20 @@ Input Sections
     margin-top: 55px;
 }
 
-.input-box {
+#camp-sign {
+    margin-left: 20px;
+}
+
+#input-box {
     background: linear-gradient(338deg, rgba(101, 165, 204, 0.8) 0%, rgba(0, 108, 120, 0.8) 50%, rgba(176, 193, 205, 1) 100%);
     width: 75%;
     max-width: 1000px;
+    height: 55vh;
     border-radius: 40px;
     border: 5px solid #f6d25f;
     transition: width 1.0s ease-in-out;
-}
-
-.input-box>p {
-    margin-top: 45px;
-    margin-bottom: 0px;
-    text-align: center;
-    color: white;
-}
-
-#pastebox-section {
-    height: 60%;
+    display: flex;
+    margin-bottom: 5px;
 }
 
 button {
@@ -141,29 +137,44 @@ button:hover {
     opacity: 1;
 }
 
+#text-box {
+    box-sizing: border-box;
+    width: 75%;
+}
+
+#text-box-btns {
+    flex-direction: column;
+    width: 200px;
+}
+
 .paste-box-btns {
-    margin-top: 5px;
+    margin: 15px;
+    width: 135px;
 }
 
-#camp-sign {
-    margin-left: 20px;
+#close-btn {
+    margin-top: 55px;
+    background-color: rgb(231, 95, 95)
 }
 
-#texty-boxy {
+#submit-btn {
+    background-color: rgb(34, 196, 34);
+}
+
+#upload-btn-2 {
+    background-color: #f6d25f;
+}
+
+textarea {
     width: 90%;
-    height: 100%;
+    height: 49.5vh;
     margin-left: 5%;
-    margin-top: 5%;
-    margin-bottom: 5%;
+    margin-top: 30px;
     opacity: 0.5;
     resize: none;
     box-sizing: border-box;
     border: 15px solid #fff;
     border-radius: 8px;
-}
-
-textarea {
-    height: 100%;
 }
 
 /*
