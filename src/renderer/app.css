@@ -181,30 +181,29 @@ textarea {
 Input Box Transitions
 */
 
-.fade-out {
-    animation-name: fade-out;
+.fade-in-05s {
+    animation-name: fade-in;
+    animation-duration: 0.5s;
+}
+
+.fade-in-1s {
+    animation-name: fade-in;
     animation-duration: 1.0s;
 }
 
-.fade-in {
+.fade-in-1-5s {
+    animation-name: fade-in;
+    animation-duration: 1.5s;
+}
+
+.fade-in-2s {
     animation-name: fade-in;
     animation-duration: 2.0s;
 }
 
-.fade-in-50 {
-    animation-name: fade-in-50;
-    animation-duration: 2.0s;
-    animation-fill-mode: forwards;
-}
-
-@keyframes fade-out {
-    from {
-        opacity: 1.0;
-    }
-
-    to {
-        opacity: 0.0;
-    }
+.fade-in-3s {
+    animation-name: fade-in;
+    animation-duration: 3.0s;
 }
 
 @keyframes fade-in {
@@ -214,16 +213,6 @@ Input Box Transitions
 
     to {
         opacity: 1.0;
-    }
-}
-
-@keyframes fade-in-50 {
-    from {
-        opacity: 0.0;
-    }
-
-    to {
-        opacity: 0.5;
     }
 }
 

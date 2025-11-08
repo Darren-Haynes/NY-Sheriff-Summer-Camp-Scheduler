@@ -22,23 +22,23 @@ const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
 
   return (
     <div id="input-options" style={campSignStyles}>
-      <p>Upload a spreadsheet</p>
+      <p className="fade-in-05s">Upload a spreadsheet</p>
 
-      <button type="button" id="upload-btn" className="btn-margin">
+      <button type="button" id="upload-btn" className="fade-in-1s">
         Upload
       </button>
-      <p>or paste sheet content</p>
+      <p className="fade-in-1-5s">or paste sheet content</p>
       <button
         onClick={onToggle}
         type="button"
         id="paste-btn"
-        className="paste-btn-txt btn-margin"
+        className="paste-btn-txt fade-in-2s"
       >
         Paste Sheet
       </button>
 
       {showCampSign && (
-        <div id="camp-sign">
+        <div id="camp-sign" className="fade-in-3s">
           <img width="400" alt="icon" src={CampSign} />
         </div>
       )}
