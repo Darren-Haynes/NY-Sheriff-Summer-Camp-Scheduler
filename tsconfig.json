@@ -18,5 +18,5 @@
       "@assets/*": ["assets/*"],
     }
   },
-  "include": ["src/**/*", "assets/*"]
+  "include": ["src/**/*", "assets/*", "src/renderer/**/*.d.ts"]
 }
