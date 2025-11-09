@@ -8,10 +8,25 @@ const PasteBox: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
     return null;
   }
 
+  const submitTextboxContent = () => {
+    const txtBox = document.getElementById("textarea") as HTMLInputElement;
+    const txtBoxContent = txtBox.value;
+    const reply = window.textAPI.send_text(txtBoxContent);
+    reply
+      .then((value): null => {
+        alert(value);
+        return null;
+      })
+      .catch((error) => {
+        // This callback executes if the promise is rejected
+        console.error("Promise rejected with:", error);
+      });
+  };
+
   return (
     <div id="input-box">
       <div id="text-box" className="fade-in-1s">
-        <textarea>Paste text here...</textarea>
+        <textarea id="textarea">Paste text here...</textarea>
       </div>
 
       <div id="text-box-btns">
@@ -31,6 +46,7 @@ const PasteBox: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
           Upload 📤
         </button>
         <button
+          onClick={submitTextboxContent}
           type="button"
           id="submit-btn"
           className="paste-box-btns fade-in-5s"
