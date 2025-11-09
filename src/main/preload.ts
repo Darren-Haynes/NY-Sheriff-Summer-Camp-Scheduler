@@ -1,2 +1,9 @@
-// See the Electron documentation for details on how to use preload scripts:
-// https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
+import { contextBridge, ipcRenderer } from "electron"
+
+const preload = {
+    send_text: (message: string) => ipcRenderer.invoke('submit-text', message)
+}
+
+contextBridge.exposeInMainWorld('textAPI', preload)
+
+export type TPreload = typeof preload
