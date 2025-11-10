@@ -1,3 +1,5 @@
+import { submitTextboxContent, fileUpload } from "./ipcFunctions";
+
 interface ToggleProps {
   isVisible: boolean;
   onToggle: React.MouseEventHandler<HTMLButtonElement>;
@@ -7,26 +9,6 @@ const PasteBox: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
   if (!isVisible) {
     return null;
   }
-
-  const submitTextboxContent = () => {
-    const txtBox = document.getElementById("textarea") as HTMLInputElement;
-    const txtBoxContent = txtBox.value;
-    const reply = window.textAPI.send_text(txtBoxContent);
-    reply
-      .then((value): null => {
-        alert(value);
-        return null;
-      })
-      .catch((error) => {
-        // This callback executes if the promise is rejected
-        console.error("Promise rejected with:", error);
-      });
-  };
-
-  // Send ipc message to main to open file picker
-  const fileUpload = () => {
-    window.textAPI.file_dialog();
-  };
 
   return (
     <div id="input-box">

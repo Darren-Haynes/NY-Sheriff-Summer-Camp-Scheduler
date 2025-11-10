@@ -1,4 +1,5 @@
 import { useMediaQuery } from "react-responsive";
+import { fileUpload } from "./ipcFunctions";
 import CampSign from "../../assets/its-all-about-the-kids.png";
 
 interface ToggleProps {
@@ -10,11 +11,6 @@ const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
   if (!isVisible) {
     return null;
   }
-
-  // Send ipc message to main to open file picker
-  const fileUpload = () => {
-    window.textAPI.file_dialog();
-  };
 
   const showCampSign = useMediaQuery({ query: "(min-height: 825px)" });
   const showAbove1000 = useMediaQuery({ query: "(min-height: 1001px)" });
