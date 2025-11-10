@@ -11,6 +11,11 @@ const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
     return null;
   }
 
+  // Send ipc message to main to open file picker
+  const fileUpload = () => {
+    window.textAPI.file_dialog();
+  };
+
   const showCampSign = useMediaQuery({ query: "(min-height: 825px)" });
   const showAbove1000 = useMediaQuery({ query: "(min-height: 1001px)" });
   const showAbove1200 = useMediaQuery({ query: "(min-height: 1201px)" });
@@ -24,7 +29,12 @@ const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
     <div id="input-options" style={campSignStyles}>
       <p className="fade-in-05s">Upload a spreadsheet</p>
 
-      <button type="button" id="upload-btn" className="fade-in-1s">
+      <button
+        onClick={fileUpload}
+        type="button"
+        id="upload-btn"
+        className="fade-in-1s"
+      >
         Upload
       </button>
       <p className="fade-in-1-5s">or paste sheet content</p>
