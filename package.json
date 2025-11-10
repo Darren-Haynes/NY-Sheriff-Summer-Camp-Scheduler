@@ -46,6 +46,8 @@
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.1",
-    "file-loader": "^6.2.0"
+    "exceljs": "^4.4.0",
+    "file-loader": "^6.2.0",
+    "react-responsive": "^10.0.1"
   }
 }
