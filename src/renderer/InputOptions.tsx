@@ -1,4 +1,5 @@
 import { useMediaQuery } from "react-responsive";
+import { fileUpload } from "./ipcFunctions";
 import CampSign from "../../assets/its-all-about-the-kids.png";
 
 interface ToggleProps {
@@ -24,7 +25,12 @@ const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
     <div id="input-options" style={campSignStyles}>
       <p className="fade-in-05s">Upload a spreadsheet</p>
 
-      <button type="button" id="upload-btn" className="fade-in-1s">
+      <button
+        onClick={fileUpload}
+        type="button"
+        id="upload-btn"
+        className="fade-in-1s"
+      >
         Upload
       </button>
       <p className="fade-in-1-5s">or paste sheet content</p>
