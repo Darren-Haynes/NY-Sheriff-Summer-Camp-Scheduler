@@ -23,6 +23,11 @@ const PasteBox: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
       });
   };
 
+  // Send ipc message to main to open file picker
+  const fileUpload = () => {
+    window.textAPI.file_dialog();
+  };
+
   return (
     <div id="input-box">
       <div id="text-box" className="fade-in-1s">
@@ -39,6 +44,7 @@ const PasteBox: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
           Close ❌
         </button>
         <button
+          onClick={fileUpload}
           type="button"
           id="upload-btn-2"
           className="paste-box-btns fade-in-3s"
