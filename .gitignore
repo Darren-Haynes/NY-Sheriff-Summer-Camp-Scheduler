@@ -1,3 +1,7 @@
+# User
+sample_data/
+src/main/scheduler.js
+
 # Logs
 logs
 *.log
