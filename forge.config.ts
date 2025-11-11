@@ -1,4 +1,5 @@
 import type { ForgeConfig } from '@electron-forge/shared-types';
+import MakerMSI from '@electron-forge/maker-wix';
 import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { MakerZIP } from '@electron-forge/maker-zip';
 import { MakerDMG } from '@electron-forge/maker-dmg';
@@ -19,7 +20,8 @@ const config: ForgeConfig = {
   },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel({}),
+    new MakerSquirrel({ authors: 'Darren Haynes' }, ['win32']),
+    new MakerMSI({ manufacturer: "Darren Haynes" }, ['win32']),
     new MakerZIP({}, ['darwin']),
     new MakerDMG({}, ['darwin']),
     new MakerRpm({}),
