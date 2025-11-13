@@ -20,8 +20,19 @@ const config: ForgeConfig = {
   },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel({ authors: 'Darren Haynes' }, ['win32']),
-    new MakerMSI({ manufacturer: "Darren Haynes" }, ['win32']),
+    // new MakerSquirrel({ authors: 'Darren Haynes' }, ['win32']),
+    new MakerMSI({
+      description: "NY Sheriff Institute Summer Camp Scheduler",
+      exe: "NY Sheriff Summer Camp Scheduler",
+      icon: "./assets/icons/sheriff-badge-msi.ico",
+      ui: {
+        images: { banner: "C:/Users/darre/Projects/NY-Sheriff-Summer-Camp-Scheduler/assets/Sheriff-helicopter-msi-overlay.jpg" },
+        chooseDirectory: true
+      },
+      manufacturer: "Darren Haynes",
+      programFilesFolderName: "NY Summer Camp",
+      version: '1.0.0'
+    }, ['win32']),
     new MakerZIP({}, ['darwin']),
     new MakerDMG({}, ['darwin']),
     new MakerRpm({}),
