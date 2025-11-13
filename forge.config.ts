@@ -26,7 +26,7 @@ const config: ForgeConfig = {
       exe: "NY Sheriff Summer Camp Scheduler",
       icon: "./assets/icons/sheriff-badge-msi.ico",
       ui: {
-        images: { banner: "C:/Users/darre/Projects/NY-Sheriff-Summer-Camp-Scheduler/assets/Sheriff-helicopter-msi-overlay.jpg" },
+        images: { banner: "C:/Users/darre/Projects/NY-Sheriff-Summer-Camp-Scheduler/assets/banner-msi.jpeg" },
         chooseDirectory: true
       },
       manufacturer: "Darren Haynes",
