@@ -37,17 +37,6 @@ h1 {
     margin-top: 22px
 }
 
-#navbar-left {
-    text-align: right;
-    margin-right: 150px;
-    margin-left: 50px
-}
-
-#navbar-right {
-    text-align: left;
-    margin-left: 150px
-}
-
 #logo {
     position: fixed;
     left: calc(50vw - 99.5px);
@@ -149,7 +138,7 @@ button:hover {
 
 .paste-box-btns {
     margin: 15px;
-    width: 135px;
+    width: 145px;
 }
 
 #close-btn {
