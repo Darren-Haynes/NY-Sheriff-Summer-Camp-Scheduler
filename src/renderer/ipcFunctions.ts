@@ -5,11 +5,9 @@ export const submitTextboxContent = () => {
     const reply = window.textAPI.send_text(txtBoxContent);
     reply
         .then((value): null => {
-            alert(value);
             return null;
         })
         .catch((error) => {
-            // This callback executes if the promise is rejected
             console.error("Promise rejected with:", error);
         });
 };
