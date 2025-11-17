@@ -39,20 +39,25 @@ ipcMain.handle('open-file-dialog', async () => {
     properties: ['openFile'],
     filters: [{ name: 'Sheets', extensions: ['xlsx'] }]
   });
-  console.log(result.filePaths[0])
 
   const workbook = new Excel.Workbook();
   await workbook.xlsx.readFile(result.filePaths[0]);
+  let data = "";
   workbook.worksheets[0].eachRow(function (row) {
-    row.eachCell(function (cell) {
-      console.log(typeof cell.value);
-    })
+    let s = JSON.stringify(row.values)
+    s = s.replace(/\[null,"|"\]/g, "")
+    s = s.replace(/","|",|,"/g, "\t")
+    data += s + "\n"
   });
+  const handleInput = new InputHandler(data)
+  // delete header row from spreadsheet
+  handleInput.kidsMap.delete("Name Last")
 });
 
 // Handle input via the pastebox
 ipcMain.handle('submit-text', async (event, message) => {
   const handleInput = new InputHandler(message)
+  console.log(message)
 });
 
 // This method will be called when Electron has finished
