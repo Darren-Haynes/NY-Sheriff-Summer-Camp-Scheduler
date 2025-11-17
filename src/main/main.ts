@@ -52,28 +52,7 @@ ipcMain.handle('open-file-dialog', async () => {
 
 // Handle input via the pastebox
 ipcMain.handle('submit-text', async (event, message) => {
-  const handleInput = new InputHandler(message, true)
-  handleInput.printMessage()
-  interface kidDataType {
-    land1: string
-    land2: string
-    land3: string
-    water1: string
-    water2: string
-    water3: string
-  }
-
-  console.log('Message from renderer:', message);
-  const kids = new Map();
-  const lines: string[] = message.split('\n')
-  lines.forEach(line => {
-    const entries = line.split(/\s+/);
-    const kidData: kidDataType = { land1: entries[3], land2: entries[4], land3: entries[5], water1: entries[6], water2: entries[7], water3: entries[8] }
-    kids.set(entries[1] + " " + entries[0], kidData)
-    // console.log(kids.size)
-  });
-
-  return lines[1]
+  const handleInput = new InputHandler(message)
 });
 
 // This method will be called when Electron has finished
