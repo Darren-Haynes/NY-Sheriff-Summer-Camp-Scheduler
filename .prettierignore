@@ -1,0 +1,31 @@
+# dependencies
+node_modules
+# build outputs
+dist
+out
+.release
+build
+.release-build
+*.tgz
+# electron/webpack artifacts
+.webpack
+.webpack-main
+.webpack-renderer
+# OS files
+.DS_Store
+Thumbs.db
+# lockfiles (do not format lockfiles)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+# local env files
+.env
+.env.local
+# IDE/editor folders
+.vscode
+.idea
+# assets or big generated files
+assets/**/*.png
+assets/**/*.jpg
+assets/**/*.svg
+assets/**/*.ico
