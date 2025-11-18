@@ -50,14 +50,11 @@ ipcMain.handle('open-file-dialog', async () => {
     data += s + "\n"
   });
   const handleInput = new InputHandler(data)
-  // delete header row from spreadsheet
-  handleInput.kidsMap.delete("Name Last")
 });
 
 // Handle input via the pastebox
 ipcMain.handle('submit-text', async (event, message) => {
   const handleInput = new InputHandler(message)
-  console.log(message)
 });
 
 // This method will be called when Electron has finished

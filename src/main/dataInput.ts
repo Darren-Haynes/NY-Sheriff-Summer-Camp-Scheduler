@@ -30,12 +30,11 @@ export default class DataInputHandler {
 
     createKidsMap(): void {
         const lines: string[] = this.dataString.split('\n')
+        if (lines[0].includes('Last Name')) { lines.shift() }
         lines.forEach(line => {
             const entries = line.split(/\s+/);
             const kidData: kidsDataType = { land1: entries[3], land2: entries[4], land3: entries[5], water1: entries[6], water2: entries[7], water3: entries[8] }
             this.kidsMap.set(entries[1] + " " + entries[0], kidData)
         })
-        console.log(this.kidsMap)
-        console.log(this.kidsMap.size)
     }
 }
