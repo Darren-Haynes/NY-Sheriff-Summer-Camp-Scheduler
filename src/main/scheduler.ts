@@ -1,13 +1,13 @@
 class Scheduler {
-    mainData: string
+    mainData: string;
     constructor() {
-        this.mainData = this.parseData()
+        this.mainData = this.parseData();
     }
 
     parseData(): string {
-        console.log('test log')
-        return 'test'
+        console.log('test log');
+        return 'test';
     }
 }
 
-const scheduler = new Scheduler()
+const scheduler = new Scheduler();
