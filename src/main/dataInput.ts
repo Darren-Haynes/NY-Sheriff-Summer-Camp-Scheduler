@@ -21,10 +21,14 @@ interface kidsDataType {
 export default class DataInputHandler {
     dataString: string;
     kidsMap: Map<string, kidsMap>;
+    errHandler: DataErrorHandler;
+    headerRow: boolean
 
     constructor(dataString: string) {
         this.dataString = dataString;
         this.kidsMap = new Map();
+        this.errHandler = new DataErrorHandler
+        this.headerRow = false;
         this.createKidsMap();
     }
 
@@ -32,18 +36,37 @@ export default class DataInputHandler {
         const lines: string[] = this.dataString.split('\n');
         if (lines[0].includes('Last Name')) {
             lines.shift();
+            this.headerRow = true
         }
-        lines.forEach(line => {
-            const entries = line.split(/\s+/);
+        lines.pop() // last line is an empty string we don't want
+        const campData = lines.map(line => line.split(/\t/))
+        const errorFree = this.errHandler.numOfFields(campData, this.headerRow)
+        campData.forEach(line => {
             const kidData: kidsDataType = {
-                land1: entries[3],
-                land2: entries[4],
-                land3: entries[5],
-                water1: entries[6],
-                water2: entries[7],
-                water3: entries[8],
+                land1: line[3],
+                land2: line[4],
+                land3: line[5],
+                water1: line[6],
+                water2: line[7],
+                water3: line[8],
             };
-            this.kidsMap.set(entries[1] + ' ' + entries[0], kidData);
+            this.kidsMap.set(line[1] + ' ' + line[0], kidData);
         });
+    }
+}
+
+class DataErrorHandler {
+    errMessages: string[];
+
+    constructor() {
+        this.errMessages = []
+    }
+    numOfFields(campData: string[][], headerRow: boolean): boolean {
+        let i: number;
+        headerRow ? i = 0 : i = 1;
+        for (i; i < campData.length; i++) {
+            if (campData[i].length > 9) { this.errMessages.push("Line ${i}: ${campData[i]}") }
+        }
+        return (this.errMessages.length === 0)
     }
 }
