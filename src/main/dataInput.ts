@@ -71,8 +71,9 @@ class DataErrorHandler {
         let i: number;
         headerRow ? i = 0 : i = 1;
         for (i; i < campData.length; i++) {
-            if (campData[i].length != 9) { this.errMessages.push("Line ${i}: ${campData[i]}") }
+            if (campData[i].length != 9) { this.errMessages.push(`Line ${i}: ${campData[i]}`) }
         }
+        console.log(this.errMessages)
         return (this.errMessages.length === 0)
     }
 }
