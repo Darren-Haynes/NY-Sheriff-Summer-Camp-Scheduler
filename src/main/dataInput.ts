@@ -56,16 +56,22 @@ export default class DataInputHandler {
 }
 
 class DataErrorHandler {
+    /*
+    This class checks for errors in the user's inputted data.
+    Misformatted data will cause bugs and troubles.
+    */
     errMessages: string[];
 
     constructor() {
         this.errMessages = []
     }
+
     numOfFields(campData: string[][], headerRow: boolean): boolean {
+        // User Data should only have 9 columns
         let i: number;
         headerRow ? i = 0 : i = 1;
         for (i; i < campData.length; i++) {
-            if (campData[i].length > 9) { this.errMessages.push("Line ${i}: ${campData[i]}") }
+            if (campData[i].length != 9) { this.errMessages.push("Line ${i}: ${campData[i]}") }
         }
         return (this.errMessages.length === 0)
     }
