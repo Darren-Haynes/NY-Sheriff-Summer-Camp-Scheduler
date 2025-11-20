@@ -18,30 +18,22 @@ interface kidsDataType {
     water3: string;
 }
 
-export default class DataInputHandler {
-    dataString: string;
+export class DataInputHandler {
+    campData: string[][];
     kidsMap: Map<string, kidsMap>;
     errHandler: DataErrorHandler;
     headerRow: boolean
 
-    constructor(dataString: string) {
-        this.dataString = dataString;
+    constructor(data: string[][], header: boolean) {
+        this.campData = data;
         this.kidsMap = new Map();
         this.errHandler = new DataErrorHandler
-        this.headerRow = false;
+        this.headerRow = header;
         this.createKidsMap();
     }
 
     createKidsMap(): void {
-        const lines: string[] = this.dataString.split('\n');
-        if (lines[0].includes('Last Name')) {
-            lines.shift();
-            this.headerRow = true
-        }
-        lines.pop() // last line is an empty string we don't want
-        const campData = lines.map(line => line.split(/\t/))
-        const errorFree = this.errHandler.numOfFields(campData, this.headerRow)
-        campData.forEach(line => {
+        this.campData.forEach(line => {
             const kidData: kidsDataType = {
                 land1: line[3],
                 land2: line[4],
@@ -55,7 +47,7 @@ export default class DataInputHandler {
     }
 }
 
-class DataErrorHandler {
+export class DataErrorHandler {
     /*
     This class checks for errors in the user's inputted data.
     Misformatted data will cause bugs and troubles.
@@ -75,5 +67,19 @@ class DataErrorHandler {
         }
         console.log(this.errMessages)
         return (this.errMessages.length === 0)
+    }
+}
+
+export function dataParser(data: string) {
+    let header = false;
+    const lines: string[] = data.split('\n');
+    if (lines[0].includes('Last Name')) {
+        lines.shift();
+        header = true
+    }
+    lines.pop() // last line is an empty string we don't want
+    const parsedData = lines.map(line => line.split(/\t/))
+    return {
+        campData: parsedData, headerRow: header
     }
 }
