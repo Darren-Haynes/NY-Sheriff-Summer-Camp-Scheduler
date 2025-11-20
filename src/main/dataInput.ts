@@ -18,16 +18,14 @@ interface kidsDataType {
     water3: string;
 }
 
-export class DataInputHandler {
+export class KidsChoices {
     campData: string[][];
     kidsMap: Map<string, kidsMap>;
-    errHandler: DataErrorHandler;
     headerRow: boolean
 
     constructor(data: string[][], header: boolean) {
         this.campData = data;
         this.kidsMap = new Map();
-        this.errHandler = new DataErrorHandler
         this.headerRow = header;
         this.createKidsMap();
     }
