@@ -21,7 +21,7 @@ interface kidsDataType {
 export class KidsChoices {
     campData: string[][];
     kidsMap: Map<string, kidsMap>;
-    headerRow: boolean
+    headerRow: boolean;
 
     constructor(data: string[][], header: boolean) {
         this.campData = data;
@@ -45,26 +45,30 @@ export class KidsChoices {
     }
 }
 
+
 export class DataErrorHandler {
     /*
-    This class checks for errors in the user's inputted data.
-    Misformatted data will cause bugs and troubles.
-    */
-    errMessages: string[];
+        This class checks for errors in the user's inputted data.
+        Misformatted data will cause bugs and troubles.
+        */
+    numOfFieldsError: string[];
+    campData: string[][];
+    headerRow: boolean;
 
-    constructor() {
-        this.errMessages = []
+    constructor(data: string[][], header: boolean) {
+        this.headerRow = header;
+        this.campData = data;
+        this.numOfFieldsError = []
     }
 
-    numOfFields(campData: string[][], headerRow: boolean): boolean {
+    numOfFields(): boolean {
         // User Data should only have 9 columns
-        let i: number;
-        headerRow ? i = 0 : i = 1;
-        for (i; i < campData.length; i++) {
-            if (campData[i].length != 9) { this.errMessages.push(`Line ${i}: ${campData[i]}`) }
+        for (let i = 0; i < this.campData.length; i++) {
+            if (this.campData[i].length != 9) {
+                this.numOfFieldsError.push(`Line ${i + 2}: ${this.campData[i]}`);
+            }
         }
-        console.log(this.errMessages)
-        return (this.errMessages.length === 0)
+        return this.numOfFieldsError.length !== 0;
     }
 }
 
@@ -73,11 +77,12 @@ export function dataParser(data: string) {
     const lines: string[] = data.split('\n');
     if (lines[0].includes('Last Name')) {
         lines.shift();
-        header = true
+        header = true;
     }
-    lines.pop() // last line is an empty string we don't want
-    const parsedData = lines.map(line => line.split(/\t/))
+    lines.pop(); // last line is an empty string we don't want
+    const parsedData = lines.map(line => line.split(/\t/));
     return {
-        campData: parsedData, headerRow: header
-    }
+        campData: parsedData,
+        headerRow: header,
+    };
 }
