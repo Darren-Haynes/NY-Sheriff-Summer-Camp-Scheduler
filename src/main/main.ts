@@ -55,7 +55,7 @@ ipcMain.handle('open-file-dialog', async () => {
   if (allErrors.every(item => item === false)) {
     console.log("There are no errors")
   } else {
-    console.log("There are errors");
+    console.log(dataErrors.activityError);
   }
 });
 
