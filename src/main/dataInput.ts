@@ -1,4 +1,4 @@
-import { landActs } from "./activityNames"
+import { landActs, waterActs } from './activityNames';
 // Parse data inputted by user, and check input for errors.
 
 interface kidsMap {
@@ -46,12 +46,11 @@ export class KidsChoices {
     }
 }
 
-
 export class DataErrorHandler {
-    /*
-        This class checks for errors in the user's inputted data.
-        Misformatted data will cause bugs and troubles.
-        */
+    /**
+     * This class checks for errors in the user's inputted data.
+     * Misformatted data will cause bugs and troubles.
+     */
     numOfFieldsError: string[];
     activityError: string[];
     campData: string[][];
@@ -60,12 +59,14 @@ export class DataErrorHandler {
     constructor(data: string[][], header: boolean) {
         this.headerRow = header;
         this.campData = data;
-        this.numOfFieldsError = []
-        this.activityError = []
+        this.numOfFieldsError = [];
+        this.activityError = [];
     }
 
     numOfFields(): boolean {
-        // User Data should only have 9 columns
+        /**
+         * All rows in user data should be of length 9.
+         */
         for (let i = 0; i < this.campData.length; i++) {
             if (this.campData[i].length != 9) {
                 this.numOfFieldsError.push(`Line ${i + 2}: ${this.campData[i]}`);
@@ -74,17 +75,30 @@ export class DataErrorHandler {
         return this.numOfFieldsError.length !== 0;
     }
 
+    #wrongActivity(acts: string[], rowNum: number, i: number, row: any): void {
+        if (!acts.includes(row[i].toLowerCase())) {
+            const rowNumOffset: number = this.headerRow ? rowNum + 2 : rowNum + 1;
+            const errorMsg = `Row ${rowNumOffset}; column ${i} -- ${row[i]}`;
+            this.activityError.push(errorMsg);
+        }
+        console.log(this.activityError);
+    }
+
     wrongActivity(): boolean {
+        /**
+         *Check that activity shortnames in user data are correct.
+         */
         this.campData.forEach((row, rowNum) => {
+            // First check for incorrect land activities
             for (let i = 3; i < 6; i++) {
-                if (!landActs.includes(row[i].toLowerCase())) {
-                    const rowNumOffset: number = this.headerRow ? rowNum + 2 : rowNum + 1;
-                    const errorMsg = `Row ${rowNumOffset}; column ${i} -- ${row[i]}`
-                    this.activityError.push(errorMsg)
-                }
+                this.#wrongActivity(landActs, rowNum, i, row);
+            }
+            // Then check for incorrect water activities
+            for (let i = 6; i < 9; i++) {
+                this.#wrongActivity(waterActs, rowNum, i, row);
             }
         });
-        return false
+        return this.activityError.length !== 0;
     }
 }
 
