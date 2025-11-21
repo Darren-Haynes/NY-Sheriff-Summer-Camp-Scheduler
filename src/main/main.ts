@@ -62,6 +62,14 @@ ipcMain.handle('open-file-dialog', async () => {
 // Handle input via the pastebox
 ipcMain.handle('submit-text', async (event, data) => {
   const { campData, headerRow } = dataParser(data);
+  const dataErrors = new DataErrorHandler(campData, headerRow)
+  const allErrors: boolean[] = [dataErrors.numOfFields(), dataErrors.wrongActivity()]
+  console.log(allErrors)
+  if (allErrors.every(item => item === false)) {
+    console.log("There are no errors")
+  } else {
+    console.log(dataErrors.activityError);
+  }
 });
 
 // This method will be called when Electron has finished
