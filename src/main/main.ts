@@ -50,8 +50,13 @@ ipcMain.handle('open-file-dialog', async () => {
   });
   const { campData, headerRow } = dataParser(data);
   const dataErrors = new DataErrorHandler(campData, headerRow)
-  const excessFields = dataErrors.numOfFields()
-  const invalidActivity = dataErrors.wrongActivity()
+  const allErrors: boolean[] = [dataErrors.numOfFields(), dataErrors.wrongActivity()]
+  console.log(allErrors)
+  if (allErrors.every(item => item === false)) {
+    console.log("There are no errors")
+  } else {
+    console.log("There are errors");
+  }
 });
 
 // Handle input via the pastebox
