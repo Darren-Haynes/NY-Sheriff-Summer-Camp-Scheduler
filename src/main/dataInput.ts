@@ -76,12 +76,15 @@ export class DataErrorHandler {
     }
 
     #wrongActivity(acts: string[], rowNum: number, i: number, row: any): void {
-        if (!acts.includes(row[i].toLowerCase())) {
-            const rowNumOffset: number = this.headerRow ? rowNum + 2 : rowNum + 1;
+        const rowNumOffset: number = this.headerRow ? rowNum + 2 : rowNum + 1;
+        if (!row[i]) {
+            const errorMsg = `Row ${rowNumOffset}; column ${i} -- NO SPORT EMPTY CELL`;
+            this.activityError.push(errorMsg);
+        }
+        else if (!acts.includes(row[i].toLowerCase())) {
             const errorMsg = `Row ${rowNumOffset}; column ${i} -- ${row[i]}`;
             this.activityError.push(errorMsg);
         }
-        console.log(this.activityError);
     }
 
     wrongActivity(): boolean {
