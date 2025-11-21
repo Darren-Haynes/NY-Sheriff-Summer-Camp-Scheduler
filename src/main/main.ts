@@ -51,7 +51,7 @@ ipcMain.handle('open-file-dialog', async () => {
   const { campData, headerRow } = dataParser(data);
   const dataErrors = new DataErrorHandler(campData, headerRow)
   const excessFields = dataErrors.numOfFields()
-  if (excessFields) console.log(excessFields)
+  const invalidActivity = dataErrors.wrongActivity()
 });
 
 // Handle input via the pastebox

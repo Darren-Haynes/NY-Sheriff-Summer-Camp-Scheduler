@@ -1,3 +1,4 @@
+import { landActs } from "./activityNames"
 // Parse data inputted by user, and check input for errors.
 
 interface kidsMap {
@@ -52,6 +53,7 @@ export class DataErrorHandler {
         Misformatted data will cause bugs and troubles.
         */
     numOfFieldsError: string[];
+    activityError: string[];
     campData: string[][];
     headerRow: boolean;
 
@@ -59,6 +61,7 @@ export class DataErrorHandler {
         this.headerRow = header;
         this.campData = data;
         this.numOfFieldsError = []
+        this.activityError = []
     }
 
     numOfFields(): boolean {
@@ -69,6 +72,19 @@ export class DataErrorHandler {
             }
         }
         return this.numOfFieldsError.length !== 0;
+    }
+
+    wrongActivity(): boolean {
+        this.campData.forEach((row, rowNum) => {
+            for (let i = 3; i < 6; i++) {
+                if (!landActs.includes(row[i].toLowerCase())) {
+                    const rowNumOffset: number = this.headerRow ? rowNum + 2 : rowNum + 1;
+                    const errorMsg = `Row ${rowNumOffset}; column ${i} -- ${row[i]}`
+                    this.activityError.push(errorMsg)
+                }
+            }
+        });
+        return false
     }
 }
 
