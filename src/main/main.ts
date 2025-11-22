@@ -62,7 +62,7 @@ ipcMain.handle('submit-text', async (event, data) => {
   const dataErrors = new DataErrorHandler(campData, headerRow)
   const allErrors: boolean[] = [dataErrors.numOfFields(), dataErrors.wrongActivity()]
   if (!allErrors.every(item => item === false)) {
-    return (dataErrors.activityError)
+    return (dataErrors.getErrorList())
   }
 });
 

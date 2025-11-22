@@ -19,6 +19,11 @@ interface kidsDataType {
     water3: string;
 }
 
+interface errorData {
+    header: string;
+    errorList: string[]
+}
+
 export class KidsChoices {
     campData: string[][];
     kidsMap: Map<string, kidsMap>;
@@ -52,7 +57,9 @@ export class DataErrorHandler {
      * Misformatted data will cause bugs and troubles.
      */
     numOfFieldsError: string[];
+    fieldsErrorHeader: string;
     activityError: string[];
+    activityErrorHeader: string;
     campData: string[][];
     headerRow: boolean;
 
@@ -60,7 +67,9 @@ export class DataErrorHandler {
         this.headerRow = header;
         this.campData = data;
         this.numOfFieldsError = [];
+        this.fieldsErrorHeader = `The Following rows have too few or too many columns`
         this.activityError = [];
+        this.activityErrorHeader = `The Following Fields Contain Incorrect Activity Names`
     }
 
     numOfFields(): boolean {
@@ -102,6 +111,29 @@ export class DataErrorHandler {
             }
         });
         return this.activityError.length !== 0;
+    }
+    getErrorList(): errorData[] {
+        /**
+         * Return list of all errors found. Each list item is an object that contains
+         * a header that describes the type of error and then an enumerated list of
+         * all errors found for that category of error.
+         */
+        const errorList: errorData[] = []
+        if (this.numOfFieldsError.length !== 0) {
+            const fieldsObj: errorData = {
+                header: this.fieldsErrorHeader,
+                errorList: this.numOfFieldsError
+            }
+            errorList.push(fieldsObj)
+        }
+        if (this.activityError.length !== 0) {
+            const activityObj: errorData = {
+                header: this.activityErrorHeader,
+                errorList: this.activityError
+            }
+            errorList.push(activityObj)
+        }
+        return errorList
     }
 }
 
