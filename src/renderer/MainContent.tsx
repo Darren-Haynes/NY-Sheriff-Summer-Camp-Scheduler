@@ -1,12 +1,13 @@
-import React, { useState } from "react";
-import InputOptions from "./InputOptions";
-import PasteBox from "./PasteBox";
+import React, { useState } from 'react';
+import InputOptions from './InputOptions';
+import PasteBox from './PasteBox';
 
 export default function MainContent() {
-  const [showInputOptions, setShowInputOptions] = useState(true);
+  const [showInputOptions, setShowInputOptions] = useState('upload');
 
-  const handleToggle = () => {
-    setShowInputOptions((prev) => !prev);
+  // TODO: fix type error
+  const handleToggle = box => {
+    setShowInputOptions(box);
   };
 
   return (
@@ -15,11 +16,8 @@ export default function MainContent() {
         <div className="overlay">
           <div id="input-section">
             <div id="central-container">
-              <InputOptions
-                isVisible={showInputOptions}
-                onToggle={handleToggle}
-              />
-              <PasteBox isVisible={!showInputOptions} onToggle={handleToggle} />
+              <InputOptions isVisible={showInputOptions} onToggle={handleToggle} />
+              <PasteBox isVisible={showInputOptions} onToggle={handleToggle} />
             </div>
           </div>
         </div>

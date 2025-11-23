@@ -1,12 +1,12 @@
-import { submitTextboxContent, fileUpload } from "./ipcFunctions";
+import { submitTextboxContent, fileUpload } from './ipcFunctions';
 
 interface ToggleProps {
-  isVisible: boolean;
+  isVisible: string;
   onToggle: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 const PasteBox: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
-  if (!isVisible) {
+  if (isVisible !== 'paste') {
     return null;
   }
 
@@ -18,7 +18,8 @@ const PasteBox: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
 
       <div id="text-box-btns">
         <button
-          onClick={onToggle}
+          // TODO: fix type error
+          onClick={() => onToggle('upload')}
           type="button"
           id="close-btn"
           className="paste-box-btns fade-in-1s"
