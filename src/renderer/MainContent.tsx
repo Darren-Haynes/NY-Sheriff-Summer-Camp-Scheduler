@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import ErrorBox from './ErrorBox';
 import InputOptions from './InputOptions';
 import PasteBox from './PasteBox';
 
 export default function MainContent() {
-  const [showInputOptions, setShowInputOptions] = useState('upload');
+  const [showInputOptions, setShowInputOptions] = useState('error');
 
   // TODO: fix type error
   const handleToggle = box => {
@@ -18,6 +19,7 @@ export default function MainContent() {
             <div id="central-container">
               <InputOptions isVisible={showInputOptions} onToggle={handleToggle} />
               <PasteBox isVisible={showInputOptions} onToggle={handleToggle} />
+              <ErrorBox isVisible={showInputOptions} onToggle={handleToggle} />
             </div>
           </div>
         </div>
