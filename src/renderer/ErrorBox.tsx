@@ -9,16 +9,17 @@ const PasteBox: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
   }
 
   return (
-    <div id="input-box">
-      <div id="text-box-btns">
+    <div id="error-box">
+      <div id="error-box-btn">
+        <h3>Fix Data Errors:</h3>
         <button
           // TODO: fix type error
           onClick={() => onToggle('upload')}
           type="button"
-          id="close-btn"
+          id="close-btn-error"
           className="paste-box-btns fade-in-1s"
         >
-          Close ❌
+          ❌
         </button>
       </div>
     </div>
