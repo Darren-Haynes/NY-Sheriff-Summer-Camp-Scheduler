@@ -1,16 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ErrorBox from './ErrorBox';
 import InputOptions from './InputOptions';
 import PasteBox from './PasteBox';
 
 export default function MainContent() {
-  const [showInputOptions, setShowInputOptions] = useState('error');
+  const [showInputOptions, setShowInputOptions] = useState('upload');
+
+  useEffect(() => {
+    // Recieve errorData from Main
+    window.textAPI.send_error(errorData => {
+      setShowInputOptions('error');
+    });
+  });
 
   // TODO: fix type error
   const handleToggle = box => {
     setShowInputOptions(box);
   };
-
   return (
     <main>
       <div className="bg-image">
