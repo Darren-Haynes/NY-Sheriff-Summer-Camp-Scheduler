@@ -3,7 +3,7 @@ interface ToggleProps {
   onToggle: React.MouseEventHandler<HTMLButtonElement>;
 }
 
-const PasteBox: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
+const errorBox: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
   if (isVisible !== 'error') {
     return null;
   }
@@ -26,4 +26,4 @@ const PasteBox: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
   );
 };
 
-export default PasteBox;
+export default errorBox;
