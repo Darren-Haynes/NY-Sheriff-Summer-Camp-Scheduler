@@ -4,12 +4,12 @@ import InputOptions from './InputOptions';
 import PasteBox from './PasteBox';
 
 export default function MainContent() {
-  const [showInputOptions, setShowInputOptions] = useState('upload');
+  const [showInputOptions, setShowInputOptions] = useState('input-box');
 
   useEffect(() => {
     // Recieve errorData from Main
     window.textAPI.send_error(errorData => {
-      setShowInputOptions('error');
+      setShowInputOptions('error-box');
     });
   });
 

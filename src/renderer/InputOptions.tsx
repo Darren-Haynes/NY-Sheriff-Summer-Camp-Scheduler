@@ -9,7 +9,7 @@ interface ToggleProps {
 
 // TODO: fix type error
 const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
-  if (isVisible !== 'upload') {
+  if (isVisible !== 'input-box') {
     return null;
   }
 
@@ -32,7 +32,7 @@ const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
       <p className="fade-in-1-5s">or paste sheet content</p>
       <button
         // TODO: fix type error
-        onClick={() => onToggle('paste')}
+        onClick={() => onToggle('paste-box')}
         type="button"
         id="paste-btn"
         className="paste-btn-txt fade-in-2s"
