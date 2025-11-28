@@ -5,11 +5,13 @@ import PasteBox from './PasteBox';
 
 export default function MainContent() {
   const [showInputOptions, setShowInputOptions] = useState('input-box');
+  const [errorContent, setErrorContent] = useState([]);
 
   useEffect(() => {
     // Recieve errorData from Main
     window.textAPI.send_error(errorData => {
       setShowInputOptions('error-box');
+      setErrorContent(JSON.parse(errorData));
     });
   });
 
@@ -25,7 +27,11 @@ export default function MainContent() {
             <div id="central-container">
               <InputOptions isVisible={showInputOptions} onToggle={handleToggle} />
               <PasteBox isVisible={showInputOptions} onToggle={handleToggle} />
-              <ErrorBox isVisible={showInputOptions} onToggle={handleToggle} />
+              <ErrorBox
+                isVisible={showInputOptions}
+                onToggle={handleToggle}
+                errors={errorContent}
+              />
             </div>
           </div>
         </div>

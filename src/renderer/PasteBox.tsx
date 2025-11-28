@@ -1,5 +1,4 @@
 import { submitTextboxContent, fileUpload } from './ipcFunctions';
-import { MouseEvent } from 'react';
 
 interface ToggleProps {
   isVisible: string;
@@ -14,7 +13,7 @@ const PasteBox: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
   return (
     <div id="input-box">
       <div id="text-box" className="fade-in-1s">
-        <textarea id="textarea">Paste text here...</textarea>
+        <textarea id="paste-textarea">Paste text here...</textarea>
       </div>
 
       <div id="text-box-btns">
