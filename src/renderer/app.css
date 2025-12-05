@@ -1,66 +1,66 @@
 html {
-    height: 100vh;
+  height: 100vh;
 }
 
 body {
-    position: relative;
-    color: black;
-    height: 100vh;
-    background-color: #f6d25f;
-    font-family: sans-serif;
-    margin: 0;
+  position: relative;
+  color: black;
+  height: 100vh;
+  background-color: #f6d25f;
+  font-family: sans-serif;
+  margin: 0;
 }
 
 /*
 NAVBAR
 */
 #navbar {
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
 }
 
 .navbar-content {
-    background-color: white;
-    color: black;
-    border: 8px solid #bf272d;
-    border-left: 0px;
-    border-right: 0px;
-    margin-top: 80px;
-    width: 50vw;
-    height: 77.5px;
+  background-color: white;
+  color: black;
+  border: 8px solid #bf272d;
+  border-left: 0px;
+  border-right: 0px;
+  margin-top: 80px;
+  width: 50vw;
+  height: 77.5px;
 }
 
 h1 {
-    font-size: 28px;
-    height: 100%;
-    margin-top: 22px
+  font-size: 28px;
+  height: 100%;
+  margin-top: 22px;
 }
 
 #logo {
-    position: fixed;
-    left: calc(50vw - 99.5px);
+  position: fixed;
+  left: calc(50vw - 99.5px);
 }
 
 /*
 Main Background
 */
 main {
-    height: calc(100vh - 173.5px)
+  height: calc(100vh - 173.5px);
 }
 
 .bg-image {
-    background-image: url(../../assets/water-activity.jpg);
-    background-position: left center;
-    background-repeat: no-repeat;
-    height: calc(100vh - 173.5px);
-    z-index: -1;
+  background-image: url(../../assets/water-activity.jpg);
+  background-position: left center;
+  background-repeat: no-repeat;
+  height: calc(100vh - 173.5px);
+  z-index: -1;
 }
 
 .overlay {
-    height: calc(100vh - 173.5px);
-    background-color: rgba(0, 0, 0, 0.8);
-    display: flex
+  height: calc(100vh - 173.5px);
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
 }
 
 /*
@@ -68,102 +68,152 @@ Input Sections
 */
 
 #central-container {
-    position: fixed;
-    width: 100%;
-    left: 0;
-    top: 240px;
-    bottom: 25px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  position: fixed;
+  width: 100%;
+  left: 0;
+  top: 240px;
+  bottom: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #input-options {
-    background: linear-gradient(338deg, rgba(101, 165, 204, 0.8) 0%, rgba(0, 108, 120, 0.8) 50%, rgba(176, 193, 205, 1) 100%);
-    width: 500px;
-    min-height: 300px;
-    border-radius: 40px;
-    text-align: center;
-    color: white;
+  background: linear-gradient(
+    338deg,
+    rgba(101, 165, 204, 0.8) 0%,
+    rgba(0, 108, 120, 0.8) 50%,
+    rgba(176, 193, 205, 1) 100%
+  );
+  width: 500px;
+  min-height: 300px;
+  border-radius: 40px;
+  text-align: center;
+  color: white;
 }
 
-#input-options>p:first-child {
-    margin-top: 55px;
+#input-options > p:first-child {
+  margin-top: 55px;
 }
 
 #camp-sign {
-    margin-left: 20px;
+  margin-left: 20px;
 }
 
-#input-box {
-    background: linear-gradient(338deg, rgba(101, 165, 204, 0.8) 0%, rgba(0, 108, 120, 0.8) 50%, rgba(176, 193, 205, 1) 100%);
-    width: 75%;
-    max-width: 1000px;
-    height: 55vh;
-    border-radius: 40px;
-    border: 5px solid #f6d25f;
-    transition: width 1.0s ease-in-out;
-    display: flex;
-    margin-bottom: 5px;
+#input-box,
+#error-box {
+  background: linear-gradient(
+    338deg,
+    rgba(101, 165, 204, 0.8) 0%,
+    rgba(0, 108, 120, 0.8) 50%,
+    rgba(176, 193, 205, 1) 100%
+  );
+  width: 75%;
+  max-width: 1000px;
+  height: 55vh;
+  border-radius: 40px;
+  border: 5px solid #f6d25f;
+  transition: width 1s ease-in-out;
+  display: flex;
+  margin-bottom: 5px;
+}
+
+#error-box {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: #bf272d;
+  flex-direction: column;
+}
+
+#error-heading {
+  flex-grow: 3;
+  height: 10px;
+  margin-left: 35px;
+  margin-top: 28px;
+}
+
+#error-content {
+  margin-left: 35px;
+  height: 95%;
 }
 
 button {
-    background-color: rgba(246, 210, 95, 1);
-    color: rgba(0, 0, 0, 1);
-    margin-top: 0;
-    padding: 10px 20px;
-    width: 185px;
-    border-radius: 20px;
-    border: none;
-    appearance: none;
-    font-size: 1.3rem;
-    font-weight: 500;
-    cursor: pointer;
+  background-color: rgba(246, 210, 95, 1);
+  color: rgba(0, 0, 0, 1);
+  margin-top: 0;
+  padding: 10px 20px;
+  width: 185px;
+  border-radius: 20px;
+  border: none;
+  appearance: none;
+  font-size: 1.3rem;
+  font-weight: 500;
+  cursor: pointer;
 }
 
 button:hover {
-    transform: scale(1.05);
-    opacity: 1;
+  transform: scale(1.05);
+  opacity: 1;
 }
 
 #text-box {
-    box-sizing: border-box;
-    width: 75%;
+  box-sizing: border-box;
+  width: 75%;
 }
 
 #text-box-btns {
-    flex-direction: column;
-    width: 200px;
+  flex-direction: column;
+  width: 200px;
+}
+
+#error-box-btn {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
 }
 
 .paste-box-btns {
-    margin: 15px;
-    width: 145px;
+  margin: 15px;
+  width: 145px;
 }
 
 #close-btn {
-    margin-top: 55px;
-    background-color: rgb(231, 95, 95)
+  margin-top: 55px;
+  background-color: rgb(231, 95, 95);
 }
 
 #submit-btn {
-    background-color: rgb(34, 196, 34);
+  background-color: rgb(34, 196, 34);
 }
 
 #upload-btn-2 {
-    background-color: #f6d25f;
+  background-color: #f6d25f;
 }
 
-textarea {
-    width: 90%;
-    height: 49.5vh;
-    margin-left: 5%;
-    margin-top: 30px;
-    opacity: 0.5;
-    resize: none;
-    box-sizing: border-box;
-    border: 15px solid #fff;
-    border-radius: 8px;
+#close-btn-error {
+  background-color: transparent;
+  height: 50px;
+  margin-right: -30px;
+}
+
+#paste-textarea {
+  width: 90%;
+  height: 49.5vh;
+  margin-left: 5%;
+  margin-top: 30px;
+  opacity: 0.5;
+  resize: none;
+  box-sizing: border-box;
+  border: 15px solid #fff;
+  border-radius: 8px;
+}
+
+#error-textarea {
+  width: 95%;
+  height: inherit;
+  margin-top: -5px;
+  opacity: 0.5;
+  resize: none;
+  box-sizing: border-box;
 }
 
 /*
@@ -171,62 +221,62 @@ Input Box Transitions
 */
 
 .fade-in-05s {
-    animation-name: fade-in;
-    animation-duration: 0.5s;
+  animation-name: fade-in;
+  animation-duration: 0.5s;
 }
 
 .fade-in-1s {
-    animation-name: fade-in;
-    animation-duration: 1.0s;
+  animation-name: fade-in;
+  animation-duration: 1s;
 }
 
 .fade-in-1-5s {
-    animation-name: fade-in;
-    animation-duration: 1.5s;
+  animation-name: fade-in;
+  animation-duration: 1.5s;
 }
 
 .fade-in-2s {
-    animation-name: fade-in;
-    animation-duration: 2.0s;
+  animation-name: fade-in;
+  animation-duration: 2s;
 }
 
 .fade-in-3s {
-    animation-name: fade-in;
-    animation-duration: 3.0s;
+  animation-name: fade-in;
+  animation-duration: 3s;
 }
 
 .fade-in-5s {
-    animation-name: fade-in;
-    animation-duration: 5.0s;
+  animation-name: fade-in;
+  animation-duration: 5s;
 }
 
 @keyframes fade-in {
-    from {
-        opacity: 0.0;
-    }
+  from {
+    opacity: 0;
+  }
 
-    to {
-        opacity: 1.0;
-    }
+  to {
+    opacity: 1;
+  }
 }
 
 /*
 FOOTER
 */
 footer {
-    display: block;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    background-color: black;
-    color: white;
-    height: 25px;
-    width: 100%;
-    text-align: center;
+  display: block;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  background-color: black;
+  color: white;
+  height: 25px;
+  width: 100%;
+  text-align: center;
 }
 
-footer>p {
-    position: relative;
-    font-size: 14px;
-    top: -10px
+footer > p {
+  position: relative;
+  font-size: 14px;
+  top: -10px;
 }

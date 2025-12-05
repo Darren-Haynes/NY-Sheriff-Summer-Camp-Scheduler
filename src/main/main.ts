@@ -28,43 +28,42 @@ const createWindow = (): void => {
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
+  // Open file Dialog for user to pick file.
+  ipcMain.handle('open-file-dialog', async () => {
+    const result = await dialog.showOpenDialog({
+      properties: ['openFile'],
+      filters: [{ name: 'Sheets', extensions: ['xlsx'] }],
+    });
+
+    const workbook = new Excel.Workbook();
+    await workbook.xlsx.readFile(result.filePaths[0]);
+    let data = '';
+    workbook.worksheets[0].eachRow({ includeEmpty: true }, function (row) {
+      let s = JSON.stringify(row.values);
+      s = s.replace(/\[null,"|"\]/g, '');
+      s = s.replace(/","|",|,"/g, '\t');
+      data += s + '\n';
+    });
+    const { campData, headerRow } = dataParser(data);
+    const dataErrors = new DataErrorHandler(campData, headerRow);
+    const allErrors: boolean[] = [dataErrors.numOfFields(), dataErrors.wrongActivity()];
+    if (!allErrors.every(item => item === false)) {
+      mainWindow.webContents.send('error-list', JSON.stringify(dataErrors.getErrorList()));
+    }
+  });
+
+  // Handle input via the pastebox
+  ipcMain.handle('submit-text', async (event, data) => {
+    const { campData, headerRow } = dataParser(data);
+    const dataErrors = new DataErrorHandler(campData, headerRow);
+    const allErrors: boolean[] = [dataErrors.numOfFields(), dataErrors.wrongActivity()];
+    if (!allErrors.every(item => item === false)) {
+      mainWindow.webContents.send('error-list', JSON.stringify(dataErrors.getErrorList()));
+    }
+  });
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
 };
-
-// Open file Dialog for user to pick file.
-ipcMain.handle('open-file-dialog', async () => {
-  const result = await dialog.showOpenDialog({
-    properties: ['openFile'],
-    filters: [{ name: 'Sheets', extensions: ['xlsx'] }],
-  });
-
-  const workbook = new Excel.Workbook();
-  await workbook.xlsx.readFile(result.filePaths[0]);
-  let data = '';
-  workbook.worksheets[0].eachRow({ includeEmpty: true }, function (row) {
-    let s = JSON.stringify(row.values);
-    s = s.replace(/\[null,"|"\]/g, '');
-    s = s.replace(/","|",|,"/g, '\t');
-    data += s + '\n';
-  });
-  const { campData, headerRow } = dataParser(data);
-  const dataErrors = new DataErrorHandler(campData, headerRow)
-  const allErrors: boolean[] = [dataErrors.numOfFields(), dataErrors.wrongActivity()]
-  if (!allErrors.every(item => item === false)) {
-    return (dataErrors.activityError)
-  }
-});
-
-// Handle input via the pastebox
-ipcMain.handle('submit-text', async (event, data) => {
-  const { campData, headerRow } = dataParser(data);
-  const dataErrors = new DataErrorHandler(campData, headerRow)
-  const allErrors: boolean[] = [dataErrors.numOfFields(), dataErrors.wrongActivity()]
-  if (!allErrors.every(item => item === false)) {
-    return (dataErrors.getErrorList())
-  }
-});
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
