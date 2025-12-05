@@ -80,7 +80,7 @@ export class DataErrorHandler {
       //TODO: Add info to user which cells are in excess of 9 in a row
       if (this.campData[i].length != 9) {
         let s = JSON.stringify(this.campData[i]);
-        s = this.campData[i].join(',').replace(/[\[]?null/g, 'Empty Cell');
+        s = this.campData[i].join(',').replace(/[[]?null/g, 'Empty Cell');
         this.numOfFieldsError.push(`Line ${i + 2}: ${s}`);
       }
     }
@@ -141,8 +141,12 @@ export class DataErrorHandler {
 
 export function dataParser(data: string) {
   let header = false;
-  const lines: string[] = data.split('\n');
+  const trimTrailing = data.replace(/[ \t\f\v]+$/g, '');
+  const lines: string[] = trimTrailing.split('\n');
   if (lines[0].includes('Last Name')) {
+    lines.forEach((line, index) => {
+      console.log(line);
+    });
     lines.shift();
     header = true;
   }
