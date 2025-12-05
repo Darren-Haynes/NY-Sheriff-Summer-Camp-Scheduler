@@ -1,25 +1,37 @@
-import React, { useState } from "react";
-import InputOptions from "./InputOptions";
-import PasteBox from "./PasteBox";
+import React, { useEffect, useState } from 'react';
+import ErrorBox from './ErrorBox';
+import InputOptions from './InputOptions';
+import PasteBox from './PasteBox';
 
 export default function MainContent() {
-  const [showInputOptions, setShowInputOptions] = useState(true);
+  const [showInputOptions, setShowInputOptions] = useState('input-box');
+  const [errorContent, setErrorContent] = useState([]);
 
-  const handleToggle = () => {
-    setShowInputOptions((prev) => !prev);
+  useEffect(() => {
+    // Recieve errorData from Main
+    window.textAPI.send_error(errorData => {
+      setShowInputOptions('error-box');
+      setErrorContent(JSON.parse(errorData));
+    });
+  });
+
+  // TODO: fix type error
+  const handleToggle = box => {
+    setShowInputOptions(box);
   };
-
   return (
     <main>
       <div className="bg-image">
         <div className="overlay">
           <div id="input-section">
             <div id="central-container">
-              <InputOptions
+              <InputOptions isVisible={showInputOptions} onToggle={handleToggle} />
+              <PasteBox isVisible={showInputOptions} onToggle={handleToggle} />
+              <ErrorBox
                 isVisible={showInputOptions}
                 onToggle={handleToggle}
+                errors={errorContent}
               />
-              <PasteBox isVisible={!showInputOptions} onToggle={handleToggle} />
             </div>
           </div>
         </div>

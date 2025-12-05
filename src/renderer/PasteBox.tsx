@@ -1,24 +1,24 @@
-import { submitTextboxContent, fileUpload } from "./ipcFunctions";
+import { submitTextboxContent, fileUpload } from './ipcFunctions';
 
 interface ToggleProps {
-  isVisible: boolean;
+  isVisible: string;
   onToggle: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 const PasteBox: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
-  if (!isVisible) {
+  if (isVisible !== 'paste-box') {
     return null;
   }
 
   return (
     <div id="input-box">
       <div id="text-box" className="fade-in-1s">
-        <textarea id="textarea">Paste text here...</textarea>
+        <textarea id="paste-textarea">Paste text here...</textarea>
       </div>
 
       <div id="text-box-btns">
         <button
-          onClick={onToggle}
+          onClick={() => onToggle('input-options')}
           type="button"
           id="close-btn"
           className="paste-box-btns fade-in-1s"
