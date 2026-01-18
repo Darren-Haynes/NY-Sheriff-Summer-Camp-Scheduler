@@ -52,7 +52,6 @@ const createWindow = (): void => {
       mainWindow.webContents.send('error-list', JSON.stringify(dataErrors.getErrorList()));
     } else {
       const scheduler = new Scheduler(data);
-      scheduler.parseData();
     }
   });
 
