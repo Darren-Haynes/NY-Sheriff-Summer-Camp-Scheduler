@@ -1,5 +1,4 @@
-import { landActs, waterActs } from './activityNames';
-// Parse data inputted by user, and check input for errors.
+import { landActs, waterActs } from './activities';
 
 interface kidsMap {
   land1: string;
