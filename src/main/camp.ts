@@ -1,4 +1,29 @@
-import { landActs, waterActs } from './activities';
+import { landActs, landRanges, waterActs, waterRanges } from './activities';
+
+type LandRanges = {
+  bball: Array<number>;
+  vball: Array<number>;
+  soc: Array<number>;
+  arch: Array<number>;
+  art: Array<number>;
+  hike: Array<number>;
+  cheer: Array<number>;
+  pball: Array<number>;
+  lax: Array<number>;
+  fball: Array<number>;
+  yoga: Array<number>;
+  fris: Array<number>;
+};
+
+type WaterRanges = {
+  swim: Array<number>;
+  fish: Array<number>;
+  canoe: Array<number>;
+  snork: Array<number>;
+  sail: Array<number>;
+  pboard: Array<number>;
+  kayak: Array<number>;
+};
 
 /**
 Camp class contains the core data for running the NY Sherrif's Summer Camp
@@ -9,6 +34,9 @@ export default class Camp {
   col: Array<string>;
   landActs: Array<string>;
   waterActs: Array<string>;
+  landRanges: LandRanges;
+  waterRanges: WaterRanges;
+
   kids: Map<
     string,
     {
@@ -38,6 +66,8 @@ export default class Camp {
     this.createKidsMap();
     this.landActs = landActs;
     this.waterActs = waterActs;
+    this.landRanges = landRanges;
+    this.waterRanges = waterRanges;
   }
 
   /**
