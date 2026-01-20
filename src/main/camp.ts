@@ -1,3 +1,5 @@
+import { landActs, waterActs } from './activities';
+
 /**
 Camp class contains the core data for running the NY Sherrif's Summer Camp
 */
@@ -5,6 +7,8 @@ export default class Camp {
   inputData: string;
   inputDataArr: Array<string>;
   col: Array<string>;
+  landActs: Array<string>;
+  waterActs: Array<string>;
   kids: Map<
     string,
     {
@@ -32,6 +36,8 @@ export default class Camp {
     this.inputData = inputData;
     this.kids = new Map();
     this.createKidsMap();
+    this.landActs = landActs;
+    this.waterActs = waterActs;
   }
 
   /**
