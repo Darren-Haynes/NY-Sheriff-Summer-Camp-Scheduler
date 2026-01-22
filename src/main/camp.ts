@@ -1,17 +1,21 @@
 import { landActs, landRanges, waterActs, waterRanges } from './activities';
-import { LandRanges, WaterRanges } from '../types/camp-types';
+import { CampActivities } from '../types/camp-types';
 
 /**
 Camp class contains the core data for running the NY Sherrif's Summer Camp
 */
-export default class Camp {
+
+export const Camp: CampActivities = {
+  waterActs: waterActs,
+  landRanges: landRanges,
+  waterRanges: waterRanges,
+  landActs: landActs,
+};
+
+export class Kids {
   inputData: string;
   inputDataArr: Array<string>;
   col: Array<string>;
-  landActs: Array<string>;
-  waterActs: Array<string>;
-  landRanges: LandRanges;
-  waterRanges: WaterRanges;
 
   kids: Map<
     string,
@@ -37,13 +41,9 @@ export default class Camp {
    * @param inputData a string of all the Kids choices
    */
   constructor(inputData: string) {
-    this.inputData = inputData;
     this.kids = new Map();
+    this.inputData = inputData;
     this.createKidsMap();
-    this.landActs = landActs;
-    this.waterActs = waterActs;
-    this.landRanges = landRanges;
-    this.waterRanges = waterRanges;
   }
 
   /**
