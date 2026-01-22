@@ -1,29 +1,5 @@
 import { landActs, landRanges, waterActs, waterRanges } from './activities';
-
-type LandRanges = {
-  bball: Array<number>;
-  vball: Array<number>;
-  soc: Array<number>;
-  arch: Array<number>;
-  art: Array<number>;
-  hike: Array<number>;
-  cheer: Array<number>;
-  pball: Array<number>;
-  lax: Array<number>;
-  fball: Array<number>;
-  yoga: Array<number>;
-  fris: Array<number>;
-};
-
-type WaterRanges = {
-  swim: Array<number>;
-  fish: Array<number>;
-  canoe: Array<number>;
-  snork: Array<number>;
-  sail: Array<number>;
-  pboard: Array<number>;
-  kayak: Array<number>;
-};
+import { LandRanges, WaterRanges } from '../types/camp-types';
 
 /**
 Camp class contains the core data for running the NY Sherrif's Summer Camp
@@ -97,5 +73,24 @@ export default class Camp {
       });
     });
     return;
+  }
+
+  private countChoices(): void {
+    this.kids.forEach(kid => {
+      const choices = kid.choices;
+      const timeSlots = kid.timeSlots;
+      const landChoices = [choices.land1, choices.land2, choices.land3];
+      const waterChoices = [choices.water1, choices.water2, choices.water3];
+      const landCounts = landChoices.reduce((acc, choice) => {
+        if (choice === 'Y') return acc + 1;
+        return acc;
+      }, 0);
+      const waterCounts = waterChoices.reduce((acc, choice) => {
+        if (choice === 'Y') return acc + 1;
+        return acc;
+      }, 0);
+      timeSlots.nineAM = landCounts > 0 ? 'Y' : 'N';
+      timeSlots.tenAM = waterCounts > 0 ? 'Y' : 'N';
+    });
   }
 }
