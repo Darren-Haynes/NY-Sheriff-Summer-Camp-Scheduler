@@ -1,31 +1,9 @@
 import { landActs, waterActs } from './activities';
-
-interface kidsMap {
-  land1: string;
-  land2: string;
-  land3: string;
-  water1: string;
-  water2: string;
-  water3: string;
-}
-
-interface kidsDataType {
-  land1: string;
-  land2: string;
-  land3: string;
-  water1: string;
-  water2: string;
-  water3: string;
-}
-
-interface errorData {
-  header: string;
-  errorList: string[];
-}
+import { KidsMap, KidsDataType, ErrorData } from '../types/dataInput-types';
 
 export class KidsChoices {
   campData: string[][];
-  kidsMap: Map<string, kidsMap>;
+  kidsMap: Map<string, KidsMap>;
   headerRow: boolean;
 
   constructor(data: string[][], header: boolean) {
@@ -37,7 +15,7 @@ export class KidsChoices {
 
   createKidsMap(): void {
     this.campData.forEach(line => {
-      const kidData: kidsDataType = {
+      const kidData: KidsDataType = {
         land1: line[3],
         land2: line[4],
         land3: line[5],
@@ -113,22 +91,22 @@ export class DataErrorHandler {
     });
     return this.activityError.length !== 0;
   }
-  getErrorList(): errorData[] {
+  getErrorList(): ErrorData[] {
     /**
      * Return list of all errors found. Each list item is an object that contains
      * a header that describes the type of error and then an enumerated list of
      * all errors found for that category of error.
      */
-    const errorList: errorData[] = [];
+    const errorList: ErrorData[] = [];
     if (this.numOfFieldsError.length !== 0) {
-      const fieldsObj: errorData = {
+      const fieldsObj: ErrorData = {
         header: this.fieldsErrorHeader.toUpperCase(),
         errorList: this.numOfFieldsError,
       };
       errorList.push(fieldsObj);
     }
     if (this.activityError.length !== 0) {
-      const activityObj: errorData = {
+      const activityObj: ErrorData = {
         header: this.activityErrorHeader.toUpperCase(),
         errorList: this.activityError,
       };
