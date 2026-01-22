@@ -1,3 +1,10 @@
+export type CampActivities = {
+  waterActs: Array<string>;
+  landRanges: LandRanges;
+  waterRanges: WaterRanges;
+  landActs: Array<string>;
+};
+
 export type LandRanges = {
   bball: Array<number>;
   vball: Array<number>;
