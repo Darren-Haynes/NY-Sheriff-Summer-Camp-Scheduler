@@ -1,4 +1,4 @@
-import { landActs, waterActs } from './activities';
+import { Camp } from './camp';
 import { KidsMap, KidsDataType, ErrorData } from '../types/dataInput-types';
 
 export class KidsChoices {
@@ -82,11 +82,11 @@ export class DataErrorHandler {
     this.campData.forEach((row, rowNum) => {
       // First check for incorrect land activities
       for (let i = 3; i < 6; i++) {
-        this.#wrongActivity(landActs, rowNum, i, row);
+        this.#wrongActivity(Camp.landActs, rowNum, i, row);
       }
       // Then check for incorrect water activities
       for (let i = 6; i < 9; i++) {
-        this.#wrongActivity(waterActs, rowNum, i, row);
+        this.#wrongActivity(Camp.waterActs, rowNum, i, row);
       }
     });
     return this.activityError.length !== 0;
