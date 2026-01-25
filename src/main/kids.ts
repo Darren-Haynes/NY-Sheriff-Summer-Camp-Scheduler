@@ -44,6 +44,7 @@ export class Kids {
   private createKidsMap(): void {
     const inputDataArr = this.inputData.split('\n');
     inputDataArr.pop(); // remove last empty line
+    inputDataArr.shift(); // remove spreadsheet header
     inputDataArr.forEach((line: string) => {
       const col = line.split('\t');
       const name = col[0] + ' ' + col[1];
