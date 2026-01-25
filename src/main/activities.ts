@@ -22,9 +22,9 @@ export const Activities: CampActivities = Object.freeze({
 
   /*
    Land activities people ranges and time slots offered.
-   // tuple[0] min of num of people per land activity
-   // tuple[1] max of num of people per land activity
-   // tuple[2] 0 = 9am only, 1 = 10am only, 2 = 9am & 10am activities
+   // array[0] min of num of people per land activity
+   // array[1] max of num of people per land activity
+   // array[2] 0 = 9am only, 1 = 10am only, 2 = 9am & 10am activities
 */
 
   landRanges: {
@@ -44,17 +44,19 @@ export const Activities: CampActivities = Object.freeze({
 
   /*
   Water activities people ranges and time slots offered.
-  // tuple[0] min of num of people per water activity
-  // tuple[1] max of num of people per water activity
-  // tuple[2] 0 = 9am only, 1 = 10am only, 2 = 9am & 10am activities
+  // array[0] min of num of people per water activity
+  // array[1] max of num of people per water activity
+  // array[2] 0 = 9am only, 1 = 10am only, 2 = 9am & 10am activities
+  // array[3] Double the minimum num of people per activity
+  // array[4] Double the maximum num of people per activity
 */
   waterRanges: {
-    swim: [6, 16, 2],
-    fish: [4, 7, 2],
-    canoe: [6, 10, 2],
-    snork: [4, 8, 2],
-    sail: [6, 16, 2],
-    pboard: [4, 8, 2],
-    kayak: [6, 8, 2],
+    swim: [6, 16, 2, 12, 32],
+    fish: [4, 7, 2, 8, 14],
+    canoe: [6, 10, 2, 12, 20],
+    snork: [4, 8, 2, 8, 16],
+    sail: [6, 16, 2, 12, 32],
+    pboard: [4, 8, 2, 8, 16],
+    kayak: [6, 8, 2, 12, 16],
   },
 });
