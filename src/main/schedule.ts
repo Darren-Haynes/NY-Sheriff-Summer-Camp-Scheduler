@@ -12,6 +12,7 @@ export class Schedule {
   algo: string;
 
   private static readonly ALGOS: string[] = ['waterFirst'];
+  private static readonly LANDWATER: string[] = ['water', 'land'];
 
   constructor(inputData: string, algo: string) {
     if (!Schedule.ALGOS.includes(algo)) {
@@ -31,23 +32,12 @@ export class Schedule {
     return choicesCount;
   }
 
-  private countActivityChoices(activityType, numOfChoices) {
-    if (typeof numOfChoices === 'number' && numOfChoices % 1 !== 0) {
-      throw new Error('Only an integers with range of 1 to 3 permitted');
-    }
-    if (numOfChoices > 3 || numOfChoices < 1) {
-      throw new Error(`${numOfChoices} is outside the allowed range 1 to 3.`);
-    }
-
-    if (!['land', 'water'].includes(activityType)) {
-      throw new Error("'land' and 'water' are the only acccepted keyword arguments");
-    }
-
+  private countActivityChoices(activityType: string, numOfChoices: number) {
+    this.choicesAndActivityValueChecks(numOfChoices, activityType);
     let kidsChoices: string[] = ['land1', 'land2', 'land3'];
     if (activityType === 'water') {
       kidsChoices = ['water1', 'water2', 'water3'];
     }
-
     const activitiesChoicesCount = this.activityTemplate();
     for (let i = 0; i < numOfChoices; i++) {
       this.notScheduled.forEach(kid => {
@@ -61,8 +51,21 @@ export class Schedule {
     return activitiesChoicesCount;
   }
 
+  private choicesAndActivityValueChecks(numOfChoices: number, activityType: string): void {
+    if (typeof numOfChoices === 'number' && numOfChoices % 1 !== 0) {
+      throw new Error('Only an integers with range of 1 to 3 permitted');
+    }
+    if (numOfChoices > 3 || numOfChoices < 1) {
+      throw new Error(`${numOfChoices} is outside the allowed range 1 to 3.`);
+    }
+    if (!Schedule.LANDWATER.includes(activityType)) {
+      throw new Error("'land' and 'water' are the only acccepted keyword arguments");
+    }
+  }
+
   private getDoubleMax({ activityType = 'land', numOfChoices = 1 }: ActivityArgs): string[] {
-    const countedChoices = this.countActivityChoices('water', 1);
+    this.choicesAndActivityValueChecks(numOfChoices, activityType);
+    const countedChoices = this.countActivityChoices(activityType, numOfChoices);
     const aboveDoubleMax: string[] = [];
     for (const [activity, range] of Object.entries(Activities.waterRanges)) {
       if (countedChoices.get(activity) > range[4]) {
