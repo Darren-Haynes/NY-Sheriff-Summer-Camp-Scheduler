@@ -52,6 +52,8 @@ const createWindow = (): void => {
       mainWindow.webContents.send('error-list', JSON.stringify(dataErrors.getErrorList()));
     } else {
       const camp = new Camp(data);
+      const result = camp.waterFirst.runAlgo();
+      console.log(result);
     }
   });
 

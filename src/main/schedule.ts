@@ -9,9 +9,16 @@ export class Schedule {
   inputData: string;
   kids: Kids;
   notScheduled: Array<string>;
+  algo: string;
 
-  constructor(inputData: string) {
+  private static readonly ALGOS: string[] = ['waterFirst'];
+
+  constructor(inputData: string, algo: string) {
+    if (!Schedule.ALGOS.includes(algo)) {
+      throw new Error(`${algo} is not a supported Camp Scheduler algorithm`);
+    }
     this.inputData = inputData;
+    this.algo = algo;
     this.kids = new Kids(this.inputData);
     this.notScheduled = this.kids.names;
   }
@@ -24,10 +31,7 @@ export class Schedule {
     return choicesCount;
   }
 
-  private countActivityChoices({
-    activityType = 'land',
-    numOfChoices = 1,
-  }: ActivityArgs): Map<string, number> {
+  private countActivityChoices(activityType, numOfChoices) {
     if (typeof numOfChoices === 'number' && numOfChoices % 1 !== 0) {
       throw new Error('Only an integers with range of 1 to 3 permitted');
     }
@@ -57,9 +61,8 @@ export class Schedule {
     return activitiesChoicesCount;
   }
 
-  getDoubleMax(): string[] {
-    const countedChoices = this.countActivityChoices({ activityType: 'water' });
-    console.log(countedChoices);
+  private getDoubleMax({ activityType = 'land', numOfChoices = 1 }: ActivityArgs): string[] {
+    const countedChoices = this.countActivityChoices('water', 1);
     const aboveDoubleMax: string[] = [];
     for (const [activity, range] of Object.entries(Activities.waterRanges)) {
       if (countedChoices.get(activity) > range[4]) {
@@ -67,5 +70,13 @@ export class Schedule {
       }
     }
     return aboveDoubleMax;
+  }
+
+  runAlgo(): string {
+    console.log(`${this.algo} algorithm initiated`);
+    const doubleMax1Activities: string[] = this.getDoubleMax({
+      activityType: 'water',
+    });
+    return doubleMax1Activities.toString();
   }
 }

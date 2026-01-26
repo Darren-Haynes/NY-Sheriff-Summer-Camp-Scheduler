@@ -5,6 +5,6 @@ export class Camp {
   waterFirst: Schedule;
 
   constructor(inputData: string) {
-    this.waterFirst = new Schedule(inputData);
+    this.waterFirst = new Schedule(inputData, 'waterFirst');
   }
 }
