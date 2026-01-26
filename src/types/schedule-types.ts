@@ -1,4 +1,4 @@
 export interface ActivityArgs {
-  activityType: string;
+  activityType?: string;
   numOfChoices?: number;
 }
