@@ -1,3 +1,5 @@
+import { KidsData } from '../types/kids-types';
+
 /**
 Kids class contains the key data for each of the kids in the camp
 */
@@ -6,25 +8,26 @@ export class Kids {
   inputDataArr: Array<string>;
   col: Array<string>;
   names: Array<string>;
+  data: KidsData;
 
-  data: Map<
-    string,
-    {
-      choices: {
-        land1: string;
-        land2: string;
-        land3: string;
-        water1: string;
-        water2: string;
-        water3: string;
-      };
-      timeSlots: {
-        land9am: boolean | null;
-        nineAM: string | null;
-        tenAM: string | null;
-      };
-    }
-  >;
+  // data: Map<
+  //   string,
+  //   {
+  //     choices: {
+  //       land1: string;
+  //       land2: string;
+  //       land3: string;
+  //       water1: string;
+  //       water2: string;
+  //       water3: string;
+  //     };
+  //     timeSlots: {
+  //       land9am: boolean | null;
+  //       nineAM: string | null;
+  //       tenAM: string | null;
+  //     };
+  //   }
+  // >;
 
   /**
    *
