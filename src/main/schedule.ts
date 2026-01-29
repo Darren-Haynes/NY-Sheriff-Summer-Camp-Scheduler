@@ -1,6 +1,7 @@
 import { Kids } from './kids';
 import { Activities } from './activities';
 import { ActivityArgs } from '../types/schedule-types';
+import { WaterKids } from '../types/camp-types';
 
 /**
 Main class that schedules the kids to activities.
@@ -10,6 +11,8 @@ export class Schedule {
   kids: Kids;
   notScheduled: Array<string>;
   algo: string;
+  water9am: WaterKids;
+  water10am: WaterKids;
 
   private static readonly ALGOS: string[] = ['waterFirst'];
   private static readonly LANDWATER: string[] = ['water', 'land'];
@@ -22,6 +25,8 @@ export class Schedule {
     this.algo = algo;
     this.kids = new Kids(this.inputData);
     this.notScheduled = this.kids.names;
+    this.water9am = Activities.water9am;
+    this.water10am = Activities.water10am;
   }
 
   /**
@@ -66,8 +71,6 @@ export class Schedule {
         activitiesChoicesCount.set(activity, newActivityCount);
       });
     }
-    console.log('ALright butty');
-    console.log(activitiesChoicesCount);
     return activitiesChoicesCount;
   }
 
@@ -115,10 +118,9 @@ export class Schedule {
    * Establishes with choice to count out of 6 options: land1, land2, land3, water1, water2, water3
    * @param {string} activity- land or water activity such as 'canoe', 'swim', 'fball' ...
    * @param {string} activityType - only 2 options: 'land' or 'water'.
-   * @param {number} ChoiceNum - land or water choice 1, 2 or 3
+   * @param {number} ChoiceNum - kids land or water choice 1st, 2nd or 3rd
    * @returns {string[]} - Array of kids names who chose the activity
    */
-
   private getKidsbyActivityChoice(
     activity: string,
     activityType: string,
@@ -135,14 +137,38 @@ export class Schedule {
     return matchedKids;
   }
 
+  /**
+   * Get random selection of elements from an Array.
+   * @param {string[]} arr - the Array to take a random selection from
+   * @param {number} numOfItems - the total number of random elements to return
+   * @returns {string[]} - the Array of random selected elements
+   */
+  private randomChoices(arr: string[], numOfItems: number): string[] {
+    if (numOfItems > arr.length) {
+      throw new Error('Random choice selection cannot be greater than list length.');
+    }
+    const randomSort = arr.sort(() => Math.random() - 0.5);
+    return randomSort.slice(0, numOfItems);
+  }
+
+  /**
+   * Add Kids to the schedule for activities that more kids have chosen than there are timeslots.
+   * @param {string[]} doubleMaxActivities - The actvities that more kids have chosen than there are timeslots.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {number} ChoiceNum - kids land or water choice 1st, 2nd or 3rd
+   * @returns {void}
+   */
   private scheduleDoubleMaxActivities(
     doubleMaxActivities: string[],
     activityType: string,
     choiceNum: number
   ): void {
-    console.log(doubleMaxActivities);
     doubleMaxActivities.forEach(activity => {
       const kidsByActivityChoice = this.getKidsbyActivityChoice(activity, activityType, choiceNum);
+      const activityMax = Activities.waterRanges[activity][1];
+      const randomKids = this.randomChoices(kidsByActivityChoice, activityMax * 2);
+      this.water9am[activity] = randomKids.slice(0, activityMax);
+      this.water10am[activity] = randomKids.slice(activityMax);
     });
   }
 
@@ -153,7 +179,6 @@ export class Schedule {
    * @param {number} numOfChoices - num of choices to count: 1, 2 or 3
    * @returns {string[]} - returns list of activities: "['fish', 'canoe',...]"
    */
-
   private getDoubleMaxActivities({
     activityType = 'land',
     numOfChoices = 1,
@@ -166,15 +191,15 @@ export class Schedule {
         activitiesAboveDoubleMax.push(activity);
       }
     }
-    this.scheduleDoubleMaxActivities(activitiesAboveDoubleMax, activityType, numOfChoices);
     return activitiesAboveDoubleMax;
   }
 
   runAlgo(): string {
     console.log(`${this.algo} algorithm initiated`);
-    const doubleMax1Activities: string[] = this.getDoubleMaxActivities({
+    const activitiesAboveDoubleMax: string[] = this.getDoubleMaxActivities({
       activityType: 'water',
     });
-    return doubleMax1Activities.toString();
+    this.scheduleDoubleMaxActivities(activitiesAboveDoubleMax, 'water', 1);
+    return activitiesAboveDoubleMax.toString();
   }
 }

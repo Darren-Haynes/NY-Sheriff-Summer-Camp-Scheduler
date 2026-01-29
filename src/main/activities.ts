@@ -19,6 +19,8 @@ export const Activities: CampActivities = Object.freeze({
 
   // Shortened names of all the water activities offered.
   waterActs: ['swim', 'fish', 'canoe', 'snork', 'sail', 'pboard', 'kayak'],
+  water9am: { swim: [], fish: [], canoe: [], snork: [], sail: [], pboard: [], kayak: [] },
+  water10am: { swim: [], fish: [], canoe: [], snork: [], sail: [], pboard: [], kayak: [] },
 
   /*
    Land activities people ranges and time slots offered.
