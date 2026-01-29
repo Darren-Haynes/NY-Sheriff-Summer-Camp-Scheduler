@@ -1,8 +1,10 @@
 export type CampActivities = {
+  landActs: Array<string>;
   waterActs: Array<string>;
+  water9am: WaterKids;
+  water10am: WaterKids;
   landRanges: LandRanges;
   waterRanges: WaterRanges;
-  landActs: Array<string>;
 };
 
 export type LandRanges = {
@@ -28,4 +30,14 @@ export type WaterRanges = {
   sail: Array<number>;
   pboard: Array<number>;
   kayak: Array<number>;
+};
+
+export type WaterKids = {
+  swim: Array<string>;
+  fish: Array<string>;
+  canoe: Array<string>;
+  snork: Array<string>;
+  sail: Array<string>;
+  pboard: Array<string>;
+  kayak: Array<string>;
 };
