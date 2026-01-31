@@ -10,25 +10,6 @@ export class Kids {
   names: Array<string>;
   data: KidsData;
 
-  // data: Map<
-  //   string,
-  //   {
-  //     choices: {
-  //       land1: string;
-  //       land2: string;
-  //       land3: string;
-  //       water1: string;
-  //       water2: string;
-  //       water3: string;
-  //     };
-  //     timeSlots: {
-  //       land9am: boolean | null;
-  //       nineAM: string | null;
-  //       tenAM: string | null;
-  //     };
-  //   }
-  // >;
-
   /**
    *
    * @param inputData a string of all the Kids choices
