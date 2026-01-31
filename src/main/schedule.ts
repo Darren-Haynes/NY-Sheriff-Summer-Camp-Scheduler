@@ -1,6 +1,12 @@
 import { Kids } from './kids';
 import { Activities } from './activities';
-import { ActivityArgs, NotScheduled, AllowedTimes } from '../types/schedule-types';
+import {
+  NotScheduled,
+  AllowedTimes,
+  AllowedActTypes,
+  AllowedChoices,
+  AllowedMaxMin,
+} from '../types/schedule-types';
 import { LandKidsAM, LandKidsPM, WaterKids } from '../types/camp-types';
 
 /**
@@ -55,7 +61,7 @@ export class Schedule {
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @returns {Map} - e.g for water activities: {'swim': 0, 'fish': 0, ...}
    */
-  private activityTemplate(activityType: string): Map<string, number> {
+  private activityTemplate(activityType: AllowedActTypes): Map<string, number> {
     const choicesCount = new Map<string, number>();
     if (activityType === 'land') {
       const allNotScheduledLandActivities = this.notScheduled9am.landActivities.concat(
@@ -79,14 +85,14 @@ export class Schedule {
     }
     return choicesCount;
   }
+
   /**
    * Counts how many times kids have chosen a specfic activity.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {number} numOfChoices - num of choices to count between 1 - 3.
    * @returns {Map} - e.g {'swim': 39, 'fish': 9, ...} how many kids chose each activity
    */
-  private countActivityChoices(activityType: string, numOfChoices: number) {
-    this.choicesAndActivityValueChecks(numOfChoices, activityType);
+  private countActivityChoices(activityType: AllowedActTypes, numOfChoices: AllowedChoices) {
     let kidsChoices: [string, string, string] = ['land1', 'land2', 'land3'];
     if (activityType === 'water') {
       kidsChoices = ['water1', 'water2', 'water3'];
@@ -103,25 +109,6 @@ export class Schedule {
       });
     }
     return activitiesChoicesCount;
-  }
-
-  /**
-   * Checks for valid activity type and that choice are in the correct range 1-3
-   * Throws error if checks fail.
-   * @param {string} activityType - only 2 options: 'land' or 'water'.
-   * @param {number} numOfChoices - num of choices to count between 1 - 3.
-   * @returns void
-   */
-  private choicesAndActivityValueChecks(numOfChoices: number, activityType: string): void {
-    if (typeof numOfChoices === 'number' && numOfChoices % 1 !== 0) {
-      throw new Error('Only an integers with range of 1 to 3 permitted');
-    }
-    if (numOfChoices > 3 || numOfChoices < 1) {
-      throw new Error(`${numOfChoices} is outside the allowed range 1 to 3.`);
-    }
-    if (!Schedule.LANDWATER.includes(activityType)) {
-      throw new Error("'land' and 'water' are the only acccepted keyword arguments");
-    }
   }
 
   /**
@@ -282,16 +269,15 @@ export class Schedule {
    * @param {boolean}  - true = doubleMax, false = doubleMin
    * @returns {string[]} - returns list of activities: "['fish', 'canoe',...]"
    */
-  private getDoubleActivities({
-    activityType = 'land',
-    numOfChoices = 1,
-    isMax = true,
-  }: ActivityArgs): string[] {
-    this.choicesAndActivityValueChecks(numOfChoices, activityType);
+  private getDoubleActivities(
+    activityType: AllowedActTypes,
+    numOfChoices: AllowedChoices,
+    maxOrMin: AllowedMaxMin
+  ): string[] {
     const countedChoices = this.countActivityChoices(activityType, numOfChoices);
     const activitiesAboveDouble: string[] = [];
     const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
-    const maxType = isMax ? 4 : 3;
+    const maxType = maxOrMin === 'max' ? 4 : 3;
     for (const [activity, range] of Object.entries(ranges)) {
       if (countedChoices.get(activity) > range[maxType]) {
         activitiesAboveDouble.push(activity);
@@ -304,9 +290,7 @@ export class Schedule {
     console.log(`${this.algo} algorithm initiated`);
 
     // 1st: Check if kid's first choice totals are greater than both 9am & 10am water timeslots available..
-    const activitiesAboveDoubleMax: string[] = this.getDoubleActivities({
-      activityType: 'water',
-    });
+    const activitiesAboveDoubleMax: string[] = this.getDoubleActivities('water', 1, 'max');
     //... and fully schedule both time slots if this is the case.
     console.log('Double above max in Water First algo: ', activitiesAboveDoubleMax);
     if (activitiesAboveDoubleMax.length > 0) {
@@ -314,9 +298,7 @@ export class Schedule {
     }
 
     // 2nd: Check if kid's first choice totals are greater than both 9am & 10am water timeslots minimum requiremqnts available..
-    const activitiesAboveDoubleMin: string[] = this.getDoubleActivities({
-      activityType: 'water',
-    });
+    const activitiesAboveDoubleMin: string[] = this.getDoubleActivities('water', 1, 'min');
     //... and fully schedule both time slots if this is the case.
     console.log('Double above min in Water First algo: ', activitiesAboveDoubleMin);
     if (activitiesAboveDoubleMin.length > 0) {
