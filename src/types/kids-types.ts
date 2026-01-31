@@ -10,7 +10,7 @@ export type KidsData = Map<
   }
 >;
 
-export type KidsChoices = {
+type KidsChoices = {
   land1: string;
   land2: string;
   land3: string;
