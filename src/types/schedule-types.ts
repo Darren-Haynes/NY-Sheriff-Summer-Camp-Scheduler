@@ -35,8 +35,8 @@ export type WaterKids = Record<WaterActivities, string[]>;
 const AllowedTimes = [9, 10] as const;
 export type AllowedTimes = (typeof AllowedTimes)[number];
 
-const AllowedActTypes = ['land', 'water'] as const;
-export type AllowedActTypes = (typeof AllowedActTypes)[number];
+const AllowedActivityTypes = ['land', 'water'] as const;
+export type AllowedActivityTypes = (typeof AllowedActivityTypes)[number];
 
 const AllowedChoices = [1, 2, 3] as const;
 export type AllowedChoices = (typeof AllowedChoices)[number];
