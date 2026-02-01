@@ -83,6 +83,8 @@ export class Schedule {
         }
       });
     }
+    console.log('CHOICE COUNT');
+    console.log(choicesCount);
     return choicesCount;
   }
 
@@ -133,7 +135,7 @@ export class Schedule {
   }
 
   /**
-   * Establishes with choice to count out of 6 options: land1, land2, land3, water1, water2, water3
+   * Establishes witch choice to count out of 6 options: land1, land2, land3, water1, water2, water3
    * @param {string} activity- land or water activity such as 'canoe', 'swim', 'fball' ...
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {number} ChoiceNum - kids land or water choice 1st, 2nd or 3rd
@@ -234,7 +236,14 @@ export class Schedule {
     maxOrMin: AllowedMaxMin
   ): void {
     doubleMaxActivities.forEach(activity => {
-      const kidsByActivityChoice = this.getKidsbyActivityChoice(activity, activityType, choiceNum);
+      let kidsByActivityChoice: string[] = [];
+      if (choiceNum > 1) {
+        for (let i = 0; i < choiceNum; i++) {
+          const activityChoices = this.getKidsbyActivityChoice(activity, activityType, i + 1);
+          kidsByActivityChoice = kidsByActivityChoice.concat(activityChoices);
+        }
+      }
+      kidsByActivityChoice = this.getKidsbyActivityChoice(activity, activityType, choiceNum);
       const activityValue = maxOrMin ? 1 : 0;
       // TODO: fix type error
       const activityMaxOrMin =
@@ -277,7 +286,7 @@ export class Schedule {
    * both 9am and 10am time slots. The 'DoubleMax' meaning that both time slots are maxed out.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {number} numOfChoices - num of choices to count: 1, 2 or 3.
-   * @param {boolean}  - true = doubleMax, false = doubleMin
+   * @param {boolean}  maxOrMin - true = doubleMax, false = doubleMin
    * @returns {string[]} - returns list of activities: "['fish', 'canoe',...]"
    */
   private getDoubleActivities(
@@ -300,20 +309,32 @@ export class Schedule {
   runAlgo(): string {
     console.log(`${this.algo} algorithm initiated`);
 
-    // 1st: Check if kid's first choice totals are greater than both 9am & 10am water timeslots available..
-    const activitiesAboveDoubleMax: string[] = this.getDoubleActivities('water', 1, 'max');
+    // 1st run: Check if kid's first choice totals are greater than both 9am & 10am water timeslots available..
+    let activitiesAboveDoubleMax: string[] = this.getDoubleActivities('water', 1, 'max');
     //... and fully schedule both time slots if this is the case.
-    console.log('Double above max in Water First algo: ', activitiesAboveDoubleMax);
+    console.log('Double above max in WaterFirst algo: ', activitiesAboveDoubleMax);
     if (activitiesAboveDoubleMax.length > 0) {
       this.scheduleDoubleActivities(activitiesAboveDoubleMax, 'water', 1, 'max');
     }
 
-    // 2nd: Check if kid's first choice totals are greater than both 9am & 10am water timeslots minimum requiremqnts available..
+    // 2nd run: Check if kid's first choice totals are greater than both 9am & 10am water timeslots minimum requiremqnts available..
     const activitiesAboveDoubleMin: string[] = this.getDoubleActivities('water', 1, 'min');
     //... and fully schedule both time slots if this is the case.
-    console.log('Double above min in Water First algo: ', activitiesAboveDoubleMin);
+    console.log('Double above min in WaterFirst algo: ', activitiesAboveDoubleMin);
     if (activitiesAboveDoubleMin.length > 0) {
       this.scheduleDoubleActivities(activitiesAboveDoubleMin, 'water', 1, 'min');
+    }
+
+    // 3rd run: Check if kid's first plus second choice totals are greater than both 9am & 10am water timeslots minimum requiremqnts available..
+    activitiesAboveDoubleMax = this.getDoubleActivities('water', 2, 'max');
+    //... and fully schedule both time slots if this is the case.
+    console.log(
+      'Double above max -- 1st+2nd choices in WaterFirst algo: ',
+      activitiesAboveDoubleMax
+    );
+    if (activitiesAboveDoubleMax.length > 0) {
+      console.log('Entering Double MAX 1st+2nd choices');
+      this.scheduleDoubleActivities(activitiesAboveDoubleMax, 'water', 1, 'max');
     }
 
     console.log(this.water9am);
