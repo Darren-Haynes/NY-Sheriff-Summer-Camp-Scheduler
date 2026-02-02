@@ -262,7 +262,11 @@ export class Schedule {
       }
 
       if (maxOrMin === 'min') {
-        const halfTheKids = kidsByActivityChoice.length / 2;
+        let halfTheKids = kidsByActivityChoice.length / 2;
+        // If there are more kids not scheduled for 9am than 10am, this helps keep equal numbers of kids between AM and PM activities.
+        if (this.notScheduled9am.names.length > this.notScheduled10am.names.length) {
+          halfTheKids = Math.ceil(halfTheKids);
+        }
         kidsNineAM = kidsByActivityChoice.slice(0, halfTheKids);
         kidsTenAM = kidsByActivityChoice.slice(halfTheKids);
       }
@@ -340,13 +344,42 @@ export class Schedule {
 
     // 4th run: Check if kid's first plus second choice totals are greater than both 9am & 10am water timeslots minimum requiremqnts available..
     activitiesAboveDoubleMin = this.getDoubleActivities('water', 2, 'min');
+    //... and fully schedule both time slots if this is the case.
     console.log(
       'Double above min -- 1st+2nd choices in WaterFirst algo: ',
+      activitiesAboveDoubleMin
+    );
+    if (activitiesAboveDoubleMin.length > 0) {
+      this.scheduleDoubleActivities(activitiesAboveDoubleMin, 'water', 2, 'min');
+    }
+
+    // 5th run: Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots available..
+    activitiesAboveDoubleMax = this.getDoubleActivities('water', 3, 'max');
+    //... and fully schedule both time slots if this is the case.
+    console.log(
+      'Double above max -- 1st+2nd choices in WaterFirst algo: ',
       activitiesAboveDoubleMax
     );
+    if (activitiesAboveDoubleMax.length > 0) {
+      console.log('Entering Double MAX 1st+2nd choices');
+      this.scheduleDoubleActivities(activitiesAboveDoubleMax, 'water', 3, 'max');
+    }
 
+    // 6th run: Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots minimum requiremqnts available..
+    activitiesAboveDoubleMin = this.getDoubleActivities('water', 3, 'min');
+    //... and fully schedule both time slots if this is the case.
+    console.log(
+      'Double above min -- 1st+2nd choices in WaterFirst algo: ',
+      activitiesAboveDoubleMin
+    );
+    if (activitiesAboveDoubleMin.length > 0) {
+      this.scheduleDoubleActivities(activitiesAboveDoubleMin, 'water', 3, 'min');
+    }
     console.log(this.water9am);
     console.log(this.water10am);
+    console.log(this.notScheduledAllNames.length);
+    console.log(this.notScheduled9am.names.length);
+    console.log(this.notScheduled10am.names.length);
 
     return 'success';
   }
