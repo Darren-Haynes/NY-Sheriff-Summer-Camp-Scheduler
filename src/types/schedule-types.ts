@@ -38,7 +38,7 @@ export type AllowedTimes = (typeof AllowedTimes)[number];
 const AllowedActivityTypes = ['land', 'water'] as const;
 export type AllowedActivityTypes = (typeof AllowedActivityTypes)[number];
 
-const AllowedChoices = [1, 2, 3] as const;
+const AllowedChoices = [[1], [2], [3], [1, 2], [1, 2], [1, 3], [1, 2, 3]] as const;
 export type AllowedChoices = (typeof AllowedChoices)[number];
 
 const AllowedMaxMin = ['max', 'min'] as const;
