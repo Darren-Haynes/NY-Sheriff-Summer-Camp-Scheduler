@@ -472,10 +472,11 @@ export class Schedule {
     if (activitiesAboveDoubleMin.length > 0) {
       this.scheduleDoubleActivities(activitiesAboveDoubleMin, 'water', [1, 2, 3], 'min');
     }
+//------------------------------------
 
-    // 7th run: Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots available..
-    let activitiesAboveSingleMax = this.getActivities('water', [1, 2, 3], 'max', 'single');
-    //... and fully schedule both time slots if this is the case.
+    // 7th run: Check if kid's first choice totals are greater than both 9am & 10am water timeslots available..
+    let activitiesAboveSingleMax = this.getActivities('water', [1], 'max', 'single');
+    //... and schedule a single time slots if this is the case.
     console.log(
       'Single above max -- 1st+2nd+3rd choices in WaterFirst algo: ',
       activitiesAboveSingleMax
@@ -483,12 +484,64 @@ export class Schedule {
     console.log('NO Single MAX 1st choices activities');
     if (activitiesAboveSingleMax.length > 0) {
       console.log('Entering Single MAX 1st+2nd+3rd choices');
+      this.scheduleSingleActivities(activitiesAboveSingleMax, 'water', [1], 'max');
+    }
+
+    // 8th run: Check if kid's first choice totals are greater than both 9am & 10am water timeslots available..
+    let activitiesAboveSingleMin = this.getActivities('water', [1], 'min', 'single');
+    //... and schedule a single time slot if this is the case.
+    console.log(
+      'Single above min -- 1st choices in WaterFirst algo: ',
+      activitiesAboveSingleMin
+    );
+    console.log('NO Single MIN 1st choices activities');
+    if (activitiesAboveSingleMin.length > 0) {
+      console.log('Entering Single MIN 1st choices');
+      this.scheduleSingleActivities(activitiesAboveSingleMin, 'water', [1], 'min');
+    }
+
+    // 9th run: Check if kid's first plus second choice totals are greater than both 9am & 10am water timeslots available..
+    activitiesAboveSingleMax = this.getActivities('water', [1, 2], 'max', 'single');
+    //... and schedule a single time slot if this is the case.
+    console.log(
+      'Single above max -- 1st+2nd choices in WaterFirst algo: ',
+      activitiesAboveSingleMax
+    );
+    console.log('NO Single MAX 1st+2nd choices activities');
+    if (activitiesAboveSingleMax.length > 0) {
+      console.log('Entering Single MAX 1st+2nd choices');
+      this.scheduleSingleActivities(activitiesAboveSingleMax, 'water', [1, 2], 'max');
+    }
+
+    // 10th run: Check if kid's first plus second choice totals are greater than both 9am & 10am water timeslots available..
+    activitiesAboveSingleMin = this.getActivities('water', [1, 2], 'min', 'single');
+    //... and schedule a single time slot if this is the case.
+    console.log(
+      'Single above min -- 1st+2nd choices in WaterFirst algo: ',
+      activitiesAboveSingleMin
+    );
+    console.log('NO Single MIN 1st and 2nd choices activities');
+    if (activitiesAboveSingleMin.length > 0) {
+      console.log('Entering Single MIN 1st+2nd choices');
+      this.scheduleSingleActivities(activitiesAboveSingleMin, 'water', [1, 2], 'min');
+    }
+
+    // 11th run: Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots available..
+    activitiesAboveSingleMax = this.getActivities('water', [1, 2, 3], 'max', 'single');
+    //... and schedule a single time slot if this is the case.
+    console.log(
+      'Single above max -- 1st+2nd+3rd choices in WaterFirst algo: ',
+      activitiesAboveSingleMax
+    );
+    console.log('NO Single MAX 1st+2nd+3rd choices activities');
+    if (activitiesAboveSingleMax.length > 0) {
+      console.log('Entering Single MAX 1st+2nd+3rd choices');
       this.scheduleSingleActivities(activitiesAboveSingleMax, 'water', [1, 2, 3], 'max');
     }
 
-    // 8th run: Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots available..
-    const activitiesAboveSingleMin = this.getActivities('water', [1, 2, 3], 'min', 'single');
-    //... and fully schedule both time slots if this is the case.
+    // 12th run: Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots available..
+    activitiesAboveSingleMin = this.getActivities('water', [1, 2, 3], 'min', 'single');
+    //... and schedule a single time slot if this is the case.
     console.log(
       'Single above min -- 1st+2nd+3rd choices in WaterFirst algo: ',
       activitiesAboveSingleMin
@@ -504,8 +557,6 @@ export class Schedule {
     console.log(this.notScheduledAllNames.length);
     console.log(this.notScheduled9am.names.length);
     console.log(this.notScheduled10am.names.length);
-    console.log(activitiesAboveSingleMax)
-    console.log(activitiesAboveSingleMin)
     return 'success';
   }
 }
