@@ -32,7 +32,7 @@ type LandActivities =
 export type LandKids = Record<LandActivities, string[]>;
 export type WaterKids = Record<WaterActivities, string[]>;
 
-const AllowedTimes = [9, 10] as const;
+const AllowedTimes = ['9am', '10am'] as const;
 export type AllowedTimes = (typeof AllowedTimes)[number];
 
 const AllowedActivityTypes = ['land', 'water'] as const;
