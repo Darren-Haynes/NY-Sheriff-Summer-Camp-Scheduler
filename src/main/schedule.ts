@@ -63,7 +63,7 @@ export class Schedule {
    * @param {string} timeSlot - only 2 options: '9am' or '10am'.
    * @returns {Activities} - The corresponding Activities object.
    */
-  private getActivityTimeSlot(activityType: AllowedActivityTypes, timeSlot: AllowedTimes) {
+  private getActivityTimeSlot(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): WaterKids | LandKidsAM | LandKidsPM {
     const activityTimeSlots = [this.water9am, this.water10am, this.land9am, this.land10am];
     let activityTimeSlot = activityTimeSlots[0];
     if (activityType === 'water') {
@@ -85,13 +85,34 @@ export class Schedule {
     return activityTimeSlot;
   }
 
+  private getSchedules3rdChoicesNames(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): string[] {
+    const activityTimeSlot = this.getActivityTimeSlot(activityType, timeSlot);
+
+    let choice3 = 'water3';
+    if (activityType === 'land') {
+      choice3 = 'land3';
+    }
+
+    const names3rdChoice: string[] = [];
+    for (const [activity, names] of Object.entries(activityTimeSlot)) {
+      names.forEach((name) => {
+        const kidData = this.kids.data.get(name)
+        if (kidData.choices[choice3] === activity) {
+          names3rdChoice.push(name);
+        }
+      })
+      };
+    return names3rdChoice
+  }
+
+
   /**
    * Get Map of scheduled activities that have more kids than the minimum required.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {string} timeSlot - only 2 options: '9am' or '10am'.
    * @returns {Map} - activity plus the number of kids schedule above the min threshold: e.g {'swim': 3, 'fish': 8, ...}
    */
-  private getScheduledAboveMin(activityType: AllowedActivityTypes, timeSlot: AllowedTimes) {
+  private getScheduledAboveMin(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): Map<string, number> {
     const scheduledAboveMin = new Map<string, number>();
     const activityRanges = [Activities.waterRanges, Activities.landRanges];
     let activityRange = activityRanges[0];
@@ -609,6 +630,8 @@ export class Schedule {
     console.log(this.notScheduledAllNames.length);
     console.log(this.notScheduled9am.names.length);
     console.log(this.notScheduled10am.names.length);
+    console.log(this.getSchedules3rdChoicesNames('water', '9am'))
+    console.log(this.getSchedules3rdChoicesNames('water', '10am'))
     return 'success';
   }
 }
