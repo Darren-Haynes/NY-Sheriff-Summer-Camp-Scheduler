@@ -58,6 +58,48 @@ export class Schedule {
   }
 
   /**
+   * Get Map of scheduled activities that have more kids than the minimum required.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {string} timeSlot - only 2 options: '9am' or '10am'.
+   * @returns {Map} - activity plus the number of kids schedule above the min threshold: e.g {'swim': 3, 'fish': 8, ...}
+   */
+  private getScheduledAboveMin(activityType: AllowedActivityTypes, timeSlot: AllowedTimes) {
+    const scheduledAboveMin = new Map<string, number>();
+    const activityRanges = [Activities.waterRanges, Activities.landRanges];
+    let activityRange = activityRanges[0];
+    if (activityType === 'land') {
+      activityRange = activityRanges[1];
+    }
+
+    const activityTimeSlots = [this.water9am, this.water10am, this.land9am, this.land10am];
+    let activityTimeSlot = activityTimeSlots[0];
+    if (activityType === 'water') {
+      if (timeSlot === '9am') {
+        activityTimeSlot = activityTimeSlots[0]
+      }
+        if (timeSlot === '10am') {
+          activityTimeSlot = activityTimeSlots[1]
+      }
+    }
+    if (activityType === 'land') {
+      if (timeSlot === '9am') {
+        activityTimeSlot = activityTimeSlots[2]
+      }
+        if (timeSlot === '10am') {
+          activityTimeSlot = activityTimeSlots[3]
+      }
+    }
+
+    for (const [activity, names] of Object.entries(activityTimeSlot)) {
+      if (names.length > activityRange[activity][0]) {
+        const aboveMinCount = names.length - activityRange[activity][0];
+        scheduledAboveMin.set(activity, aboveMinCount)
+      };
+    };
+    return scheduledAboveMin;
+  }
+
+  /**
    * Constructs Map of 'land' or 'water' activities with default count of 0.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @returns {Map} - e.g for water activities: {'swim': 0, 'fish': 0, ...}
