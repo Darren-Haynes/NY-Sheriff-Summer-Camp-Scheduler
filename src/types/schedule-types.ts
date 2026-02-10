@@ -46,3 +46,6 @@ export type AllowedMaxMin = (typeof AllowedMaxMin)[number];
 
 const AllowedDoubleSingle = ['double', 'single'] as const;
 export type AllowedDoubleSingle = (typeof AllowedDoubleSingle)[number];
+
+const AllowedChoiceNums = [1, 2, 3] as const;
+export type AllowedChoiceNums = (typeof AllowedChoiceNums)[number];

@@ -6,7 +6,8 @@ import {
   AllowedActivityTypes,
   AllowedChoices,
   AllowedMaxMin,
-  AllowedDoubleSingle
+  AllowedDoubleSingle,
+  AllowedChoiceNums
 } from '../types/schedule-types';
 import { LandKidsAM, LandKidsPM, WaterKids } from '../types/camp-types';
 
@@ -85,24 +86,41 @@ export class Schedule {
     return activityTimeSlot;
   }
 
-  private getSchedules3rdChoicesNames(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): string[] {
+  private getScheduledChoicesNames(activityType: AllowedActivityTypes, timeSlot: AllowedTimes, choiceNum: AllowedChoiceNums): string[] {
     const activityTimeSlot = this.getActivityTimeSlot(activityType, timeSlot);
 
-    let choice3 = 'water3';
-    if (activityType === 'land') {
-      choice3 = 'land3';
+    let choice: string =  'water1';
+    if (activityType === 'water') {
+      if (choiceNum === 2) {
+        choice = 'water2'
+      }
+      if (choiceNum === 3) {
+        choice = 'water3'
+      }
     }
 
-    const names3rdChoice: string[] = [];
+    if (activityType === 'land') {
+      if (choiceNum === 1) {
+        choice = 'land1'
+      }
+      if (choiceNum === 2) {
+        choice = 'land2'
+      }
+      if (choiceNum === 3) {
+        choice = 'land3'
+      }
+    }
+
+    const namesChoice: string[] = [];
     for (const [activity, names] of Object.entries(activityTimeSlot)) {
       names.forEach((name) => {
         const kidData = this.kids.data.get(name)
-        if (kidData.choices[choice3] === activity) {
-          names3rdChoice.push(name);
+        if (kidData.choices[choice] === activity) {
+          namesChoice.push(name);
         }
       })
       };
-    return names3rdChoice
+    return namesChoice
   }
 
 
@@ -630,8 +648,6 @@ export class Schedule {
     console.log(this.notScheduledAllNames.length);
     console.log(this.notScheduled9am.names.length);
     console.log(this.notScheduled10am.names.length);
-    console.log(this.getSchedules3rdChoicesNames('water', '9am'))
-    console.log(this.getSchedules3rdChoicesNames('water', '10am'))
     return 'success';
   }
 }
