@@ -46,7 +46,11 @@ const createWindow = (): void => {
     });
     const { campData, headerRow } = dataParser(data);
     const dataErrors = new DataErrorHandler(campData, headerRow);
-    const allErrors: boolean[] = [dataErrors.numOfFields(), dataErrors.wrongActivity()];
+    const allErrors: boolean[] = [
+      dataErrors.numOfFields(),
+      dataErrors.wrongActivity(),
+      dataErrors.duplicateChoice(),
+    ];
     if (!allErrors.every(item => item === false)) {
       mainWindow.webContents.send('error-list', JSON.stringify(dataErrors.getErrorList()));
     }
