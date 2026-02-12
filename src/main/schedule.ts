@@ -515,17 +515,19 @@ export class Schedule {
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {number[]} choices - num of choices to count in any combo of 1 thru 3: [[1], [2], [3], [1, 2], [1, 2], [1, 3], [1, 2, 3]]
    * @param {string}  maxOrMin - true = doubleMax, false = doubleMin
-   * @returns {void}
+   * @returns {boolean} true if activities were scheduled, false if not enough kids chose the activity
    */
   private scheduleSingleMin(
     activityType: AllowedActivityTypes,
     choices: AllowedChoices,
     maxOrMin: AllowedMaxMin,
-  ): void {
+  ): boolean {
     const activitiesAboveSingleMin: string[] = this.getActivities(activityType, choices, maxOrMin, 'single');
     if (activitiesAboveSingleMin.length > 0) {
       this.scheduleSingleActivities(activitiesAboveSingleMin, activityType, choices, maxOrMin);
+      return true;
     }
+    return false;
   }
 
   /**
@@ -534,17 +536,19 @@ export class Schedule {
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {number[]} choices - num of choices to count in any combo of 1 thru 3: [[1], [2], [3], [1, 2], [1, 2], [1, 3], [1, 2, 3]]
    * @param {string}  maxOrMin - true = doubleMax, false = doubleMin
-   * @returns {void}
+   * @returns {boolean} true if activities were scheduled, false if not enough kids chose the activity
    */
   private scheduleDoubleMin(
     activityType: AllowedActivityTypes,
     choices: AllowedChoices,
     maxOrMin: AllowedMaxMin,
-  ): void {
+  ): boolean {
     const activitiesAboveDoubleMin: string[] = this.getActivities(activityType, choices, maxOrMin, 'double');
     if (activitiesAboveDoubleMin.length > 0) {
       this.scheduleDoubleActivities(activitiesAboveDoubleMin, activityType, choices, maxOrMin);
+      return true;
     }
+    return false;
   }
 
   /**
@@ -553,16 +557,17 @@ export class Schedule {
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {number[]} choices - num of choices to count in any combo of 1 thru 3: [[1], [2], [3], [1, 2], [1, 2], [1, 3], [1, 2, 3]]
    * @param {string}  maxOrMin - true = doubleMax, false = doubleMin
-   * @returns {void}
+   * @returns {boolean} true if activities were scheduled, false if not enough kids chose the activity
    */
   private scheduleSingleMax(
     activityType: AllowedActivityTypes,
     choices: AllowedChoices,
     maxOrMin: AllowedMaxMin,
-  ): void {
+  ): boolean {
     const activitiesAboveSingleMax: string[] = this.getActivities(activityType, choices, maxOrMin, 'single');
     if (activitiesAboveSingleMax.length > 0) {
       this.scheduleSingleActivities(activitiesAboveSingleMax, activityType, choices, maxOrMin);
+      return true;
     }
   }
 
@@ -571,17 +576,19 @@ export class Schedule {
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {number[]} choices - num of choices to count in any combo of 1 thru 3: [[1], [2], [3], [1, 2], [1, 2], [1, 3], [1, 2, 3]]
    * @param {string}  maxOrMin - true = doubleMax, false = doubleMin
-   * @returns {void}
+   * @returns {boolean} true if activities were scheduled, false if not enough kids chose the activity
    */
   private scheduleDoubleMax(
     activityType: AllowedActivityTypes,
     choices: AllowedChoices,
     maxOrMin: AllowedMaxMin,
-  ): void {
+  ): boolean {
     const activitiesAboveDoubleMax: string[] = this.getActivities(activityType, choices, maxOrMin, 'double');
     if (activitiesAboveDoubleMax.length > 0) {
       this.scheduleDoubleActivities(activitiesAboveDoubleMax, activityType, choices, maxOrMin);
+      return true;
     }
+    return false;
   }
 
   runAlgo(): string {
