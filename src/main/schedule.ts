@@ -64,7 +64,7 @@ export class Schedule {
    * @param {string} timeSlot - only 2 options: '9am' or '10am'.
    * @returns {Activities} - The corresponding Activities object.
    */
-  private getActivityTimeSlot(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): WaterKids | LandKidsAM | LandKidsPM {
+  private getActivityTypeTimeSlot(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): WaterKids | LandKidsAM | LandKidsPM {
     const activityTimeSlots = [this.water9am, this.water10am, this.land9am, this.land10am];
     let activityTimeSlot = activityTimeSlots[0];
     if (activityType === 'water') {
@@ -86,10 +86,18 @@ export class Schedule {
     return activityTimeSlot;
   }
 
+  /**
+   * Get an array of all the scheduled kids names who got their choice for a specific choice number.
+   * e.g if we are looking at choiceNum 1 and 'kevin' was actually scheduled to his first choice, then he is added to the array
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {string} timeSlot - only 2 options: '9am' or '10am'.
+   * @param {number} choiceNum - only 3 choice options: 1, 2, or 3.
+   * @returns {string[]} - Array of all scheduled kids names who got their choice for a specific choice number, for specific activity type and time slot.
+   */
   private getScheduledChoicesNames(activityType: AllowedActivityTypes, timeSlot: AllowedTimes, choiceNum: AllowedChoiceNums): string[] {
-    const activityTimeSlot = this.getActivityTimeSlot(activityType, timeSlot);
+    const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
 
-    let choice: string =  'water1';
+    let choice: string = 'water1';
     if (activityType === 'water') {
       if (choiceNum === 2) {
         choice = 'water2'
@@ -112,7 +120,7 @@ export class Schedule {
     }
 
     const namesChoice: string[] = [];
-    for (const [activity, names] of Object.entries(activityTimeSlot)) {
+    for (const [activity, names] of Object.entries(activityTypeTimeSlot)) {
       names.forEach((name) => {
         const kidData = this.kids.data.get(name)
         if (kidData.choices[choice] === activity) {
@@ -139,7 +147,7 @@ export class Schedule {
       activityRange = activityRanges[1];
     }
 
-    const activityTimeSlot = this.getActivityTimeSlot(activityType, timeSlot);
+    const activityTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
     for (const [activity, names] of Object.entries(activityTimeSlot)) {
       if (names.length > activityRange[activity][0]) {
         const aboveMinCount = names.length - activityRange[activity][0];
