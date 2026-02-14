@@ -131,12 +131,11 @@ export class Schedule {
     return namesChoice
   }
 
-
   /**
    * Get Map of scheduled activities that have more kids than the minimum required.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {string} timeSlot - only 2 options: '9am' or '10am'.
-   * @returns {Map} - activity plus the number of kids schedule above the min threshold: e.g {'swim': 3, 'fish': 8, ...}
+   * @returns {Map} - activity plus the number of kids scheduled above the min threshold: e.g {'swim': 3, 'fish': 8, ...}
    */
   private getScheduledAboveMin(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): Map<string, number> {
     const scheduledAboveMin = new Map<string, number>();
@@ -158,24 +157,38 @@ export class Schedule {
   }
 
   /**
-   * Constructs Map of 'land' or 'water' activities with default count of 0.
+   * Constructs Map of 'land' or 'water' activities that have not been scheduled yet with default count of 0.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @returns {Map} - e.g for water activities: {'swim': 0, 'fish': 0, ...}
    */
-  private activityTemplate(activityType: AllowedActivityTypes): Map<string, number> {
+  private activityTemplate(activityType: AllowedActivityTypes, timeSlot: AllowedTimeSlots): Map<string, number> {
     const choicesCount = new Map<string, number>();
     if (activityType === 'land') {
-      const allNotScheduledLandActivities =  [...new Set([...this.notScheduled9am.landActivities, ...this.notScheduled10am.landActivities])];
+      let notScheduledLandActivities: string[]
+      if (timeSlot === "9am") {
+        notScheduledLandActivities = [...new Set([...this.notScheduled9am.landActivities])];
+      } else if (timeSlot === "10am") {
+        notScheduledLandActivities = [...new Set([...this.notScheduled10am.landActivities])];
+      } else {
+        notScheduledLandActivities = [...new Set([...this.notScheduled9am.landActivities, ...this.notScheduled10am.landActivities])];
+      }
       Activities.landActs.forEach(activity => {
-        if (allNotScheduledLandActivities.includes(activity)) {
+        if (notScheduledLandActivities.includes(activity)) {
           choicesCount.set(activity, 0);
         }
       });
     }
     if (activityType === 'water') {
-      const allNotScheduledWaterActivities =  [...new Set([...this.notScheduled9am.waterActivities, ...this.notScheduled10am.waterActivities])];
+      let notScheduledWaterActivities: string[]
+      if (timeSlot === "9am") {
+        notScheduledWaterActivities = [...new Set([...this.notScheduled9am.waterActivities])];
+      } else if (timeSlot === "10am") {
+        notScheduledWaterActivities = [...new Set([...this.notScheduled10am.waterActivities])];
+      } else {
+        notScheduledWaterActivities = [...new Set([...this.notScheduled9am.waterActivities, ...this.notScheduled10am.landActivities])];
+      }
       Activities.waterActs.forEach(activity => {
-        if (allNotScheduledWaterActivities.includes(activity)) {
+        if (notScheduledWaterActivities.includes(activity)) {
           choicesCount.set(activity, 0);
         }
       });
@@ -189,12 +202,12 @@ export class Schedule {
    * @param {number[]} choices - num of choices to count between 1 - 3.
    * @returns {Map} - e.g {'swim': 39, 'fish': 9, ...} how many kids chose each activity
    */
-  private countActivityChoices(activityType: AllowedActivityTypes, choices: AllowedChoices) {
+  private countActivityChoices(activityType: AllowedActivityTypes, choices: AllowedChoices, timeSlot: AllowedTimes) {
     let kidsChoices: [string, string, string] = ['land1', 'land2', 'land3'];
     if (activityType === 'water') {
       kidsChoices = ['water1', 'water2', 'water3'];
     }
-    const activitiesChoicesCount = this.activityTemplate(activityType);
+    const activitiesChoicesCount = this.activityTemplate(activityType, timeSlot);
     for (let i = 0; i < choices.length; i++) {
       this.notScheduledAllNames.forEach(kid => {
         const kidsData = this.kids.data.get(kid);
@@ -207,13 +220,11 @@ export class Schedule {
         }
       });
     }
-    console.log('ACT CHOICE COUNT');
-    console.log(activitiesChoicesCount);
     return activitiesChoicesCount;
   }
 
   /**
-   * Establishes with choice to count out of 6 options: land1, land2, land3, water1, water2, water3
+   * Establishes which choice to count out of 6 options: land1, land2, land3, water1, water2, water3
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {number[]} ChoiceNum - land or water choice 1, 2 or 3
    * @returns {string} - returns specific activity choice such as 'land1' or 'water3' etc.
@@ -234,7 +245,9 @@ export class Schedule {
   }
 
   /**
-   * Establishes witch choice to count out of 6 options: land1, land2, land3, water1, water2, water3
+   * Get an array of kids who have chosen a specific activity from their 1st, 2nd or 3rd choice.
+   * If more kids want to attend an activity than there are slots, we need to randomly choose from them to
+   * avoid any selection bias.
    * @param {string} activity- land or water activity such as 'canoe', 'swim', 'fball' ...
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {number[]} ChoiceNum - kids land or water choice 1st, 2nd or 3rd
@@ -259,6 +272,8 @@ export class Schedule {
 
   /**
    * Get random selection of elements from an Array.
+   * If more kids want to attend an activity than there are slots, we need to randomly choose from them to
+   * to avoid any selection bias.
    * @param {string[]} arr - the Array to take a random selection from
    * @param {number} numOfItems - the total number of random elements to return
    * @returns {string[]} - the Array of random selected elements
@@ -272,7 +287,7 @@ export class Schedule {
   }
 
   /**
-   * Remove names and activites from notScheduled lists
+   * Remove names and activites from notScheduled lists (because they are scheduled)
    * @param {string[]} names - Array of names to be removed from notScheduled lists
    * @param {string} activityType - Type of activity: either 'land' or 'water'
    * @param {string} activity - activity such as "fball", "canoe", "swim"
@@ -494,9 +509,10 @@ export class Schedule {
     activityType: AllowedActivityTypes,
     choices: AllowedChoices,
     maxOrMin: AllowedMaxMin,
-    doubleOrSingle: AllowedDoubleSingle
+    doubleOrSingle: AllowedDoubleSingle,
+    timeSlot: AllowedTimes
   ): string[] {
-    const countedChoices = this.countActivityChoices(activityType, choices);
+    const countedChoices = this.countActivityChoices(activityType, choices, timeSlot);
     const qualifiedActivities: string[] = [];
     const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
     const minCountQualifier = this.getActivityCountQualifier(maxOrMin, doubleOrSingle);
@@ -522,7 +538,7 @@ export class Schedule {
     choices: AllowedChoices,
     maxOrMin: AllowedMaxMin,
   ): boolean {
-    const activitiesAboveSingleMin: string[] = this.getActivities(activityType, choices, maxOrMin, 'single');
+    const activitiesAboveSingleMin: string[] = this.getActivities(activityType, choices, maxOrMin, 'single', 'both');
     if (activitiesAboveSingleMin.length > 0) {
       this.scheduleSingleActivities(activitiesAboveSingleMin, activityType, choices, maxOrMin);
       return true;
@@ -543,7 +559,7 @@ export class Schedule {
     choices: AllowedChoices,
     maxOrMin: AllowedMaxMin,
   ): boolean {
-    const activitiesAboveDoubleMin: string[] = this.getActivities(activityType, choices, maxOrMin, 'double');
+    const activitiesAboveDoubleMin: string[] = this.getActivities(activityType, choices, maxOrMin, 'double', 'both');
     if (activitiesAboveDoubleMin.length > 0) {
       this.scheduleDoubleActivities(activitiesAboveDoubleMin, activityType, choices, maxOrMin);
       return true;
@@ -564,7 +580,7 @@ export class Schedule {
     choices: AllowedChoices,
     maxOrMin: AllowedMaxMin,
   ): boolean {
-    const activitiesAboveSingleMax: string[] = this.getActivities(activityType, choices, maxOrMin, 'single');
+    const activitiesAboveSingleMax: string[] = this.getActivities(activityType, choices, maxOrMin, 'single', 'both');
     if (activitiesAboveSingleMax.length > 0) {
       this.scheduleSingleActivities(activitiesAboveSingleMax, activityType, choices, maxOrMin);
       return true;
@@ -583,7 +599,7 @@ export class Schedule {
     choices: AllowedChoices,
     maxOrMin: AllowedMaxMin,
   ): boolean {
-    const activitiesAboveDoubleMax: string[] = this.getActivities(activityType, choices, maxOrMin, 'double');
+    const activitiesAboveDoubleMax: string[] = this.getActivities(activityType, choices, maxOrMin, 'double', 'both');
     if (activitiesAboveDoubleMax.length > 0) {
       this.scheduleDoubleActivities(activitiesAboveDoubleMax, activityType, choices, maxOrMin);
       return true;
@@ -602,28 +618,38 @@ export class Schedule {
     // Check if kid's first plus second choice totals are greater than both 9am & 10am water timeslots minimum requiremqnts available..
     this.scheduleDoubleMin('water', [1, 2], 'min')
     // Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots available..
-    this.scheduleDoubleMax('water', [1, 2, 3], 'max')
-    // 6th run: Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots minimum requiremqnts available..
-    this.scheduleDoubleMin('water', [1, 2, 3], 'min')
+    // this.scheduleDoubleMax('water', [1, 2, 3], 'max')
+    // Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots minimum requiremqnts available..
+    // this.scheduleDoubleMin('water', [1, 2, 3], 'min')
 
-    // 7th run: Check if kid's first choice totals are greater than both 9am & 10am water timeslots available..
+    // Check if kid's first choice totals are greater than both 9am & 10am water timeslots available..
     this.scheduleSingleMax('water', [1], 'max')
-    // 8th run: Check if kid's first choice totals are greater than both 9am & 10am water timeslots available..
+    // Check if kid's first choice totals are greater than both 9am & 10am water timeslots available..
     this.scheduleSingleMin('water', [1], 'min')
-    // 9th run: Check if kid's first plus second choice totals are greater than both 9am & 10am water timeslots available..
+    // Check if kid's first plus second choice totals are greater than both 9am & 10am water timeslots available..
     this.scheduleSingleMax('water', [1, 2], 'max')
-    // 10th run: Check if kid's first plus second choice totals are greater than both 9am & 10am water timeslots available..
+    // Check if kid's first plus second choice totals are greater than both 9am & 10am water timeslots available..
     this.scheduleSingleMin('water', [1, 2], 'min')
-    // 11th run: Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots available..
-    this.scheduleSingleMax('water', [1, 2, 3], 'max')
-    // 12th run: Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots available..
-    this.scheduleSingleMin('water', [1, 2, 3], 'min')
+    // Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots available..
+    // this.scheduleSingleMax('water', [1, 2, 3], 'max')
+    // Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots available..
+    // this.scheduleSingleMin('water', [1, 2, 3], 'min')
+    const kidsToSpareWater9am = this.getScheduledAboveMin('water', '9am')
+    const kidsToSpareWater10am = this.getScheduledAboveMin('water', '10am')
+    let notScheduled9amActivities = this.notScheduled9am.waterActivities
+    let notScheduled10amActivities = this.notScheduled10am.waterActivities
 
     console.log(this.water9am);
     console.log(this.water10am);
-    console.log(this.notScheduledAllNames.length);
-    console.log(this.notScheduled9am.names.length);
-    console.log(this.notScheduled10am.names.length);
+    console.log('Kids left to schedule ', this.notScheduledAllNames.length);
+    console.log('Kids left to schedule for 9am', this.notScheduled9am.names.length - 52);
+    console.log('Kids left to schedule for 10am', this.notScheduled10am.names.length - 52);
+    console.log('kids to spare water for 9am', kidsToSpareWater9am)
+    console.log('kids to spare water for 10am', kidsToSpareWater10am)
+    console.log('Kids activities count 9am :',this.countActivityChoices('water', [1, 2], '9am'))
+    console.log('Kids activities count 10am :',this.countActivityChoices('water', [1, 2], '10am'))
+    console.log('Not scheduled 9am activities: ', notScheduled9amActivities)
+    console.log('Not scheduled 10am activities: ', notScheduled10amActivities)
     return 'success';
   }
 }
