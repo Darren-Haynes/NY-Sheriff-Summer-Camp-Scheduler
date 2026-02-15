@@ -81,8 +81,6 @@ export class Schedule {
 
     const activityCount = new Map<string, number>();
     for (const activity in activityTimeSlot) {
-      console.log(activityType, timeSlot)
-      console.log(activity, activityTimeSlot[activity], activityTimeSlot[activity].length)
       if (!showZero && activityTimeSlot[activity].length === 0) {
           continue;
       } else {
@@ -228,6 +226,22 @@ export class Schedule {
       });
     }
     return choicesCount;
+  }
+
+  /**
+   * Sorts activities by shortfall from minimum requirement.
+   * @param {Map<string,number>} notScheduledActivites - num of choices to count between 1 - 3.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @returns {Map<string, number>} - e.g {'swim': 3, 'fish': 2, ...}
+   */
+  private sortActivitiesByShortfall(notScheduledActivities: Map<string, number>, activityType: AllowedActivityTypes): Map<string, number> {
+    const activityRanges = activityType === 'water' ? Activities.waterRanges : Activities.landRanges;
+    const shortfallFromMin: Map<string, number> = new Map();
+    notScheduledActivities.forEach((activityCount, activity) => {
+      const activityMin = activityRanges[activity][0];
+      shortfallFromMin.set(activity, activityMin - activityCount);
+    });
+    return new Map([...shortfallFromMin.entries()].sort((a, b) => b[1] - a[1]));
   }
 
   /**
@@ -652,9 +666,9 @@ export class Schedule {
     // Check if kid's first plus second choice totals are greater than both 9am & 10am water timeslots minimum requiremqnts available..
     this.scheduleDoubleMin('water', [1, 2], 'min')
     // Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots available..
-    // this.scheduleDoubleMax('water', [1, 2, 3], 'max')
+    this.scheduleDoubleMax('water', [1, 2, 3], 'max')
     // Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots minimum requiremqnts available..
-    // this.scheduleDoubleMin('water', [1, 2, 3], 'min')
+    this.scheduleDoubleMin('water', [1, 2, 3], 'min')
 
     // Check if kid's first choice totals are greater than both 9am & 10am water timeslots available..
     this.scheduleSingleMax('water', [1], 'max')
@@ -665,9 +679,10 @@ export class Schedule {
     // Check if kid's first plus second choice totals are greater than both 9am & 10am water timeslots available..
     this.scheduleSingleMin('water', [1, 2], 'min')
     // Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots available..
-    // this.scheduleSingleMax('water', [1, 2, 3], 'max')
+    this.scheduleSingleMax('water', [1, 2, 3], 'max')
     // Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots available..
-    // this.scheduleSingleMin('water', [1, 2, 3], 'min')
+    this.scheduleSingleMin('water', [1, 2, 3], 'min')
+
     const kidsToSpareWater9am = this.getScheduledAboveMin('water', '9am')
     const kidsToSpareWater10am = this.getScheduledAboveMin('water', '10am')
 
@@ -678,10 +693,12 @@ export class Schedule {
     console.log('Kids left to schedule for 10am', this.notScheduled10am.names.length - 52);
     console.log('kids to spare water for 9am', kidsToSpareWater9am)
     console.log('kids to spare water for 10am', kidsToSpareWater10am)
-    console.log('Kids activities count 9am :',this.countActivityChoices('water', [1, 2], '9am'))
-    console.log('Kids that are scheduled for water at 9am:', this.scheduledActivityCount('water', '9am', true))
-    console.log('Kids activities count 10am :',this.countActivityChoices('water', [1, 2], '10am'))
-    console.log(this.scheduledActivityCount('water', '10am', true))
+    console.log('Kids activities count 9am :',this.countActivityChoices('water', [1, 2, 3], '9am'))
+    console.log('Kids activities count 10am :',this.countActivityChoices('water', [1, 2, 3], '10am'))
+    const filtered = this.countActivityChoices('water', [1, 2, 3], '9am')
+    console.log('Kids that are scheduled for water at 9am:', this.scheduledActivityCount('water', '9am', false))
+    console.log('Kids that are scheduled for water at 10am:', this.scheduledActivityCount('water', '10am', false))
+    console.log("Shortfall so far: ", this.sortActivitiesByShortfall(filtered, 'water'))
     return 'success';
   }
 }
