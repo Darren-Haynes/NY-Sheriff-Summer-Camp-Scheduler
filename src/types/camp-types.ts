@@ -47,22 +47,22 @@ export type WaterKids = {
 };
 
 export type LandKidsAM = {
-  bball: Array<string>;
-  vball: Array<string>;
-  soc: Array<string>;
-  arch: Array<string>;
   art: Array<string>;
   hike: Array<string>;
+  bball: Array<string>;
   cheer: Array<string>;
+  soc: Array<string>;
+  vball: Array<string>;
+  arch: Array<string>;
 };
 
 export type LandKidsPM = {
-  pball: Array<string>;
-  lax: Array<string>;
-  fball: Array<string>;
-  yoga: Array<string>;
   fris: Array<string>;
-  arch: Array<string>;
   art: Array<string>;
   hike: Array<string>;
+  pball: Array<string>;
+  fball: Array<string>;
+  lax: Array<string>;
+  yoga: Array<string>;
+  arch: Array<string>;
 };
