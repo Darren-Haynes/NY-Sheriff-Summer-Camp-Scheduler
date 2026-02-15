@@ -59,6 +59,40 @@ export class Schedule {
   }
 
   /**
+   * Get a map of how many kids are scheduled to each activity for given activity type and time slot.
+   * There are 4 total options base on the parameters: land9am, land10am, water9am, water10am.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {string} timeSlot - only 2 options: '9am' or '10am'.
+   * @param {boolean} showZero - whether to include activities with zero kids scheduled.
+   * @returns {Map<string, number>} a map of the how many kids are scheduled to each activity.
+   */
+  private scheduledActivityCount(activityType: AllowedActivityTypes, timeSlot: AllowedTimes, showZero: boolean): Map<string, number> {
+    let activityTimeSlot = activityType === 'water' ? this.water9am : timeSlot === '9am' ? this.land9am : this.land10am;
+    if (activityType === 'water') {
+      if (timeSlot === '10am') {
+        activityTimeSlot = this.water10am;
+      }
+    }
+    if (activityType === 'land') {
+      if (timeSlot === '10am') {
+        activityTimeSlot = this.land10am;
+      }
+    }
+
+    const activityCount = new Map<string, number>();
+    for (const activity in activityTimeSlot) {
+      console.log(activityType, timeSlot)
+      console.log(activity, activityTimeSlot[activity], activityTimeSlot[activity].length)
+      if (!showZero && activityTimeSlot[activity].length === 0) {
+          continue;
+      } else {
+          activityCount.set(activity, activityTimeSlot[activity].length);
+      }
+    }
+    return activityCount;
+  }
+
+  /**
    * Get the right Activities object based on the activity type and time slot.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {string} timeSlot - only 2 options: '9am' or '10am'.
@@ -636,8 +670,6 @@ export class Schedule {
     // this.scheduleSingleMin('water', [1, 2, 3], 'min')
     const kidsToSpareWater9am = this.getScheduledAboveMin('water', '9am')
     const kidsToSpareWater10am = this.getScheduledAboveMin('water', '10am')
-    let notScheduled9amActivities = this.notScheduled9am.waterActivities
-    let notScheduled10amActivities = this.notScheduled10am.waterActivities
 
     console.log(this.water9am);
     console.log(this.water10am);
@@ -647,9 +679,9 @@ export class Schedule {
     console.log('kids to spare water for 9am', kidsToSpareWater9am)
     console.log('kids to spare water for 10am', kidsToSpareWater10am)
     console.log('Kids activities count 9am :',this.countActivityChoices('water', [1, 2], '9am'))
+    console.log('Kids that are scheduled for water at 9am:', this.scheduledActivityCount('water', '9am', true))
     console.log('Kids activities count 10am :',this.countActivityChoices('water', [1, 2], '10am'))
-    console.log('Not scheduled 9am activities: ', notScheduled9amActivities)
-    console.log('Not scheduled 10am activities: ', notScheduled10amActivities)
+    console.log(this.scheduledActivityCount('water', '10am', true))
     return 'success';
   }
 }
