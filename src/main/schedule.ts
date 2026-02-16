@@ -278,16 +278,13 @@ export class Schedule {
    * @returns {Map} - e.g {'swim': 39, 'fish': 9, ...} how many kids chose each activity
    */
   private countActivityChoices(activityType: AllowedActivityTypes, choices: AllowedChoices, timeSlot: AllowedTimes) {
-    let kidsChoices: [string, string, string] = ['land1', 'land2', 'land3'];
-    if (activityType === 'water') {
-      kidsChoices = ['water1', 'water2', 'water3'];
-    }
+    const ACTIVITY_TYPES = activityType === 'water' ? Schedule.WATERTYPES : Schedule.LANDTYPES;
     const activitiesChoicesCount = this.activityTemplate(activityType, timeSlot);
     for (let i = 0; i < choices.length; i++) {
       this.notScheduledAllNames.forEach(kid => {
         const kidsData = this.kids.data.get(kid);
         // TODO fix type error
-        const activity = kidsData.choices[kidsChoices[choices[i] - 1].toLowerCase();
+        const activity = kidsData.choices[ACTIVITY_TYPES[choices[i] - 1].toLowerCase();
         if (activitiesChoicesCount.has(activity)) {
           const currentActivityCount = activitiesChoicesCount.get(activity);
           const newActivityCount = currentActivityCount + 1;
@@ -307,16 +304,9 @@ export class Schedule {
   // TODO: choiceNum argument may cause a bug. The original argument passed in is called
   // numOfChoices which refers to the number of choices between 1 or 2 or 3 total choices.
 
-  private getKidsChoice(activityType: string, choiceNum: number): string {
-    if (activityType === 'land') {
-      const landChoices = ['land1', 'land2', 'land3'];
-      return landChoices[choiceNum - 1];
-    }
-    if (activityType === 'water') {
-      const waterChoices = ['water1', 'water2', 'water3'];
-      return waterChoices[choiceNum - 1];
-    }
-    throw new Error("Invalid activity type. Type needs to be 'land' or 'water'.");
+  private getKidsChoice(activityType: AllowedActivityTypes, choiceNum: AllowedChoiceNums): string {
+    const ACTIVITY_TYPES = activityType === 'water' ? Schedule.WATERTYPES : Schedule.LANDTYPES;
+      return ACTIVITY_TYPES[choiceNum - 1];
   }
 
   /**
@@ -330,8 +320,8 @@ export class Schedule {
    */
   private getKidsbyActivityChoice(
     activity: string,
-    activityType: string,
-    choiceNum: number
+    activityType: AllowedActivityTypes,
+    choiceNum: AllowedChoiceNums
   ): string[] {
     const choice: string = this.getKidsChoice(activityType, choiceNum);
     const matchedKids: string[] = [];
