@@ -49,6 +49,12 @@ export class Schedule {
     this.land10am = Activities.land10am;
   }
 
+  /**
+   * Create object that contains the names of kids who are not yet scheduled for an activity,
+   * and also land or water activities that have not been scheduled.
+   * @param {boolean} nineAm - true if the time slot is 9am, false if it's 10am.
+   * @returns {NotScheduled} e.g {names: ['doe john', 'doe jane'...], landActivities: ['fball', 'arch'...], waterActivities: ['fish', 'canoe'...]}
+   */
   private notScheduledConstructor(nineAM = true): NotScheduled {
     const nineOrTen = nineAM
       ? structuredClone(Activities.land9amActs)
@@ -442,10 +448,7 @@ export class Schedule {
       }
 
       if (activityType === 'water') {
-        let timeSlot = '9am';
-        if (this.notScheduled10am.names.length >= this.notScheduled9am.names.length) {
-          timeSlot = '10am';
-        }
+        const timeSlot = this.notScheduled10am.names.length >= this.notScheduled9am.names.length ? '10am' : '9am';
         if (timeSlot === '9am') {
           this.water9am[activity] = kidsTimeSlot;
           this.removeScheduled(kidsTimeSlot, activityType, activity, '9am');
@@ -457,12 +460,7 @@ export class Schedule {
       }
 
       if (activityType === 'land') {
-        let timeSlot = '9am';
-        if (Activities.landRanges[activity][2] === 2) {
-          if (this.notScheduled10am.names.length >= this.notScheduled9am.names.length) {
-            timeSlot = '10am';
-          }
-        }
+        const timeSlot = this.notScheduled10am.names.length >= this.notScheduled9am.names.length ? '10am' : '9am';
         if (Activities.landRanges[activity][2] === 1) {
             timeSlot = '10am';
         }
