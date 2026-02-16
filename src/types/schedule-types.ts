@@ -35,6 +35,9 @@ export type WaterKids = Record<WaterActivities, string[]>;
 const AllowedTimes = ['9am', '10am', 'both'] as const;
 export type AllowedTimes = (typeof AllowedTimes)[number];
 
+const Allowed9and10Only = ['9am', '10am'] as const;
+export type Allowed9and10Only = (typeof AllowedTimes)[number];
+
 const AllowedActivityTypes = ['land', 'water'] as const;
 export type AllowedActivityTypes = (typeof AllowedActivityTypes)[number];
 
