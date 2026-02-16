@@ -3,6 +3,7 @@ import { Activities } from './activities';
 import {
   NotScheduled,
   AllowedTimes,
+  Allowed9and10Only,
   AllowedActivityTypes,
   AllowedChoices,
   AllowedMaxMin,
@@ -195,7 +196,7 @@ export class Schedule {
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @returns {Map} - e.g for water activities: {'swim': 0, 'fish': 0, ...}
    */
-  private activityTemplate(activityType: AllowedActivityTypes, timeSlot: AllowedTimeSlots): Map<string, number> {
+  private activityTemplate(activityType: AllowedActivityTypes, timeSlot: Allowed9and10Only): Map<string, number> {
     const choicesCount = new Map<string, number>();
     if (activityType === 'land') {
       let notScheduledLandActivities: string[]
