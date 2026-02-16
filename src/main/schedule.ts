@@ -28,6 +28,8 @@ export class Schedule {
 
   private static readonly ALGOS: string[] = ['waterFirst'];
   private static readonly LANDWATER: string[] = ['water', 'land'];
+  private static readonly LANDTYPES: string[] = ['land1', 'land2', 'land3'];
+  private static readonly WATERTYPES: string[] = ['water1', 'water2', 'water3'];
 
   // TODO: see if improvemets can be made using this resouce https://www.freecodecamp.org/news/how-to-use-the-builder-pattern-in-python-a-practical-guide-for-devs/
   constructor(inputData: string, algo: string) {
@@ -169,8 +171,8 @@ export class Schedule {
    * @param {string} timeSlot - only 2 options: '9am' or '10am'.
    * @returns {Map} - activity plus the number of kids scheduled above the min threshold: e.g {'swim': 3, 'fish': 8, ...}
    */
-  private getScheduledAboveMin(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): Map<string, number> {
-    const scheduledAboveMin = new Map<string, number>();
+  private getScheduledAboveMin(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): Map<string, [number, string[]]> {
+    const scheduledAboveMin = new Map<string, [number, string[]]>();
     const activityRanges = [Activities.waterRanges, Activities.landRanges];
     let activityRange = activityRanges[0];
 
@@ -182,7 +184,7 @@ export class Schedule {
     for (const [activity, names] of Object.entries(activityTimeSlot)) {
       if (names.length > activityRange[activity][0]) {
         const aboveMinCount = names.length - activityRange[activity][0];
-        scheduledAboveMin.set(activity, aboveMinCount)
+        scheduledAboveMin.set(activity, [aboveMinCount, names])
       };
     };
     return scheduledAboveMin;
@@ -229,6 +231,31 @@ export class Schedule {
   }
 
   /**
+   * Count how many kids have chosen a specific activity as one of their choices.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {string} activity - activity such as 'canoe', 'pboard' or 'bball;
+   * @returns {number} - simple int of the count
+   */
+  private howManyToSpareHaveActivityAsAChoice(activityType: AllowedActivityTypes, activity: string, kidsToSpare: Map<string, [number, string[]]>): number {
+    const ACTIVITY_TYPES = activityType === 'water' ? Schedule.WATERTYPES : Schedule.LANDTYPES;
+    let count = 0;
+    console.log(typeof kidsToSpare)
+    kidsToSpare.forEach(kids => {
+      kids[1].forEach(kid => {
+        const theKid = this.kids.data.get(kid)
+        for (const [kidActivityType, kidActivity] of Object.entries(theKid.choices)) {
+          if (ACTIVITY_TYPES.includes(kidActivityType)) {
+            if (kidActivity === activity) {
+              count += 1;
+            }
+          }
+        }
+      });
+    });
+    return count;
+  }
+
+  /**
    * Sorts activities by shortfall from minimum requirement.
    * @param {Map<string,number>} notScheduledActivites - num of choices to count between 1 - 3.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
@@ -241,7 +268,7 @@ export class Schedule {
       const activityMin = activityRanges[activity][0];
       shortfallFromMin.set(activity, activityMin - activityCount);
     });
-    return new Map([...shortfallFromMin.entries()].sort((a, b) => b[1] - a[1]));
+    return new Map([...shortfallFromMin.entries()].sort((a, b) => a[1] - b[1]));
   }
 
   /**
@@ -699,6 +726,7 @@ export class Schedule {
     console.log('Kids that are scheduled for water at 9am:', this.scheduledActivityCount('water', '9am', false))
     console.log('Kids that are scheduled for water at 10am:', this.scheduledActivityCount('water', '10am', false))
     console.log("Shortfall so far: ", this.sortActivitiesByShortfall(filtered, 'water'))
+    console.log('To spare count: ',this.howManyToSpareHaveActivityAsAChoice('water', 'pboard', kidsToSpareWater9am))
     return 'success';
   }
 }
