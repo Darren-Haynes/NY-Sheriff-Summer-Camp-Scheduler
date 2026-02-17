@@ -60,7 +60,7 @@ export class Schedule {
       ? structuredClone(Activities.land9amActs)
       : structuredClone(Activities.land10amActs);
     const notScheduled: NotScheduled = {
-      names: this.kids.names,
+      names: structuredClone(this.kids.names),
       landActivities: structuredClone(nineOrTen),
       waterActivities: structuredClone(Activities.waterActs),
     };
@@ -358,6 +358,14 @@ export class Schedule {
     return randomSort.slice(0, numOfItems);
   }
 
+  private removeElementsFromArray(arr: string[], elementsToRemove: string[]): void {
+    const setOfElementsToRemove = new Set(elementsToRemove);
+    for (let i = arr.length - 1; i >= 0; i--) {
+      if (setOfElementsToRemove.has(arr[i])) {
+        arr.splice(i, 1);
+      }
+    }
+  }
   /**
    * Remove names and activites from notScheduled lists (because they are scheduled)
    * @param {string[]} names - Array of names to be removed from notScheduled lists
@@ -373,40 +381,31 @@ export class Schedule {
     timeSlot: AllowedTimes
   ): void {
     // TODO: fix all type errors within this method
-    names.forEach(name => {
-      // Remove names from master not scheduled names list
-      this.notScheduledAllNames = this.notScheduledAllNames.filter(name2 => name2 != name);
-
+    this.removeElementsFromArray(this.notScheduledAllNames, names);
       // Remove names and activities from 9am timeslots
-      if (timeSlot === '9am') {
-        this.notScheduled9am.names = this.notScheduled9am.names.filter(name2 => name2 != name);
-        if (activityType === 'land') {
-          this.notScheduled9am.landActivities = this.notScheduled9am.landActivities.filter(
-            activity2 => activity2 != activity
-          );
-        }
-        if (activityType === 'water') {
-          this.notScheduled9am.waterActivities = this.notScheduled9am.waterActivities.filter(
-            activity2 => activity2 != activity
-          );
-        }
-      }
-
-      // Remove names and activities from 9am timeslots
-      if (timeSlot === '10am') {
-        this.notScheduled10am.names = this.notScheduled10am.names.filter(name2 => name2 != name);
+    if (timeSlot === '9am') {
+      this.removeElementsFromArray(this.notScheduled9am.names, names);
+      if (activityType === 'water') {
+        const activityIdx = this.notScheduled9am.waterActivities.indexOf(activity)
+        this.notScheduled9am.waterActivities.splice(activityIdx, 1)
       }
       if (activityType === 'land') {
-        this.notScheduled10am.landActivities = this.notScheduled10am.landActivities.filter(
-          activity2 => activity2 != activity
-        );
+        const activityIdx = this.notScheduled9am.landActivities.indexOf(activity)
+        this.notScheduled9am.landActivities.splice(activityIdx, 1)
+      }
+    }
+      // Remove names and activities from 10am timeslots
+      if (timeSlot === '10am') {
+        this.removeElementsFromArray(this.notScheduled10am.names, names);
+      if (activityType === 'land') {
+        const activityIdx = this.notScheduled10am.landActivities.indexOf(activity)
+        this.notScheduled10am.landActivities.splice(activityIdx, 1)
       }
       if (activityType === 'water') {
-        this.notScheduled10am.waterActivities = this.notScheduled10am.waterActivities.filter(
-          activity2 => activity2 != activity
-        );
+        const activityIdx = this.notScheduled10am.waterActivities.indexOf(activity)
+        this.notScheduled10am.waterActivities.splice(activityIdx, 1)
       }
-    });
+    }
   }
 
   /**
@@ -430,7 +429,7 @@ export class Schedule {
           kidsByActivityChoice = kidsByActivityChoice.concat(activityChoices);
         }
       } else {
-        kidsByActivityChoice = this.getKidsbyActivityChoice(activity, activityType, choiceNum);
+        kidsByActivityChoice = this.getKidsbyActivityChoice(activity, activityType, choiceNum[0]);
       }
       const activityValue = (maxOrMin === 'max') ? 1 : 0;
       // TODO: fix type error
@@ -444,6 +443,7 @@ export class Schedule {
         kidsTimeSlot = this.randomChoices(kidsByActivityChoice, activityMaxOrMin);
       }
       if (maxOrMin === 'min') {
+        // if (kidsTimeSlot.length >gcc Activities.)
         kidsTimeSlot = kidsByActivityChoice
       }
 
@@ -461,9 +461,6 @@ export class Schedule {
 
       if (activityType === 'land') {
         const timeSlot = this.notScheduled10am.names.length >= this.notScheduled9am.names.length ? '10am' : '9am';
-        if (Activities.landRanges[activity][2] === 1) {
-            timeSlot = '10am';
-        }
         if (timeSlot === '9am') {
           this.land9am[activity] = kidsTimeSlot;
           this.removeScheduled(kidsTimeSlot, activityType, activity, '9am');
@@ -497,7 +494,7 @@ export class Schedule {
           kidsByActivityChoice = kidsByActivityChoice.concat(activityChoices);
         }
       } else {
-        kidsByActivityChoice = this.getKidsbyActivityChoice(activity, activityType, choiceNum);
+        kidsByActivityChoice = this.getKidsbyActivityChoice(activity, activityType, choiceNum[0]);
       }
       const activityValue = maxOrMin ? 1 : 0;
       // TODO: fix type error
@@ -604,6 +601,7 @@ export class Schedule {
   ): boolean {
     const activitiesAboveSingleMin: string[] = this.getActivities(activityType, choices, maxOrMin, 'single', 'both');
     if (activitiesAboveSingleMin.length > 0) {
+      console.log('Activities above single minimum:', activitiesAboveSingleMin);
       this.scheduleSingleActivities(activitiesAboveSingleMin, activityType, choices, maxOrMin);
       return true;
     }
@@ -625,6 +623,7 @@ export class Schedule {
   ): boolean {
     const activitiesAboveDoubleMin: string[] = this.getActivities(activityType, choices, maxOrMin, 'double', 'both');
     if (activitiesAboveDoubleMin.length > 0) {
+      console.log('Activities above double minimum:', activitiesAboveDoubleMin);
       this.scheduleDoubleActivities(activitiesAboveDoubleMin, activityType, choices, maxOrMin);
       return true;
     }
@@ -646,9 +645,11 @@ export class Schedule {
   ): boolean {
     const activitiesAboveSingleMax: string[] = this.getActivities(activityType, choices, maxOrMin, 'single', 'both');
     if (activitiesAboveSingleMax.length > 0) {
+      console.log('Activities above single maximum:', activitiesAboveSingleMax);
       this.scheduleSingleActivities(activitiesAboveSingleMax, activityType, choices, maxOrMin);
       return true;
     }
+    return false;
   }
 
   /**
@@ -665,6 +666,7 @@ export class Schedule {
   ): boolean {
     const activitiesAboveDoubleMax: string[] = this.getActivities(activityType, choices, maxOrMin, 'double', 'both');
     if (activitiesAboveDoubleMax.length > 0) {
+      console.log('Activities above doulbe maximum:', activitiesAboveDoubleMax);
       this.scheduleDoubleActivities(activitiesAboveDoubleMax, activityType, choices, maxOrMin);
       return true;
     }
@@ -673,31 +675,68 @@ export class Schedule {
 
   runAlgo(): string {
     console.log(`${this.algo} algorithm initiated`);
+    let result = false;
     // Check if kid's first choice totals are greater than both 9am & 10am water timeslots available..
-    this.scheduleDoubleMax('water', [1], 'max')
+    result = this.scheduleDoubleMax('water', [1], 'max')
+    if (result) {
+      console.log("this.scheduleDoubleMax('water', [1], 'max') ran successfully")
+    }
     // Check if kid's first choice totals are greater than both 9am & 10am water timeslots minimum requiremqnts available..
-    this.scheduleDoubleMin('water', [1], 'min')
+    result = this.scheduleDoubleMin('water', [1], 'min')
+    if (result) {
+      console.log("this.scheduleDoubleMin('water', [1], 'min') ran successfully")
+    }
     // Check if kid's first plus second choice totals are greater than both 9am & 10am water timeslots available..
-    this.scheduleDoubleMax('water', [1, 2], 'max')
+    result = this.scheduleDoubleMax('water', [1, 2], 'max')
+    if (result) {
+      console.log("this.scheduleDoubleMax('water', [1, 2], 'max') ran successfully")
+    }
     // Check if kid's first plus second choice totals are greater than both 9am & 10am water timeslots minimum requiremqnts available..
-    this.scheduleDoubleMin('water', [1, 2], 'min')
+    result = this.scheduleDoubleMin('water', [1, 2], 'min')
+    if (result) {
+      console.log("this.scheduleDoubleMin('water', [1, 2], 'min') ran successfully")
+    }
     // Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots available..
-    this.scheduleDoubleMax('water', [1, 2, 3], 'max')
+    result = this.scheduleDoubleMax('water', [1, 2, 3], 'max')
+    if (result) {
+      console.log("this.scheduleDoubleMax('water', [1, 2, 3], 'max') ran successfully")
+    }
     // Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots minimum requiremqnts available..
-    this.scheduleDoubleMin('water', [1, 2, 3], 'min')
+    result = this.scheduleDoubleMin('water', [1, 2, 3], 'min')
+    if (result) {
+      console.log("this.scheduleDoubleMin('water', [1, 2, 3], 'min') ran successfully")
+    }
 
     // Check if kid's first choice totals are greater than both 9am & 10am water timeslots available..
-    this.scheduleSingleMax('water', [1], 'max')
+    result = this.scheduleSingleMax('water', [1], 'max')
+    if (result) {
+      console.log("this.scheduleSingleMax('water', [1], 'max') ran successfully")
+    }
     // Check if kid's first choice totals are greater than both 9am & 10am water timeslots available..
-    this.scheduleSingleMin('water', [1], 'min')
+    result = this.scheduleSingleMin('water', [1], 'min')
+    if (result) {
+      console.log("this.scheduleSingleMin('water', [1], 'min') ran successfully")
+    }
     // Check if kid's first plus second choice totals are greater than both 9am & 10am water timeslots available..
-    this.scheduleSingleMax('water', [1, 2], 'max')
+    result = this.scheduleSingleMax('water', [1, 2], 'max')
+    if (result) {
+      console.log("this.scheduleSingleMax('water', [1, 2], 'max') ran successfully")
+    }
     // Check if kid's first plus second choice totals are greater than both 9am & 10am water timeslots available..
-    this.scheduleSingleMin('water', [1, 2], 'min')
+    result = this.scheduleSingleMin('water', [1, 2], 'min')
+    if (result) {
+      console.log("this.scheduleSingleMin('water', [1, 2], 'min') ran successfully")
+    }
     // Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots available..
-    this.scheduleSingleMax('water', [1, 2, 3], 'max')
+    result = this.scheduleSingleMax('water', [1, 2, 3], 'max')
+    if (result) {
+      console.log("this.scheduleSingleMax('water', [1, 2, 3], 'max') ran successfully")
+    }
     // Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots available..
-    this.scheduleSingleMin('water', [1, 2, 3], 'min')
+    result = this.scheduleSingleMin('water', [1, 2, 3], 'min')
+    if (result) {
+      console.log("this.scheduleSingleMin('water', [1, 2, 3], 'min') ran successfully")
+    }
 
     const kidsToSpareWater9am = this.getScheduledAboveMin('water', '9am')
     const kidsToSpareWater10am = this.getScheduledAboveMin('water', '10am')
@@ -707,15 +746,20 @@ export class Schedule {
     console.log('Kids left to schedule ', this.notScheduledAllNames.length);
     console.log('Kids left to schedule for 9am', this.notScheduled9am.names.length - 52);
     console.log('Kids left to schedule for 10am', this.notScheduled10am.names.length - 52);
-    console.log('kids to spare water for 9am', kidsToSpareWater9am)
-    console.log('kids to spare water for 10am', kidsToSpareWater10am)
+    // console.log('kids to spare water for 9am', kidsToSpareWater9am)
+    // console.log('kids to spare water for 10am', kidsToSpareWater10am)
     console.log('Kids activities count 9am :',this.countActivityChoices('water', [1, 2, 3], '9am'))
     console.log('Kids activities count 10am :',this.countActivityChoices('water', [1, 2, 3], '10am'))
-    const filtered = this.countActivityChoices('water', [1, 2, 3], '9am')
+    const filtered9am = this.countActivityChoices('water', [1, 2, 3], '9am')
+    const filtered10am = this.countActivityChoices('water', [1, 2, 3], '10am')
+    console.log("Not scheduled activities: ", filtered9am)
+    console.log("Not scheduled activities: ", filtered10am)
     console.log('Kids that are scheduled for water at 9am:', this.scheduledActivityCount('water', '9am', false))
     console.log('Kids that are scheduled for water at 10am:', this.scheduledActivityCount('water', '10am', false))
-    console.log("Shortfall so far: ", this.sortActivitiesByShortfall(filtered, 'water'))
-    console.log('To spare count: ',this.howManyToSpareHaveActivityAsAChoice('water', 'pboard', kidsToSpareWater9am))
+    console.log("Shortfall so far 9am: ", this.sortActivitiesByShortfall(filtered9am, 'water'))
+    console.log("Shortfall so far 10am: ", this.sortActivitiesByShortfall(filtered10am, 'water'))
+    console.log('To spare count 9am: ',this.howManyToSpareHaveActivityAsAChoice('water', 'pboard', kidsToSpareWater9am))
+    console.log('To spare count 10am: ',this.howManyToSpareHaveActivityAsAChoice('water', 'pboard', kidsToSpareWater10am))
     return 'success';
   }
 }
