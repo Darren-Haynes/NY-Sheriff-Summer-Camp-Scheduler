@@ -180,13 +180,7 @@ export class Schedule {
    */
   private getScheduledAboveMin(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): Map<string, [number, string[]]> {
     const scheduledAboveMin = new Map<string, [number, string[]]>();
-    const activityRanges = [Activities.waterRanges, Activities.landRanges];
-    let activityRange = activityRanges[0];
-
-    if (activityType === 'land') {
-      activityRange = activityRanges[1];
-    }
-
+    const activityRange = activityType === 'land' ? Activities.landRanges : Activities.waterRanges
     const activityTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
     for (const [activity, names] of Object.entries(activityTimeSlot)) {
       if (names.length > activityRange[activity][0]) {
@@ -738,28 +732,19 @@ export class Schedule {
       console.log("this.scheduleSingleMin('water', [1, 2, 3], 'min') ran successfully")
     }
 
-    const kidsToSpareWater9am = this.getScheduledAboveMin('water', '9am')
-    const kidsToSpareWater10am = this.getScheduledAboveMin('water', '10am')
-
     console.log(this.water9am);
     console.log(this.water10am);
     console.log('Kids left to schedule ', this.notScheduledAllNames.length);
     console.log('Kids left to schedule for 9am', this.notScheduled9am.names.length - 52);
     console.log('Kids left to schedule for 10am', this.notScheduled10am.names.length - 52);
-    // console.log('kids to spare water for 9am', kidsToSpareWater9am)
-    // console.log('kids to spare water for 10am', kidsToSpareWater10am)
     console.log('Kids activities count 9am :',this.countActivityChoices('water', [1, 2, 3], '9am'))
     console.log('Kids activities count 10am :',this.countActivityChoices('water', [1, 2, 3], '10am'))
     const filtered9am = this.countActivityChoices('water', [1, 2, 3], '9am')
     const filtered10am = this.countActivityChoices('water', [1, 2, 3], '10am')
-    console.log("Not scheduled activities: ", filtered9am)
-    console.log("Not scheduled activities: ", filtered10am)
     console.log('Kids that are scheduled for water at 9am:', this.scheduledActivityCount('water', '9am', false))
     console.log('Kids that are scheduled for water at 10am:', this.scheduledActivityCount('water', '10am', false))
     console.log("Shortfall so far 9am: ", this.sortActivitiesByShortfall(filtered9am, 'water'))
     console.log("Shortfall so far 10am: ", this.sortActivitiesByShortfall(filtered10am, 'water'))
-    console.log('To spare count 9am: ',this.howManyToSpareHaveActivityAsAChoice('water', 'pboard', kidsToSpareWater9am))
-    console.log('To spare count 10am: ',this.howManyToSpareHaveActivityAsAChoice('water', 'pboard', kidsToSpareWater10am))
     return 'success';
   }
 }
