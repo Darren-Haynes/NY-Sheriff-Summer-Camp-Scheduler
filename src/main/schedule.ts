@@ -573,7 +573,7 @@ export class Schedule {
     const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
     const minCountQualifier = this.getActivityCountQualifier(maxOrMin, doubleOrSingle);
     for (const [activity, range] of Object.entries(ranges)) {
-      if (countedChoices.get(activity) > range[minCountQualifier]) {
+      if (countedChoices.get(activity) >= range[minCountQualifier]) {
         qualifiedActivities.push(activity);
       }
     }
@@ -766,6 +766,5 @@ export class Schedule {
     console.log('Kids that are scheduled for water at 10am:', this.scheduledActivityCount('water', '10am', false))
     console.log("Shortfall so far 9am: ", this.sortActivitiesByShortfall(filtered9am, 'water'))
     console.log("Shortfall so far 10am: ", this.sortActivitiesByShortfall(filtered10am, 'water'))
-    return 'success';
-  }
+    return 'success'; }
 }
