@@ -7,6 +7,7 @@ import {
   AllowedActivityTypes,
   AllowedChoices,
   AllowedMaxMin,
+  AllowedMaxMinSched,
   AllowedDoubleSingle,
   AllowedChoiceNums
 } from '../types/schedule-types';
@@ -667,70 +668,76 @@ export class Schedule {
     return false;
   }
 
+  private scheduleDoubles(
+    activityType: AllowedActivityTypes,
+    choices: AllowedChoices,
+    maxOrMinSched: AllowedMaxMinSched,
+  ): boolean {
+    // TODO - remove line below and the console.log logic below that relies on it.
+    let result = false;
+    for (let i = 1; i < choices.length + 1; i++) {
+      switch (maxOrMinSched) {
+        case 'maxOnly':
+        result = this.scheduleDoubleMax(activityType, choices.slice(0, i), 'max')
+        if (result) {
+          console.log(`this.scheduleDoubleMax(${activityType}, ${choices.slice(0, i)}, 'max') ran successfully`)
+        }
+        case 'minOnly':
+        result = this.scheduleDoubleMin(activityType, choices.slice(0, i), 'min')
+        if (result) {
+          console.log(`this.scheduleDoubleMin($${activityType}, ${choices.slice(0, i)}, 'min' ran successfully`)
+        }
+        case 'bothMinAndMax':
+        result = this.scheduleDoubleMax(activityType, choices.slice(0, i), 'max')
+        if (result) {
+          console.log(`this.scheduleDoubleMax(${activityType}, ${choices.slice(0, i)}, 'max') ran successfully`)
+        }
+        result = this.scheduleDoubleMin(activityType, choices.slice(0, i), 'min')
+        if (result) {
+          console.log(`this.scheduleDoubleMin($${activityType}, ${choices.slice(0, i)}, 'min' ran successfully`)
+        }
+      }
+    }
+    return false;
+  }
+
+  private scheduleSingles(
+    activityType: AllowedActivityTypes,
+    choices: AllowedChoices,
+    maxOrMinSched: AllowedMaxMinSched,
+  ): boolean {
+    // TODO - remove line below and the console.log logic below that relies on it.
+    let result = false;
+    for (let i = 1; i < choices.length + 1; i++) {
+      switch (maxOrMinSched) {
+        case 'maxOnly':
+        result = this.scheduleSingleMax(activityType, choices.slice(0, i), 'max')
+        if (result) {
+          console.log(`this.scheduleSingleMax(${activityType}, ${choices.slice(0, i)}, 'max') ran successfully`)
+        }
+        case 'minOnly':
+        result = this.scheduleSingleMin(activityType, choices.slice(0, i), 'min')
+        if (result) {
+          console.log(`this.scheduleSingleMin($${activityType}, ${choices.slice(0, i)}, 'min' ran successfully`)
+        }
+        case 'bothMinAndMax':
+        result = this.scheduleSingleMax(activityType, choices.slice(0, i), 'max')
+        if (result) {
+          console.log(`this.scheduleSingleMax(${activityType}, ${choices.slice(0, i)}, 'max') ran successfully`)
+        }
+        result = this.scheduleSingleMin(activityType, choices.slice(0, i), 'min')
+        if (result) {
+          console.log(`this.scheduleSingleMin($${activityType}, ${choices.slice(0, i)}, 'min' ran successfully`)
+        }
+      }
+    }
+    return false;
+  }
+
   runAlgo(): string {
     console.log(`${this.algo} algorithm initiated`);
-    let result = false;
-    // Check if kid's first choice totals are greater than both 9am & 10am water timeslots available..
-    result = this.scheduleDoubleMax('water', [1], 'max')
-    if (result) {
-      console.log("this.scheduleDoubleMax('water', [1], 'max') ran successfully")
-    }
-    // Check if kid's first choice totals are greater than both 9am & 10am water timeslots minimum requiremqnts available..
-    result = this.scheduleDoubleMin('water', [1], 'min')
-    if (result) {
-      console.log("this.scheduleDoubleMin('water', [1], 'min') ran successfully")
-    }
-    // Check if kid's first plus second choice totals are greater than both 9am & 10am water timeslots available..
-    result = this.scheduleDoubleMax('water', [1, 2], 'max')
-    if (result) {
-      console.log("this.scheduleDoubleMax('water', [1, 2], 'max') ran successfully")
-    }
-    // Check if kid's first plus second choice totals are greater than both 9am & 10am water timeslots minimum requiremqnts available..
-    result = this.scheduleDoubleMin('water', [1, 2], 'min')
-    if (result) {
-      console.log("this.scheduleDoubleMin('water', [1, 2], 'min') ran successfully")
-    }
-    // Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots available..
-    result = this.scheduleDoubleMax('water', [1, 2, 3], 'max')
-    if (result) {
-      console.log("this.scheduleDoubleMax('water', [1, 2, 3], 'max') ran successfully")
-    }
-    // Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots minimum requiremqnts available..
-    result = this.scheduleDoubleMin('water', [1, 2, 3], 'min')
-    if (result) {
-      console.log("this.scheduleDoubleMin('water', [1, 2, 3], 'min') ran successfully")
-    }
-
-    // Check if kid's first choice totals are greater than both 9am & 10am water timeslots available..
-    result = this.scheduleSingleMax('water', [1], 'max')
-    if (result) {
-      console.log("this.scheduleSingleMax('water', [1], 'max') ran successfully")
-    }
-    // Check if kid's first choice totals are greater than both 9am & 10am water timeslots available..
-    result = this.scheduleSingleMin('water', [1], 'min')
-    if (result) {
-      console.log("this.scheduleSingleMin('water', [1], 'min') ran successfully")
-    }
-    // Check if kid's first plus second choice totals are greater than both 9am & 10am water timeslots available..
-    result = this.scheduleSingleMax('water', [1, 2], 'max')
-    if (result) {
-      console.log("this.scheduleSingleMax('water', [1, 2], 'max') ran successfully")
-    }
-    // Check if kid's first plus second choice totals are greater than both 9am & 10am water timeslots available..
-    result = this.scheduleSingleMin('water', [1, 2], 'min')
-    if (result) {
-      console.log("this.scheduleSingleMin('water', [1, 2], 'min') ran successfully")
-    }
-    // Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots available..
-    result = this.scheduleSingleMax('water', [1, 2, 3], 'max')
-    if (result) {
-      console.log("this.scheduleSingleMax('water', [1, 2, 3], 'max') ran successfully")
-    }
-    // Check if kid's first plus second plus third choice totals are greater than both 9am & 10am water timeslots available..
-    result = this.scheduleSingleMin('water', [1, 2, 3], 'min')
-    if (result) {
-      console.log("this.scheduleSingleMin('water', [1, 2, 3], 'min') ran successfully")
-    }
+    this.scheduleDoubles('water', [1, 2, 3], 'bothMinAndMax')
+    this.scheduleSingles('water', [1, 2, 3], 'bothMinAndMax')
 
     console.log(this.water9am);
     console.log(this.water10am);
