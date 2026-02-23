@@ -668,6 +668,13 @@ export class Schedule {
     return false;
   }
 
+  /**
+   * Precursor to scheduleDoubleMax and scheduleDoubleMin methods.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {number[]} choices - num of choices to count in any combo of 1 thru 3: [[1], [2], [3], [1, 2], [1, 2], [1, 3], [1, 2, 3]]
+   * @param {string}  maxOrMinSched - 3 options: 'maxOnly', 'minOnly', 'bothMinAndMax'
+   * @returns {boolean} true if 1 or more activities were scheduled, false if not activity is schedule.
+   */
   private scheduleDoubles(
     activityType: AllowedActivityTypes,
     choices: AllowedChoices,
@@ -698,9 +705,16 @@ export class Schedule {
         }
       }
     }
-    return false;
+    return result;
   }
 
+/**
+  * Precursor to scheduleSingleMax and scheduleSinlgeMin methods.
+  * @param {string} activityType - only 2 options: 'land' or 'water'.
+  * @param {number[]} choices - num of choices to count in any combo of 1 thru 3: [[1], [2], [3], [1, 2], [1, 2], [1, 3], [1, 2, 3]]
+  * @param {string}  maxOrMinSched - 3 options: 'maxOnly', 'minOnly', 'bothMinAndMax'
+  * @returns {boolean} true if 1 or more activities were scheduled, false if not activity is schedule.
+  */
   private scheduleSingles(
     activityType: AllowedActivityTypes,
     choices: AllowedChoices,
