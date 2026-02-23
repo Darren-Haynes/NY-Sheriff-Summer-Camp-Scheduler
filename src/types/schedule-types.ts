@@ -47,6 +47,9 @@ export type AllowedChoices = (typeof AllowedChoices)[number];
 const AllowedMaxMin = ['max', 'min'] as const;
 export type AllowedMaxMin = (typeof AllowedMaxMin)[number];
 
+const AllowedMaxMinSched = ['maxOnly', 'minOnly', 'bothMinAndMax'] as const;
+export type AllowedMaxMinSched = (typeof AllowedMaxMinSched)[number];
+
 const AllowedDoubleSingle = ['double', 'single'] as const;
 export type AllowedDoubleSingle = (typeof AllowedDoubleSingle)[number];
 
