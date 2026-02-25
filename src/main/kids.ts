@@ -9,6 +9,7 @@ export class Kids {
   col: Array<string>;
   names: Array<string>;
   data: KidsData;
+  totalKidsCount: number;
 
   /**
    *
@@ -17,6 +18,7 @@ export class Kids {
   constructor(inputData: string) {
     this.data = new Map();
     this.inputData = inputData;
+    this.totalKidsCount = 0;
     this.createKidsMap();
     this.names = Array.from(this.data.keys());
   }
@@ -48,6 +50,7 @@ export class Kids {
         },
       });
     });
+    this.totalKidsCount = inputDataArr.length;
     return;
   }
 
