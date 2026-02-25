@@ -748,23 +748,29 @@ export class Schedule {
     return false;
   }
 
+  private viewSchedule(activityType: AllowedActivityTypes): void {
+    console.log(`BEGINNING OF ${activityType.toUpperCase()} VIEW SCHEDULE`)
+    activityType === 'water' ? console.log(this.water9am) : console.log(this.land9am);
+    activityType === 'water' ? console.log(this.water10am) : console.log(this.land10am);
+    console.log('Kids left to schedule ', this.notScheduledAllNames.length);
+    console.log('Kids left to schedule for 9am', this.notScheduled9am.names.length - 52);
+    console.log('Kids left to schedule for 10am', this.notScheduled10am.names.length - 52);
+    console.log('Kids activities count 9am :',this.countActivityChoices(activityType, [1, 2, 3], '9am'))
+    console.log('Kids activities count 10am :',this.countActivityChoices(activityType, [1, 2, 3], '10am'))
+    const filtered9am = this.countActivityChoices(activityType, [1, 2, 3], '9am')
+    const filtered10am = this.countActivityChoices(activityType, [1, 2, 3], '10am')
+    console.log(`Kids that are scheduled for ${activityType} at 9am:`, this.scheduledActivityCount(activityType, '9am', false))
+    console.log(`Kids that are scheduled for ${activityType} at 10am:`, this.scheduledActivityCount(activityType, '10am', false))
+    console.log("Shortfall so far 9am: ", this.sortActivitiesByShortfall(filtered9am, activityType))
+    console.log("Shortfall so far 10am: ", this.sortActivitiesByShortfall(filtered10am, activityType))
+    console.log(`END OF ${activityType.toUpperCase()} VIEW SCHEDULE\n`)
+  }
+
   runAlgo(): string {
     console.log(`${this.algo} algorithm initiated`);
     this.scheduleDoubles('water', [1, 2, 3], 'bothMinAndMax')
     this.scheduleSingles('water', [1, 2, 3], 'bothMinAndMax')
 
-    console.log(this.water9am);
-    console.log(this.water10am);
-    console.log('Kids left to schedule ', this.notScheduledAllNames.length);
-    console.log('Kids left to schedule for 9am', this.notScheduled9am.names.length - 52);
-    console.log('Kids left to schedule for 10am', this.notScheduled10am.names.length - 52);
-    console.log('Kids activities count 9am :',this.countActivityChoices('water', [1, 2, 3], '9am'))
-    console.log('Kids activities count 10am :',this.countActivityChoices('water', [1, 2, 3], '10am'))
-    const filtered9am = this.countActivityChoices('water', [1, 2, 3], '9am')
-    const filtered10am = this.countActivityChoices('water', [1, 2, 3], '10am')
-    console.log('Kids that are scheduled for water at 9am:', this.scheduledActivityCount('water', '9am', false))
-    console.log('Kids that are scheduled for water at 10am:', this.scheduledActivityCount('water', '10am', false))
-    console.log("Shortfall so far 9am: ", this.sortActivitiesByShortfall(filtered9am, 'water'))
-    console.log("Shortfall so far 10am: ", this.sortActivitiesByShortfall(filtered10am, 'water'))
+    this.viewSchedule('water')
     return 'success'; }
 }
