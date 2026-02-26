@@ -343,6 +343,25 @@ export class Schedule {
   }
 
   /**
+   * Filter scheduled activities that are below max capacity,
+   * so we can see which activities we can add more kids to.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {string} timeSlot - only 2 options -'9am' or '10am'
+   * @returns {Map<string, number>} - Map of activity names and their number open slots
+   */
+  private getActivitiesBelowMax(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): Map<string, number> {
+    const openSlots = new Map<string, number>();
+    const scheduledCount = this.scheduledActivityCount(activityType, timeSlot, false)
+    for (const [activity, count] of scheduledCount) {
+      const activityMax = Activities.waterRanges[activity][1]
+      if (count < activityMax) {
+        openSlots.set(activity, activityMax - count);
+      }
+    }
+    return openSlots;
+  }
+
+  /**
    * Get random selection of elements from an Array.
    * If more kids want to attend an activity than there are slots, we need to randomly choose from them to
    * to avoid any selection bias.
@@ -786,7 +805,11 @@ export class Schedule {
     console.log(this.howManyToSpareHaveActivityAsAChoice(activityType, 'canoe', scheduledAboveMin10am))
     console.log(this.howManyToSpareHaveActivityAsAChoice(activityType, 'pboard', scheduledAboveMin10am))
 
-    console.log(`END OF ${activityType.toUpperCase()} VIEW SCHEDULE\n`)
+    const scheudledBelowMax9am = this.getActivitiesBelowMax(activityType, '9am');
+    const scheudledBelowMax10am = this.getActivitiesBelowMax(activityType, '10am');
+    console.log(`9am ${activityType} schedule below max: `, scheudledBelowMax9am);
+    console.log(`10am ${activityType} schedule below max: `, scheudledBelowMax10am);
+    console.log(`END OF ${activityType.toUpperCase()} VIEW SCHEDULE\n`);
   }
 
   runAlgo(): string {
