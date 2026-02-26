@@ -185,7 +185,7 @@ export class Schedule {
    * @param {string} timeSlot - only 2 options: '9am' or '10am'.
    * @returns {Map} - activity plus the number of kids scheduled above the min threshold: e.g {'swim': 3, 'fish': 8, ...}
    */
-  private getScheduledAboveMin(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): Map<string, [number, string[]]> {
+  private getKidsScheduleAboveMin(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): Map<string, [number, string[]]> {
     const scheduledAboveMin = new Map<string, [number, string[]]>();
     const activityRange = activityType === 'land' ? Activities.landRanges : Activities.waterRanges
     const activityTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
@@ -247,7 +247,6 @@ export class Schedule {
   private howManyToSpareHaveActivityAsAChoice(activityType: AllowedActivityTypes, activity: string, kidsToSpare: Map<string, [number, string[]]>): number {
     const ACTIVITY_TYPES = activityType === 'water' ? Schedule.WATERTYPES : Schedule.LANDTYPES;
     let count = 0;
-    console.log(typeof kidsToSpare)
     kidsToSpare.forEach(kids => {
       kids[1].forEach(kid => {
         const theKid = this.kids.data.get(kid)
@@ -761,21 +760,32 @@ export class Schedule {
     const notScheduledAllNames = activityType === 'water' ? this.notScheduledAllNamesWater : this.notScheduledAllNamesLand;
     console.log(`BEGINNING OF ${activityType.toUpperCase()} VIEW SCHEDULE`);
     console.log(`TOTAL KIDS COUNT: `, this.kids.totalKidsCount);
+
     activityType === 'water' ? console.log(this.water9am) : console.log(this.land9am);
     activityType === 'water' ? console.log(this.water10am) : console.log(this.land10am);
+
     console.log('Kids left to schedule ', notScheduledAllNames.length);
     console.log(`Kids left to schedule for 9am ${activityType}: `, notScheduled9am.names.length - (this.kids.totalKidsCount / 2);
     console.log(`Kids left to schedule for 10am ${activityType}: `, notScheduled10am.names.length - (this.kids.totalKidsCount / 2));
     console.log(`Kids activities count 9am ${activityType}:`,this.countActivityChoices(activityType, [1, 2, 3], '9am'))
     console.log(`Kids activities count 10am ${activityType}:`,this.countActivityChoices(activityType, [1, 2, 3], '10am'))
-    const filtered9am = this.countActivityChoices(activityType, [1, 2, 3], '9am')
-    const filtered10am = this.countActivityChoices(activityType, [1, 2, 3], '10am')
     console.log(`9am ${activityType} activities: `, notScheduled9am[activityProperty])
     console.log(`10am ${activityType} activities: `, notScheduled10am[activityProperty])
     console.log(`Kids that are scheduled for ${activityType} at 9am:`, this.scheduledActivityCount(activityType, '9am', false))
     console.log(`Kids that are scheduled for ${activityType} at 10am:`, this.scheduledActivityCount(activityType, '10am', false))
+
+    const filtered9am = this.countActivityChoices(activityType, [1, 2, 3], '9am')
+    const filtered10am = this.countActivityChoices(activityType, [1, 2, 3], '10am')
     console.log(`Shortfall so far 9am ${activityType}: `, this.sortActivitiesByShortfall(filtered9am, activityType))
     console.log(`Shortfall so far 10am ${activityType}: `, this.sortActivitiesByShortfall(filtered10am, activityType))
+
+    const scheduledAboveMin9am = this.getKidsScheduleAboveMin(activityType, '9am')
+    console.log(this.howManyToSpareHaveActivityAsAChoice(activityType, 'canoe', scheduledAboveMin9am))
+    console.log(this.howManyToSpareHaveActivityAsAChoice(activityType, 'pboard', scheduledAboveMin9am))
+    const scheduledAboveMin10am = this.getKidsScheduleAboveMin(activityType, '10am')
+    console.log(this.howManyToSpareHaveActivityAsAChoice(activityType, 'canoe', scheduledAboveMin10am))
+    console.log(this.howManyToSpareHaveActivityAsAChoice(activityType, 'pboard', scheduledAboveMin10am))
+
     console.log(`END OF ${activityType.toUpperCase()} VIEW SCHEDULE\n`)
   }
 
@@ -784,7 +794,7 @@ export class Schedule {
     this.scheduleDoubles('water', [1, 2, 3], 'bothMinAndMax')
     this.scheduleSingles('water', [1, 2, 3], 'bothMinAndMax')
 
-    this.printDebugView('water')
     this.printDebugView('land')
+    this.printDebugView('water')
     return 'success'; }
 }
