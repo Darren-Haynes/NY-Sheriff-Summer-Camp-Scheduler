@@ -9,7 +9,9 @@ import {
   AllowedMaxMin,
   AllowedMaxMinSched,
   AllowedDoubleSingle,
-  AllowedChoiceNums
+  AllowedChoiceNums,
+  LandActivities,
+  WaterActivities
 } from '../types/schedule-types';
 import { LandKidsAM, LandKidsPM, WaterKids } from '../types/camp-types';
 
@@ -244,7 +246,7 @@ export class Schedule {
    * @param {string} activity - activity such as 'canoe', 'pboard' or 'bball;
    * @returns {number} - simple int of the count
    */
-  private howManyToSpareHaveActivityAsAChoice(activityType: AllowedActivityTypes, activity: string, kidsToSpare: Map<string, [number, string[]]>): number {
+  private howManyToSpareHaveActivityAsAChoice(activityType: AllowedActivityTypes, activity: LandActivities | WaterActivities, kidsToSpare: Map<string, [number, string[]]>): number {
     const ACTIVITY_TYPES = activityType === 'water' ? Schedule.WATERTYPES : Schedule.LANDTYPES;
     let count = 0;
     kidsToSpare.forEach(kids => {
@@ -326,7 +328,7 @@ export class Schedule {
    * @returns {string[]} - Array of kids names who chose the activity
    */
   private getKidsbyActivityChoice(
-    activity: string,
+    activity: LandActivities | WaterActivities,
     activityType: AllowedActivityTypes,
     choiceNum: AllowedChoiceNums
   ): string[] {
@@ -343,7 +345,7 @@ export class Schedule {
   }
 
   /**
-   * Filter scheduled activities that are below max capacity,
+   * Filter scheduled activities that are below (but not equal to) max capacity,
    * so we can see which activities we can add more kids to.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {string} timeSlot - only 2 options -'9am' or '10am'
@@ -359,6 +361,59 @@ export class Schedule {
       }
     }
     return openSlots;
+  }
+
+  /**
+   * Filter scheduled activities that are above (but not equal to) minimum capacity,
+   * so we can see which activities we can take kids from.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {string} timeSlot - only 2 options -'9am' or '10am'
+   * @returns {Map<string, number>} - Map of activity names and their number of kids above minimum capacity
+   */
+  private getActivitiesAboveMin(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): Map<string, number> {
+    const aboveMin = new Map<string, number>();
+    const scheduledCount = this.scheduledActivityCount(activityType, timeSlot, false)
+    for (const [activity, count] of scheduledCount) {
+      const activityMin = activityType === 'water' ? Activities.waterRanges[activity][0] : Activities.landRanges[activity][0];
+      if (count > activityMin) {
+        aboveMin.set(activity, count - activityMin);
+      }
+    }
+    return aboveMin;
+  }
+
+  /**
+   * Get kids who can be rescheduled for a specific activity and time slot.
+   * This will be kids that are scheduled to an activity that is above the minimum count
+   * for an activty and can spare kids.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {string} timeSlot - only 2 options -'9am' or '10am'
+   * @param {number[]} choices - num of choices to count in any combo of 1 thru 3: [[1], [2], [3], [1, 2], [1, 2], [1, 3], [1, 2, 3]]
+   * @returns {string[]} - array of kids names who can be rescheduled
+   */
+  private getKidsWhoCanReschedule(activityType: AllowedActivityTypes, activity: LandActivities | WaterActivities, timeSlot: AllowedTimes, choices: AllowedChoices): Array<string> {
+    let scheduledActivities = null;
+    if (activityType === 'land') {
+      scheduledActivities = timeSlot === '9am' ? this.land9am : this.land10am
+    } else if (activityType === 'water') {
+      scheduledActivities = timeSlot === '9am' ? this.water9am : this.water10am
+    }
+    const activitiesAboveMin = this.getActivitiesAboveMin(activityType, timeSlot)
+    const kidsWhoCanReschedule = new Array;
+    for (const [activityAboveMin, count] of activitiesAboveMin) {
+      const scheduledKids = scheduledActivities[activityAboveMin]
+      for (const kid of scheduledKids) {
+        for (const choice of choices) {
+          const kidsData = this.kids.data.get(kid)
+          const kidsChoices = kidsData.choices
+          const kidsChoice = activityType === 'land' ? Object.keys(kidsChoices)[choice - 1] : Object.keys(kidsChoices)[choice + 2]
+          if (kidsChoices[kidsChoice] === activity) {
+            kidsWhoCanReschedule.push(kid)
+          }
+        }
+      }
+    }
+    return kidsWhoCanReschedule;
   }
 
   /**
@@ -396,7 +451,7 @@ export class Schedule {
   private removeScheduled(
     names: string[],
     activityType: string,
-    activity: string,
+    activity: LandActivities | WaterActivities,
     timeSlot: AllowedTimes
   ): void {
     // TODO: fix all type errors within this method
@@ -795,8 +850,10 @@ export class Schedule {
 
     const filtered9am = this.countActivityChoices(activityType, [1, 2, 3], '9am')
     const filtered10am = this.countActivityChoices(activityType, [1, 2, 3], '10am')
-    console.log(`Shortfall so far 9am ${activityType}: `, this.sortActivitiesByShortfall(filtered9am, activityType))
-    console.log(`Shortfall so far 10am ${activityType}: `, this.sortActivitiesByShortfall(filtered10am, activityType))
+    const shortfall9am = this.sortActivitiesByShortfall(filtered9am, activityType)
+    const shortfall10am = this.sortActivitiesByShortfall(filtered10am, activityType)
+    console.log(`Shortfall so far 9am ${activityType}: `, shortfall9am);
+    console.log(`Shortfall so far 10am ${activityType}: `, shortfall10am);
 
     const scheduledAboveMin9am = this.getKidsScheduleAboveMin(activityType, '9am')
     console.log(this.howManyToSpareHaveActivityAsAChoice(activityType, 'canoe', scheduledAboveMin9am))
@@ -809,9 +866,15 @@ export class Schedule {
     const scheudledBelowMax10am = this.getActivitiesBelowMax(activityType, '10am');
     console.log(`9am ${activityType} schedule below max: `, scheudledBelowMax9am);
     console.log(`10am ${activityType} schedule below max: `, scheudledBelowMax10am);
-    console.log(`END OF ${activityType.toUpperCase()} VIEW SCHEDULE\n`);
-  }
 
+    let kidsWhoCanReschedule = [];
+    for (const [activity] of shortfall9am) {
+      kidsWhoCanReschedule = this.getKidsWhoCanReschedule('water', activity, '9am', [1, 2, 3]);
+      console.log("Activity to rescedule to:", activity)
+      console.log("Kids who can reschedule:", kidsWhoCanReschedule)
+    }
+    console.log(`END OF ${activityType.toUpperCase()} VIEW SCHEDULE\n`);
+}
   runAlgo(): string {
     console.log(`${this.algo} algorithm initiated`);
     this.scheduleDoubles('water', [1, 2, 3], 'bothMinAndMax')
