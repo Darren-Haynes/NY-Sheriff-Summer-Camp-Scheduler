@@ -11,7 +11,7 @@ import {
   AllowedDoubleSingle,
   AllowedChoiceNums,
   LandActivities,
-  WaterActivities
+  WaterActivities,
 } from '../types/schedule-types';
 import { LandKidsAM, LandKidsPM, WaterKids } from '../types/camp-types';
 
@@ -832,48 +832,48 @@ export class Schedule {
     const notScheduled10am = activityType === 'water' ? this.notScheduled10amWater : this.notScheduled10amLand;
     const activityProperty = activityType === 'water' ? 'waterActivities' : 'landActivities';
     const notScheduledAllNames = activityType === 'water' ? this.notScheduledAllNamesWater : this.notScheduledAllNamesLand;
+    console.log(`\n%%%${'-'.repeat(40)}%%%`)
     console.log(`BEGINNING OF ${activityType.toUpperCase()} VIEW SCHEDULE`);
     console.log(`TOTAL KIDS COUNT: `, this.kids.totalKidsCount);
 
-    activityType === 'water' ? console.log(this.water9am) : console.log(this.land9am);
-    activityType === 'water' ? console.log(this.water10am) : console.log(this.land10am);
+    // activityType === 'water' ? console.log(this.water9am) : console.log(this.land9am);
+    // activityType === 'water' ? console.log(this.water10am) : console.log(this.land10am);
 
     console.log('Kids left to schedule ', notScheduledAllNames.length);
     console.log(`Kids left to schedule for 9am ${activityType}: `, notScheduled9am.names.length - (this.kids.totalKidsCount / 2);
     console.log(`Kids left to schedule for 10am ${activityType}: `, notScheduled10am.names.length - (this.kids.totalKidsCount / 2));
-    console.log(`Kids activities count 9am ${activityType}:`,this.countActivityChoices(activityType, [1, 2, 3], '9am'))
-    console.log(`Kids activities count 10am ${activityType}:`,this.countActivityChoices(activityType, [1, 2, 3], '10am'))
-    console.log(`9am ${activityType} activities: `, notScheduled9am[activityProperty])
-    console.log(`10am ${activityType} activities: `, notScheduled10am[activityProperty])
-    console.log(`Kids that are scheduled for ${activityType} at 9am:`, this.scheduledActivityCount(activityType, '9am', false))
-    console.log(`Kids that are scheduled for ${activityType} at 10am:`, this.scheduledActivityCount(activityType, '10am', false))
+    // console.log(`Kids count that are scheduled for ${activityType} at 9am:`, this.scheduledActivityCount(activityType, '9am', false))
+    // console.log(`Kids count that are scheduled for ${activityType} at 10am:`, this.scheduledActivityCount(activityType, '10am', false))
 
     const filtered9am = this.countActivityChoices(activityType, [1, 2, 3], '9am')
     const filtered10am = this.countActivityChoices(activityType, [1, 2, 3], '10am')
     const shortfall9am = this.sortActivitiesByShortfall(filtered9am, activityType)
     const shortfall10am = this.sortActivitiesByShortfall(filtered10am, activityType)
-    console.log(`Shortfall so far 9am ${activityType}: `, shortfall9am);
-    console.log(`Shortfall so far 10am ${activityType}: `, shortfall10am);
-
-    const scheduledAboveMin9am = this.getKidsScheduleAboveMin(activityType, '9am')
-    console.log(this.howManyToSpareHaveActivityAsAChoice(activityType, 'canoe', scheduledAboveMin9am))
-    console.log(this.howManyToSpareHaveActivityAsAChoice(activityType, 'pboard', scheduledAboveMin9am))
-    const scheduledAboveMin10am = this.getKidsScheduleAboveMin(activityType, '10am')
-    console.log(this.howManyToSpareHaveActivityAsAChoice(activityType, 'canoe', scheduledAboveMin10am))
-    console.log(this.howManyToSpareHaveActivityAsAChoice(activityType, 'pboard', scheduledAboveMin10am))
 
     const scheudledBelowMax9am = this.getActivitiesBelowMax(activityType, '9am');
     const scheudledBelowMax10am = this.getActivitiesBelowMax(activityType, '10am');
-    console.log(`9am ${activityType} schedule below max: `, scheudledBelowMax9am);
-    console.log(`10am ${activityType} schedule below max: `, scheudledBelowMax10am);
 
     let kidsWhoCanReschedule = [];
+    console.log(`\n\n${'*'.repeat(30)}`)
+    console.log("***9AM SHORTFALL activities***")
+    console.log(`Shortfall so far 9am ${activityType}: `, shortfall9am);
+    console.log(`9am ${activityType} schedule below max: `, scheudledBelowMax9am);
     for (const [activity] of shortfall9am) {
       kidsWhoCanReschedule = this.getKidsWhoCanReschedule('water', activity, '9am', [1, 2, 3]);
       console.log("Activity to rescedule to:", activity)
       console.log("Kids who can reschedule:", kidsWhoCanReschedule)
     }
+    console.log(`\n\n${'*'.repeat(30)}`)
+    console.log("***10AM SHORTFALL activities***")
+    console.log(`Shortfall so far 10am ${activityType}: `, shortfall10am);
+    console.log(`10am ${activityType} schedule below max: `, scheudledBelowMax10am);
+    for (const [activity] of shortfall10am) {
+      kidsWhoCanReschedule = this.getKidsWhoCanReschedule('water', activity, '10am', [1, 2, 3]);
+      console.log("Activity to rescedule to:", activity)
+      console.log("Kids who can reschedule:", kidsWhoCanReschedule)
+    }
     console.log(`END OF ${activityType.toUpperCase()} VIEW SCHEDULE\n`);
+    console.log(`${'-'.repeat(40)}`)
 }
   runAlgo(): string {
     console.log(`${this.algo} algorithm initiated`);
@@ -882,5 +882,7 @@ export class Schedule {
 
     this.printDebugView('land')
     this.printDebugView('water')
+    console.log(this.kids.waterActivitiesChoiceCount)
+    console.log(this.kids.landActivitiesChoiceCount)
     return 'success'; }
 }
