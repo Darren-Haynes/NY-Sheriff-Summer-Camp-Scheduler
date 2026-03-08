@@ -10,6 +10,38 @@ export interface NotScheduled {
   waterActivities: string[];
 }
 
+interface ActivityCounts {
+  total: number;
+  choice1: number;
+  choice2: number;
+  choice3: number;
+}
+
+export interface WaterActivityCounts {
+  swim: ActivityCounts;
+  fish: ActivityCounts;
+  canoe: ActivityCounts;
+  snork: ActivityCounts;
+  sail: ActivityCounts;
+  pboard: ActivityCounts;
+  kayak: ActivityCounts;
+}
+
+export interface LandActivityCounts {
+  bball: ActivityCounts;
+  vball: ActivityCounts;
+  soc: ActivityCounts;
+  arch: ActivityCounts;
+  art: ActivityCounts;
+  hike: ActivityCounts;
+  cheer: ActivityCounts;
+  pball: ActivityCounts;
+  lax: ActivityCounts;
+  fball: ActivityCounts;
+  yoga: ActivityCounts;
+  fris: ActivityCounts;
+}
+
 export type WaterActivities = 'swim' | 'fish' | 'canoe' | 'snork' | 'sail' | 'pboard' | 'kayak';
 // TODO: uncomment the 2 line below to try and increase type safety
 // type Land9amActivities = 'bball' | 'vball' | 'soc' | 'arch' | 'art' | 'hike' | 'cheer';

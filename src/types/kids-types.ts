@@ -18,3 +18,35 @@ type KidsChoices = {
   water2: string;
   water3: string;
 };
+
+interface ActivityCounts {
+  total: number;
+  choice1: number;
+  choice2: number;
+  choice3: number;
+}
+
+export interface WaterActivityCounts {
+  swim: ActivityCounts;
+  fish: ActivityCounts;
+  canoe: ActivityCounts;
+  snork: ActivityCounts;
+  sail: ActivityCounts;
+  pboard: ActivityCounts;
+  kayak: ActivityCounts;
+}
+
+export interface LandActivityCounts {
+  bball: ActivityCounts;
+  vball: ActivityCounts;
+  soc: ActivityCounts;
+  arch: ActivityCounts;
+  art: ActivityCounts;
+  hike: ActivityCounts;
+  cheer: ActivityCounts;
+  pball: ActivityCounts;
+  lax: ActivityCounts;
+  fball: ActivityCounts;
+  yoga: ActivityCounts;
+  fris: ActivityCounts;
+}
