@@ -288,9 +288,10 @@ export class Schedule {
    */
   private countActivityChoices(activityType: AllowedActivityTypes, choices: AllowedChoices, timeSlot: AllowedTimes) {
     const ACTIVITY_TYPES = activityType === 'water' ? Schedule.WATERTYPES : Schedule.LANDTYPES;
+    const UNSCHEDULED_NAMES = activityType === 'water' ? this.notScheduledAllNamesWater : this.notScheduledAllNamesLand;
     const activitiesChoicesCount = this.activityTemplate(activityType, timeSlot);
     for (let i = 0; i < choices.length; i++) {
-      this.notScheduledAllNamesWater.forEach(kid => {
+      UNSCHEDULED_NAMES.forEach(kid => {
         const kidsData = this.kids.data.get(kid);
         // TODO fix type error
         const activity = kidsData.choices[ACTIVITY_TYPES[choices[i] - 1].toLowerCase();
@@ -857,6 +858,7 @@ export class Schedule {
     console.log(`\n\n${'*'.repeat(30)}`)
     console.log("***9AM SHORTFALL activities***")
     console.log(`Shortfall so far 9am ${activityType}: `, shortfall9am);
+    console.log('Unscheduled 9am kids and their choices:', this.notScheduledAllNamesWater)
     console.log(`9am ${activityType} schedule below max: `, scheudledBelowMax9am);
     for (const [activity] of shortfall9am) {
       kidsWhoCanReschedule = this.getKidsWhoCanReschedule('water', activity, '9am', [1, 2, 3]);
@@ -882,7 +884,5 @@ export class Schedule {
 
     this.printDebugView('land')
     this.printDebugView('water')
-    console.log(this.kids.waterActivitiesChoiceCount)
-    console.log(this.kids.landActivitiesChoiceCount)
     return 'success'; }
 }
