@@ -275,16 +275,19 @@ export class Schedule {
     const shortfallFromMin: Map<string, number> = new Map();
     notScheduledActivities.forEach((activityCount, activity) => {
       const activityMin = activityRanges[activity][0];
-      shortfallFromMin.set(activity, activityMin - activityCount);
+      if (activityMin - activityCount > 0) {
+        shortfallFromMin.set(activity, activityMin - activityCount);
+      }
     });
     return new Map([...shortfallFromMin.entries()].sort((a, b) => a[1] - b[1]));
   }
 
   /**
-   * Counts how many times kids have chosen a specfic activity.
+   * Counts how many times unscheduled kids have chosen a specfic activity.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {number[]} choices - num of choices to count between 1 - 3.
-   * @returns {Map} - e.g {'swim': 39, 'fish': 9, ...} how many kids chose each activity
+   * @param {string} timeSlot - only 2 options: '9am' or '10am'.
+   * @returns {Map} - e.g {'swim': 39, 'fish': 9, ...} how many unscheduled kids chose each activity
    */
   private countActivityChoices(activityType: AllowedActivityTypes, choices: AllowedChoices, timeSlot: AllowedTimes) {
     const ACTIVITY_TYPES = activityType === 'water' ? Schedule.WATERTYPES : Schedule.LANDTYPES;
@@ -321,8 +324,6 @@ export class Schedule {
 
   /**
    * Get an array of kids who have chosen a specific activity from their 1st, 2nd or 3rd choice.
-   * If more kids want to attend an activity than there are slots, we need to randomly choose from them to
-   * avoid any selection bias.
    * @param {string} activity- land or water activity such as 'canoe', 'swim', 'fball' ...
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {number[]} ChoiceNum - kids land or water choice 1st, 2nd or 3rd
@@ -335,7 +336,8 @@ export class Schedule {
   ): string[] {
     const choice: string = this.getKidsChoice(activityType, choiceNum);
     const matchedKids: string[] = [];
-    this.notScheduledAllNamesWater.forEach(name => {
+    const unscheduledKidsNames = activityType === 'land' ? this.notScheduledAllNamesLand : this.notScheduledAllNamesWater;
+    unscheduledKidsNames.forEach(name => {
       const kidsChoices = this.kids.data.get(name);
       // TODO: fix type error
       if (kidsChoices.choices[choice].toLowerCase() === activity) {
@@ -828,6 +830,33 @@ export class Schedule {
     return false;
   }
 
+  private scheduleBelowMin(activityType: AllowedActivityTypes): void {
+    const unscheduledActivitiesCount = this.countActivityChoices(activityType, [1, 2, 3], '9am')
+    let keysToDelete = []
+    for (const [activity, count] of unscheduledActivitiesCount.entries()) {
+      if (count === 0) {
+        keysToDelete.push(activity)
+      }
+    }
+    // Delete activities with 0 count. This means none of the unscheduled kids have chosen this activity at 9am.
+    for (const activity of keysToDelete) {
+      unscheduledActivitiesCount.delete(activity)
+    }
+
+    const activityKids = {};
+    for (const [activity, count] of unscheduledActivitiesCount) {
+      console.log("HELLO THERE BUTTY", unscheduledActivitiesCount)
+      console.log(activity)
+      activityKids[activity] = []
+      for (let i = 1; i <= 3; i++) {
+        activityKids[activity].push(...this.getKidsbyActivityChoice(activity, activityType, i))
+      }
+    }
+    console.log("ACTIVITY KIDS", activityKids)
+    const kidsWhoCanReschedule = this.getKidsWhoCanReschedule('water', 'swim', '9am', [1, 2, 3]);
+    console.log("KIDS WHO CAN RESCUDULE: ", kidsWhoCanReschedule)
+  }
+
   private printDebugView(activityType: AllowedActivityTypes): void {
     const notScheduled9am = activityType === 'water' ? this.notScheduled9amWater : this.notScheduled9amLand;
     const notScheduled10am = activityType === 'water' ? this.notScheduled10amWater : this.notScheduled10amLand;
@@ -876,11 +905,15 @@ export class Schedule {
     }
     console.log(`END OF ${activityType.toUpperCase()} VIEW SCHEDULE\n`);
     console.log(`${'-'.repeat(40)}`)
+
+    console.log("FILTERED 9AM", filtered9am)
+
 }
   runAlgo(): string {
     console.log(`${this.algo} algorithm initiated`);
     this.scheduleDoubles('water', [1, 2, 3], 'bothMinAndMax')
     this.scheduleSingles('water', [1, 2, 3], 'bothMinAndMax')
+    this.scheduleBelowMin('water')
 
     this.printDebugView('land')
     this.printDebugView('water')
