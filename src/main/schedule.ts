@@ -464,6 +464,22 @@ export class Schedule {
   }
 
   /**
+   * Set activity for kids' time slot.
+   * @param {string} name - kids name in format "<last> <first>" e.g "Jones Tom"
+   * @returns {object} - Object with time slot as key and activity as value
+   */
+  const getAssignedActivities(name: string[]): object {
+    const kidsData = this.kids.data.get(name)
+    const kidsAssignedActivities = {};
+    for (const timeSlot in kidsData.timeSlots) {
+      if (kidsData.timeSlots[timeSlot] !== null) {
+        kidsAssignedActivities[timeSlot] = kidsData.timeSlots[timeSlot]
+      }
+    }
+    return kidsAssignedActivities
+  }
+
+  /**
    * Remove names and activites from notScheduled lists (because they are scheduled)
    * @param {string[]} names - Array of names to be removed from notScheduled lists
    * @param {string} activityType - Type of activity: either 'land' or 'water'
@@ -885,7 +901,7 @@ export class Schedule {
     console.log("KIDS WHO CAN RESCUDULE: ", kidsWhoCanReschedule)
   }
 
-  private printDebugView(activityType: AllowedActivityTypes): void {
+  private printDebugView(activityType: AllowedActivityTypes, detailed: boolean = false): void {
     const notScheduled9am = activityType === 'water' ? this.notScheduled9amWater : this.notScheduled9amLand;
     const notScheduled10am = activityType === 'water' ? this.notScheduled10amWater : this.notScheduled10amLand;
     const activityProperty = activityType === 'water' ? 'waterActivities' : 'landActivities';
@@ -943,6 +959,7 @@ export class Schedule {
         }
       }
     }
+
     console.log("\nthis.kids.data.get(name).timeSlots Count:", scheduledCount)
     const totalKidsCount = this.kids.totalKidsCount - notScheduledAllNames.length
     if (scheduledCount !== totalKidsCount) {
@@ -950,14 +967,20 @@ export class Schedule {
       console.log(scheduledCount, "!==", totalKidsCount, "\n")
     }
 
+    if (detailed) {
+      for (const name of this.kids.names) {
+        const result = this.getAssignedActivities(name)
+        if (Object.keys(result).length > 0) {
+          console.log(name, this.getAssignedActivities(name))
+        }
+      }
+    }
+
     console.log("\n")
     console.log(`END OF ${activityType.toUpperCase()} VIEW SCHEDULE\n`);
     console.log(`${'-'.repeat(40)}`)
-
-    console.log("FILTERED 9AM", filtered9am)
-
-
 }
+
   runAlgo(): string {
     console.log(`${this.algo} algorithm initiated`);
     this.scheduleDoubles('water', [1, 2, 3], 'bothMinAndMax')
@@ -965,6 +988,6 @@ export class Schedule {
     this.scheduleBelowMin('water')
 
     this.printDebugView('land')
-    this.printDebugView('water')
+    this.printDebugView('water', true)
     return 'success'; }
   }
