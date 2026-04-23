@@ -72,8 +72,9 @@ export class Kids {
         // TODO: timeSlot are not used, update and use or get rid off them
         timeSlots: {
           land9am: null,
-          nineAM: null,
-          tenAM: null,
+          land10am: null,
+          water9am: null,
+          water10am: null,
         },
       });
     });
