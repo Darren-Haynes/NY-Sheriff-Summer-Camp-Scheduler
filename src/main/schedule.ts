@@ -5,6 +5,7 @@ import {
   AllowedTimes,
   Allowed9and10Only,
   AllowedActivityTypes,
+  AllowedActivityTimes,
   AllowedChoices,
   AllowedMaxMin,
   AllowedMaxMinSched,
@@ -443,6 +444,25 @@ export class Schedule {
       }
     }
   }
+
+  /**
+   * Set activity for kids' time slot.
+   * @param {string[]} names - Array of kid names to set activity for.
+   * @param {string} activity - activity such as "fball", "canoe", "swim"
+   * @param {number} activityTimeSlot - integers 9 and 10 only, representing 9am or 10am
+   * @returns {void}
+   */
+  private setKidsTimeSlot(
+    names: string[],
+    activity: LandActivities | WaterActivities,
+    activityTimeSlot: AllowedActivityTimes
+  ): void {
+    names.forEach((name) => {
+      const kid = this.kids.data.get(name)
+      kid.timeSlots[activityTimeSlot] = activity;
+    });
+  }
+
   /**
    * Remove names and activites from notScheduled lists (because they are scheduled)
    * @param {string[]} names - Array of names to be removed from notScheduled lists
@@ -529,10 +549,12 @@ export class Schedule {
         if (timeSlot === '9am') {
           this.water9am[activity] = kidsTimeSlot;
           this.removeScheduled(kidsTimeSlot, activityType, activity, '9am');
+          this.setKidsTimeSlot(kidsTimeSlot, activity, 'water9am')
         }
         if (timeSlot === '10am') {
           this.water10am[activity] = kidsTimeSlot;
           this.removeScheduled(kidsTimeSlot, activityType, activity, '10am');
+          this.setKidsTimeSlot(kidsTimeSlot, activity, 'water10am')
         }
       }
 
@@ -541,10 +563,12 @@ export class Schedule {
         if (timeSlot === '9am') {
           this.land9am[activity] = kidsTimeSlot;
           this.removeScheduled(kidsTimeSlot, activityType, activity, '9am');
+          this.setKidsTimeSlot(kidsTimeSlot, activity, 'land9am')
         }
         if (timeSlot === '10am') {
           this.land10am[activity] = kidsTimeSlot;
           this.removeScheduled(kidsTimeSlot, activityType, activity, '10am');
+          this.setKidsTimeSlot(kidsTimeSlot, activity, 'land10am')
         }
       }
     });
@@ -606,10 +630,14 @@ export class Schedule {
       if (activityType === 'water') {
         this.water9am[activity] = kidsNineAM;
         this.water10am[activity] = kidsTenAM;
+        this.setKidsTimeSlot(kidsNineAM, activity, 'water9am')
+        this.setKidsTimeSlot(kidsTenAM, activity, 'water10am')
       }
       if (activityType === 'land') {
         this.land9am[activity] = kidsNineAM;
         this.land10am[activity] = kidsTenAM;
+        this.setKidsTimeSlot(kidsNineAM, activity, 'land9am')
+        this.setKidsTimeSlot(kidsTenAM, activity, 'land10am')
       }
     });
   }
@@ -903,10 +931,31 @@ export class Schedule {
       console.log("Activity to rescedule to:", activity)
       console.log("Kids who can reschedule:", kidsWhoCanReschedule)
     }
+
+    console.log("TIMESLOTS")
+    let scheduledCount = 0;
+    for (const name of this.kids.names) {
+      const timeSlots = this.kids.data.get(name)
+      for (const time in timeSlots.timeSlots) {
+        if (timeSlots.timeSlots[time] !== null) {
+          scheduledCount += 1;
+          // console.log(name, time, timeSlots.timeSlots[time])
+        }
+      }
+    }
+    console.log("\nthis.kids.data.get(name).timeSlots Count:", scheduledCount)
+    const totalKidsCount = this.kids.totalKidsCount - notScheduledAllNames.length
+    if (scheduledCount !== totalKidsCount) {
+      console.log("Scheduled # mismatch. this.Kids.timeSlots != this.kids.totalKidsCount: ")
+      console.log(scheduledCount, "!==", totalKidsCount, "\n")
+    }
+
+    console.log("\n")
     console.log(`END OF ${activityType.toUpperCase()} VIEW SCHEDULE\n`);
     console.log(`${'-'.repeat(40)}`)
 
     console.log("FILTERED 9AM", filtered9am)
+
 
 }
   runAlgo(): string {
@@ -918,4 +967,4 @@ export class Schedule {
     this.printDebugView('land')
     this.printDebugView('water')
     return 'success'; }
-}
+  }
