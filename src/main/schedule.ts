@@ -391,6 +391,7 @@ export class Schedule {
    * This will be kids that are scheduled to an activity that is above the minimum count
    * for an activty and can spare kids.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {string} activity - activity such as "fball", "canoe", "swim"
    * @param {string} timeSlot - only 2 options -'9am' or '10am'
    * @param {number[]} choices - num of choices to count in any combo of 1 thru 3: [[1], [2], [3], [1, 2], [1, 2], [1, 3], [1, 2, 3]]
    * @returns {string[]} - array of kids names who can be rescheduled
@@ -874,31 +875,76 @@ export class Schedule {
     return false;
   }
 
-  private scheduleBelowMin(activityType: AllowedActivityTypes): void {
-    const unscheduledActivitiesCount = this.countActivityChoices(activityType, [1, 2, 3], '9am')
-    let keysToDelete = []
-    for (const [activity, count] of unscheduledActivitiesCount.entries()) {
-      if (count === 0) {
-        keysToDelete.push(activity)
+  /**
+   * Get object containing activities that have not yet been scheduled and how many kids have chosen each activity.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {string} timeSlot - only 2 options -'9am' or '10am'
+   * @param {boolean} includeZero - if true, activities that kids haven't chosen will be included in the result.
+   * @returns {Object<activity, shortfall from min kids required for activity} - Array of kids names who chose the activity
+   */
+  private getActivitiesBelowMin(activityType: AllowedActivityTypes, timeSlot: Allowed9and10Only, includeZero=false): Map<LandActivities | WaterActivities, number> {
+    const notScheduledActivitiesCount
+      = this.countActivityChoices(activityType, [1, 2, 3], timeSlot)
+
+    if (!includeZero) {
+      let keysToDelete = []
+      for (const [activity, count] of notScheduledActivitiesCount
+        .entries()) {
+        if (count === 0) {
+          keysToDelete.push(activity)
+        }
+      }
+      // Delete activities with 0 count. This means none of the unscheduled kids have chosen this activity.
+      for (const activity of keysToDelete) {
+        notScheduledActivitiesCount
+          .delete(activity)
       }
     }
-    // Delete activities with 0 count. This means none of the unscheduled kids have chosen this activity at 9am.
-    for (const activity of keysToDelete) {
-      unscheduledActivitiesCount.delete(activity)
-    }
 
+    const shortfall = this.sortActivitiesByShortfall(notScheduledActivitiesCount, activityType)
+    console.log("NOT SCHEDULED:", timeSlot)
+    console.log(notScheduledActivitiesCount
+    )
+    console.log("SHORTFALL", shortfall)
+    return notScheduledActivitiesCount
+  }
+
+  /**
+   * Get kids that are not yet scheduled and have a chosen an activity from an array of activities
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {string} notScheduledActivities - land or water activities such as 'canoe', 'swim', 'fball' ...
+   * @returns {Object<activity, [kids names]} - Array of kids names who chose the activity
+   */
+  private getNotScheduledKidsBelowMin(activityType: AllowedActivityTypes, notScheduledActivities: Array<LandActivities | WaterActivities>): Object {
     const activityKids = {};
-    for (const [activity, count] of unscheduledActivitiesCount) {
-      console.log("HELLO THERE BUTTY", unscheduledActivitiesCount)
-      console.log(activity)
+    for (const activity of notScheduledActivities) {
       activityKids[activity] = []
       for (let i = 1; i <= 3; i++) {
         activityKids[activity].push(...this.getKidsbyActivityChoice(activity, activityType, i))
       }
     }
-    console.log("ACTIVITY KIDS", activityKids)
-    const kidsWhoCanReschedule = this.getKidsWhoCanReschedule('water', 'swim', '9am', [1, 2, 3]);
-    console.log("KIDS WHO CAN RESCUDULE: ", kidsWhoCanReschedule)
+    return activityKids
+  }
+
+  private scheduleBelowMin(activityType: AllowedActivityTypes): void {
+    const notScheduledActivitiesCount9am = this.getActivitiesBelowMin(activityType, '9am');
+    const notScheduledActivitiesCount10am = this.getActivitiesBelowMin(activityType, '10am');
+
+    const activityKids9am = this.getNotScheduledKidsBelowMin(activityType, [...notScheduledActivitiesCount9am.keys()]);
+    const activityKids10am = this.getNotScheduledKidsBelowMin(activityType, [...notScheduledActivitiesCount10am.keys()]);
+
+    console.log("NOT SCHEDULED 9AM ACTIVITY KIDS", activityKids9am)
+    console.log("NOT SCHEDULED 10AM ACTIVITY KIDS", activityKids10am)
+
+    const kidsWhoCanRescheduleCanoe9am = this.getKidsWhoCanReschedule('water', 'canoe', '9am', [1, 2, 3]);
+    console.log("KIDS WHO CAN RESCUDULE CANOE 9AM: ", kidsWhoCanRescheduleCanoe9am)
+    const kidsWhoCanReschedulePboard9am = this.getKidsWhoCanReschedule('water', 'pboard', '9am', [1, 2, 3]);
+    console.log("KIDS WHO CAN RESCUDULE PBOARD 9AM: ", kidsWhoCanReschedulePboard9am)
+
+    const kidsWhoCanRescheduleCanoe10am = this.getKidsWhoCanReschedule('water', 'canoe', '10am', [1, 2, 3]);
+    console.log("KIDS WHO CAN RESCUDULE CANOE 10AM: ", kidsWhoCanRescheduleCanoe10am)
+    const kidsWhoCanReschedulePboard10am = this.getKidsWhoCanReschedule('water', 'pboard', '10am', [1, 2, 3]);
+    console.log("KIDS WHO CAN RESCUDULE PBOARD 10AM: ", kidsWhoCanReschedulePboard10am)
   }
 
   private printDebugView(activityType: AllowedActivityTypes, detailed: boolean = false): void {
@@ -936,7 +982,7 @@ export class Schedule {
     for (const [activity] of shortfall9am) {
       kidsWhoCanReschedule = this.getKidsWhoCanReschedule('water', activity, '9am', [1, 2, 3]);
       console.log("Activity to rescedule to:", activity)
-      console.log("Kids who can reschedule:", kidsWhoCanReschedule)
+      console.log("9am water Kids who can reschedule:", kidsWhoCanReschedule)
     }
     console.log(`\n\n${'*'.repeat(30)}`)
     console.log("***10AM SHORTFALL activities***")
@@ -945,7 +991,7 @@ export class Schedule {
     for (const [activity] of shortfall10am) {
       kidsWhoCanReschedule = this.getKidsWhoCanReschedule('water', activity, '10am', [1, 2, 3]);
       console.log("Activity to rescedule to:", activity)
-      console.log("Kids who can reschedule:", kidsWhoCanReschedule)
+      console.log("10am water Kids who can reschedule:", kidsWhoCanReschedule)
     }
 
     console.log("TIMESLOTS")
@@ -985,7 +1031,8 @@ export class Schedule {
     console.log(`${this.algo} algorithm initiated`);
     this.scheduleDoubles('water', [1, 2, 3], 'bothMinAndMax')
     this.scheduleSingles('water', [1, 2, 3], 'bothMinAndMax')
-    this.scheduleBelowMin('water')
+    this.scheduleBelowMin('water', '9am')
+    this.scheduleBelowMin('water', '10am')
 
     this.printDebugView('land')
     this.printDebugView('water', true)
