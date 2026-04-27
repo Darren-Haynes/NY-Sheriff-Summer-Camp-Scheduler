@@ -4,9 +4,12 @@ export interface ActivityArgs {
   isMax?: boolean;
 }
 
-export interface NotScheduled {
+export interface NotScheduledLand {
   names: string[];
   landActivities: string[];
+}
+export interface NotScheduledWater {
+  names: string[];
   waterActivities: string[];
 }
 

@@ -1,7 +1,8 @@
 import { Kids } from './kids';
 import { Activities } from './activities';
 import {
-  NotScheduled,
+  NotScheduledLand,
+  NotScheduledWater,
   AllowedTimes,
   Allowed9and10Only,
   AllowedActivityTypes,
@@ -22,11 +23,11 @@ Main class that schedules the kids to activities.
 export class Schedule {
   inputData: string;
   kids: Kids;
-  notScheduled9amWater: NotScheduled;
-  notScheduled10amWater: NotScheduled;
+  notScheduled9amWater: NotScheduledWater;
+  notScheduled10amWater: NotScheduledWater;
   notScheduledAllNamesWater: string[];
-  notScheduled9amLand: NotScheduled;
-  notScheduled10amLand: NotScheduled;
+  notScheduled9amLand: NotScheduledLand;
+  notScheduled10amLand: NotScheduledLand;
   notScheduledAllNamesLand: string[];
   algo: string;
   water9am: WaterKids;
@@ -280,7 +281,7 @@ export class Schedule {
         shortfallFromMin.set(activity, activityMin - activityCount);
       }
     });
-    return new Map([...shortfallFromMin.entries()].sort((a, b) => a[1] - b[1]));
+    return new Map([...shortfallFromMin.entries()].sort((b, a) => a[1] - b[1]));
   }
 
   /**
@@ -481,6 +482,42 @@ export class Schedule {
   }
 
   /**
+   * Set activity for kids' time slot.
+   * @param {string[]} names - kids that are getting moved from one timeslot activity to another.
+   * @param {string} newActivity - new activity to assign to kids
+   * @param {string} activityTimeSlot - time slot to update (e.g. 'land9am', 'water10am')
+   * @returns {void}
+   */
+  private updateKidsScheduledActivity(
+    names: string[],
+    newActivity: LandActivities | WaterActivities,
+    activityTimeSlot: AllowedActivityTimes
+  ): void {
+    for (const name of names) {
+      const kidsData = this.kids.data.get(name)
+      const oldActivity = kidsData.timeSlots[activityTimeSlot]
+      kidsData.timeSlots[activityTimeSlot] = newActivity
+      let activityObj = null;
+      switch (activityTimeSlot) {
+        case 'land9am':
+          activityObj = this.land9am
+          break
+        case 'land10am':
+          activityObj = this.land10am
+          break
+        case 'water9am':
+          activityObj = this.water9am
+          break
+        case 'water10am':
+          activityObj = this.water10am
+          break
+      }
+      const nameIndex = activityObj[oldActivity].indexOf(name)
+      activityObj[oldActivity].splice(nameIndex, 1)
+    }
+  }
+
+  /**
    * Remove names and activites from notScheduled lists (because they are scheduled)
    * @param {string[]} names - Array of names to be removed from notScheduled lists
    * @param {string} activityType - Type of activity: either 'land' or 'water'
@@ -488,7 +525,7 @@ export class Schedule {
    * @param {number} timeSlot - integers 9 and 10 only, representing 9am or 10am
    * @returns {void}
    */
-  private removeScheduled(
+  private removeFromNotScheduled(
     names: string[],
     activityType: string,
     activity: LandActivities | WaterActivities,
@@ -565,12 +602,12 @@ export class Schedule {
         const timeSlot = this.notScheduled10amWater.names.length >= this.notScheduled9amWater.names.length ? '10am' : '9am';
         if (timeSlot === '9am') {
           this.water9am[activity] = kidsTimeSlot;
-          this.removeScheduled(kidsTimeSlot, activityType, activity, '9am');
+          this.removeFromNotScheduled(kidsTimeSlot, activityType, activity, '9am');
           this.setKidsTimeSlot(kidsTimeSlot, activity, 'water9am')
         }
         if (timeSlot === '10am') {
           this.water10am[activity] = kidsTimeSlot;
-          this.removeScheduled(kidsTimeSlot, activityType, activity, '10am');
+          this.removeFromNotScheduled(kidsTimeSlot, activityType, activity, '10am');
           this.setKidsTimeSlot(kidsTimeSlot, activity, 'water10am')
         }
       }
@@ -579,12 +616,12 @@ export class Schedule {
         const timeSlot = this.notScheduled10amWater.names.length >= this.notScheduled9amWater.names.length ? '10am' : '9am';
         if (timeSlot === '9am') {
           this.land9am[activity] = kidsTimeSlot;
-          this.removeScheduled(kidsTimeSlot, activityType, activity, '9am');
+          this.removeFromNotScheduled(kidsTimeSlot, activityType, activity, '9am');
           this.setKidsTimeSlot(kidsTimeSlot, activity, 'land9am')
         }
         if (timeSlot === '10am') {
           this.land10am[activity] = kidsTimeSlot;
-          this.removeScheduled(kidsTimeSlot, activityType, activity, '10am');
+          this.removeFromNotScheduled(kidsTimeSlot, activityType, activity, '10am');
           this.setKidsTimeSlot(kidsTimeSlot, activity, 'land10am')
         }
       }
@@ -640,8 +677,8 @@ export class Schedule {
         kidsTenAM = kidsByActivityChoice.slice(halfTheKids);
       }
 
-      this.removeScheduled(kidsNineAM, activityType, activity, '9am');
-      this.removeScheduled(kidsTenAM, activityType, activity, '10am');
+      this.removeFromNotScheduled(kidsNineAM, activityType, activity, '9am');
+      this.removeFromNotScheduled(kidsTenAM, activityType, activity, '10am');
 
       // TODO: fix type error
       if (activityType === 'water') {
@@ -657,6 +694,37 @@ export class Schedule {
         this.setKidsTimeSlot(kidsTenAM, activity, 'land10am')
       }
     });
+  }
+
+  /**
+   * Add Kids to the schedule for activities that don't have enough kids to fufill the minumim number required.
+   * Kids are taken from other activities to reach the minimum number required.
+   * @param {string[]} kidsWhoCanReschedule - list of kids who can be taken from other schedule activities.
+   * @param {number[]} notScheduledCount - number of kids needed to be taken from other activities to reach the minimum number required.
+   * @param {string[]} activityKids - non-scheduled kids that are getting scheduled to the activity.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {string} activityTime - only 2 options expected: '9am', '10am'.
+   * @param {string} activity - land or water activity such as 'canoe', 'swim', 'fball', etc.
+   * @returns {void}
+   */
+  private scheduleBelowMinActivities(
+    kidsWhoCanReschedule: string[],
+    notScheduledCount: number,
+    activityKids: string[],
+    activityType: AllowedActivityTypes,
+    activityTime: AllowedTimes,
+    activity: LandActivities | WaterActivities
+  ): void {
+    const randomKids = this.randomChoices(kidsWhoCanReschedule, notScheduledCount)
+    const allKidsToSchedule = activityKids.concat(randomKids)
+    const timeSlot = activityType + activityTime
+    this.removeFromNotScheduled(activityKids, activityType, activity, activityTime)
+    this.updateKidsScheduledActivity(randomKids, activity, timeSlot)
+    if (activityType === 'water') {
+      this.water9am[activity] = allKidsToSchedule;
+    } else {
+      this.land9am[activity] = allKidsToSchedule;
+    }
   }
 
   /**
@@ -906,7 +974,7 @@ export class Schedule {
     console.log(notScheduledActivitiesCount
     )
     console.log("SHORTFALL", shortfall)
-    return notScheduledActivitiesCount
+    return shortfall
   }
 
   /**
@@ -926,25 +994,39 @@ export class Schedule {
     return activityKids
   }
 
+  /**
+   * Schedule activities where there are not enough kids to reach the minumum number of kids required.
+   * Kids are taken from other activities to reach the minimum number required.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   */
   private scheduleBelowMin(activityType: AllowedActivityTypes): void {
     const notScheduledActivitiesCount9am = this.getActivitiesBelowMin(activityType, '9am');
     const notScheduledActivitiesCount10am = this.getActivitiesBelowMin(activityType, '10am');
 
-    const activityKids9am = this.getNotScheduledKidsBelowMin(activityType, [...notScheduledActivitiesCount9am.keys()]);
-    const activityKids10am = this.getNotScheduledKidsBelowMin(activityType, [...notScheduledActivitiesCount10am.keys()]);
+    const notScheduledActivities9am = [...notScheduledActivitiesCount9am.keys()];
+    const notScheduledActivities10am = [...notScheduledActivitiesCount10am.keys()];
 
-    console.log("NOT SCHEDULED 9AM ACTIVITY KIDS", activityKids9am)
-    console.log("NOT SCHEDULED 10AM ACTIVITY KIDS", activityKids10am)
+    const activityKids9am = this.getNotScheduledKidsBelowMin(activityType, notScheduledActivities9am);
+    const activityKids10am = this.getNotScheduledKidsBelowMin(activityType, notScheduledActivities10am);
 
-    const kidsWhoCanRescheduleCanoe9am = this.getKidsWhoCanReschedule('water', 'canoe', '9am', [1, 2, 3]);
-    console.log("KIDS WHO CAN RESCUDULE CANOE 9AM: ", kidsWhoCanRescheduleCanoe9am)
-    const kidsWhoCanReschedulePboard9am = this.getKidsWhoCanReschedule('water', 'pboard', '9am', [1, 2, 3]);
-    console.log("KIDS WHO CAN RESCUDULE PBOARD 9AM: ", kidsWhoCanReschedulePboard9am)
-
-    const kidsWhoCanRescheduleCanoe10am = this.getKidsWhoCanReschedule('water', 'canoe', '10am', [1, 2, 3]);
-    console.log("KIDS WHO CAN RESCUDULE CANOE 10AM: ", kidsWhoCanRescheduleCanoe10am)
-    const kidsWhoCanReschedulePboard10am = this.getKidsWhoCanReschedule('water', 'pboard', '10am', [1, 2, 3]);
-    console.log("KIDS WHO CAN RESCUDULE PBOARD 10AM: ", kidsWhoCanReschedulePboard10am)
+    let randomKids = [];
+    for (const activity of notScheduledActivities9am) {
+      const kidsWhoCanReschedule9am = this.getKidsWhoCanReschedule(activityType, activity, '9am', [1, 2, 3]);
+      const kidsWhoCanReschedule10am = this.getKidsWhoCanReschedule(activityType, activity, '10am', [1, 2, 3]);
+      if (notScheduledActivities10am.includes(activity)) {
+        const count9am = notScheduledActivitiesCount9am.get(activity)
+        const count10am = notScheduledActivitiesCount9am.get(activity)
+        const notScheduled9am = activityType === 'water' ? this.notScheduled9amWater : this.notScheduled9amLand;
+        const notScheduled10am = activityType === 'water' ? this.notScheduled10amWater : this.notScheduled10amLand;
+        const notScheduled9amCount = notScheduled9am.names.length - (this.kids.totalKidsCount / 2)
+        const notScheduled10amCount = notScheduled10am.names.length - (this.kids.totalKidsCount / 2)
+        if (notScheduled9amCount >= notScheduled10amCount) {
+          this.scheduleBelowMinActivities(kidsWhoCanReschedule9am, count9am, activityKids9am[activity], activityType, '9am', activity)
+        } else {
+          this.scheduleBelowMinActivities(kidsWhoCanReschedule10am, count10am, activityKids10am[activity], activityType, '10am', activity)
+        }
+      }
+    }
   }
 
   private printDebugView(activityType: AllowedActivityTypes, detailed: boolean = false): void {
@@ -1027,14 +1109,32 @@ export class Schedule {
     console.log(`${'-'.repeat(40)}`)
 }
 
+  schedulingLog(func_name: string, when: string): void {
+    console.log(`\n${when} ${func_name}`)
+    const notScheduledAllNames = 'water' === 'water' ? this.notScheduledAllNamesWater : this.notScheduledAllNamesLand;
+    console.log("NOT SCHEDULED COUNT ALL NAMES WATER: ", notScheduledAllNames.length)
+    console.log("NOT SCHEDULED 9AM WATER NAMES: ", this.notScheduled9amWater.names.length)
+    console.log("NOT SCHEDULED 9AM WATER ACTIVITIS: ", this.notScheduled9amWater.waterActivities)
+    console.log("NOT SCHEDULED 10AM WATER: ", this.notScheduled10amWater.names.length)
+    console.log("NOT SCHEDULED 10AM WATER ACTIVITIS: ", this.notScheduled10amWater.waterActivities)
+    console.log("\n")
+  }
+
   runAlgo(): string {
     console.log(`${this.algo} algorithm initiated`);
-    this.scheduleDoubles('water', [1, 2, 3], 'bothMinAndMax')
-    this.scheduleSingles('water', [1, 2, 3], 'bothMinAndMax')
-    this.scheduleBelowMin('water', '9am')
-    this.scheduleBelowMin('water', '10am')
+    this.schedulingLog('any scheduling', 'before')
 
-    this.printDebugView('land')
-    this.printDebugView('water', true)
-    return 'success'; }
+    this.scheduleDoubles('water', [1, 2, 3], 'bothMinAndMax')
+    this.schedulingLog('scheduleDoubles()', 'after')
+
+    this.scheduleSingles('water', [1, 2, 3], 'bothMinAndMax')
+    this.schedulingLog('scheduleSingles()', 'after')
+
+    this.scheduleBelowMin('water')
+    this.schedulingLog('scheduleBelowMin()', 'after')
+
+    // this.printDebugView('land')
+    // this.printDebugView('water', true)
+    return 'success';
   }
+}
