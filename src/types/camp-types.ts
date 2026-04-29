@@ -1,3 +1,5 @@
+import { WaterActivityCounts, LandActivityCounts } from '../types/kids-types';
+
 export type CampActivities = {
   landActs: Array<string>;
   waterActs: Array<string>;
@@ -9,6 +11,8 @@ export type CampActivities = {
   land10am: LandKidsPM;
   landRanges: LandRanges;
   waterRanges: WaterRanges;
+  waterActivitiesChoiceCount: WaterActivityCounts;
+  landActivitiesChoiceCount: LandActivityCounts;
 };
 
 export type LandRanges = {
