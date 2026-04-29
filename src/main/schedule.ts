@@ -20,6 +20,8 @@ import { LandKidsAM, LandKidsPM, WaterKids } from '../types/camp-types';
 
 /**
 Main class that schedules the kids to activities.
+* @param {KidsData} Kids - Kids class that contains basic data about the kids attending camp
+* @param {string} algo - name of algo that is being run to schedule kids
 */
 export class Schedule {
   inputData: string;
@@ -459,6 +461,12 @@ export class Schedule {
     return randomSort.slice(0, numOfItems);
   }
 
+  /**
+   * Remove all items in one string array from another string array.
+   * @param {string[]} arr - the Array to remove elements from
+   * @param {string[]} elementsToRemove - the Array with the elements to remove
+   * @returns {void}
+   */
   private removeElementsFromArray(arr: string[], elementsToRemove: string[]): void {
     const setOfElementsToRemove = new Set(elementsToRemove);
     for (let i = arr.length - 1; i >= 0; i--) {
