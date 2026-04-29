@@ -3,7 +3,6 @@ import { LandActivities, WaterActivities } from './schedule-types';
 export type KidsData = Map<
   string,
   {
-    choices: KidsChoices;
     timeSlots: {
       land9am: LandActivities | null;
       land10am: LandActivities | null;
@@ -21,10 +20,6 @@ type KidsChoices = {
   water2: string;
   water3: string;
 };
-
-export interface Choice {
-  string: KidsChoices;
-}
 
 interface ActivityCounts {
   total: number;
