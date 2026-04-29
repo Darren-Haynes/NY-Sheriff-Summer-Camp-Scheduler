@@ -1,11 +1,13 @@
+import { LandActivities, WaterActivities } from './schedule-types';
+
 export type KidsData = Map<
   string,
   {
-    choices: KidsChoices;
     timeSlots: {
-      land9am: boolean | null;
-      nineAM: string | null;
-      tenAM: string | null;
+      land9am: LandActivities | null;
+      land10am: LandActivities | null;
+      water9am: WaterActivities | null;
+      water10am: WaterActivities | null;
     };
   }
 >;

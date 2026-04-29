@@ -4,42 +4,13 @@ export interface ActivityArgs {
   isMax?: boolean;
 }
 
-export interface NotScheduled {
+export interface NotScheduledLand {
   names: string[];
   landActivities: string[];
+}
+export interface NotScheduledWater {
+  names: string[];
   waterActivities: string[];
-}
-
-interface ActivityCounts {
-  total: number;
-  choice1: number;
-  choice2: number;
-  choice3: number;
-}
-
-export interface WaterActivityCounts {
-  swim: ActivityCounts;
-  fish: ActivityCounts;
-  canoe: ActivityCounts;
-  snork: ActivityCounts;
-  sail: ActivityCounts;
-  pboard: ActivityCounts;
-  kayak: ActivityCounts;
-}
-
-export interface LandActivityCounts {
-  bball: ActivityCounts;
-  vball: ActivityCounts;
-  soc: ActivityCounts;
-  arch: ActivityCounts;
-  art: ActivityCounts;
-  hike: ActivityCounts;
-  cheer: ActivityCounts;
-  pball: ActivityCounts;
-  lax: ActivityCounts;
-  fball: ActivityCounts;
-  yoga: ActivityCounts;
-  fris: ActivityCounts;
 }
 
 export type WaterActivities = 'swim' | 'fish' | 'canoe' | 'snork' | 'sail' | 'pboard' | 'kayak';
@@ -90,3 +61,6 @@ export type AllowedChoiceNums = (typeof AllowedChoiceNums)[number];
 
 const AllowedActivities = ['swim', 'fish', 'canoe', 'snork', 'sail', 'pboard', 'kayak'] as const;
 export type AllowedActivities = (typeof AllowedActivities)[number];
+
+const AllowedActivityTimes = ['land9am', 'land10am', 'water9am', 'water10am'] as const;
+export type AllowedActivityTimes = (typeof AllowedActivities)[number];
