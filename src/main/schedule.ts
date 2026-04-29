@@ -41,13 +41,13 @@ export class Schedule {
   private static readonly WATERTYPES: string[] = ['water1', 'water2', 'water3'];
 
   // TODO: see if improvemets can be made using this resouce https://www.freecodecamp.org/news/how-to-use-the-builder-pattern-in-python-a-practical-guide-for-devs/
-  constructor(inputData: string, algo: string) {
+  constructor(kids: Kids, algo: string) {
     if (!Schedule.ALGOS.includes(algo)) {
       throw new Error(`${algo} is not a supported Camp Scheduler algorithm`);
     }
     this.inputData = inputData;
     this.algo = algo;
-    this.kids = new Kids(this.inputData);
+    this.kids = kids
     this.notScheduled9amWater = this.notScheduledConstructor(true);
     this.notScheduled10amWater = this.notScheduledConstructor(false);
     this.notScheduledAllNamesWater = structuredClone(this.kids.names);
@@ -1122,16 +1122,16 @@ export class Schedule {
 
   runAlgo(): string {
     console.log(`${this.algo} algorithm initiated`);
-    this.schedulingLog('any scheduling', 'before')
+    // this.schedulingLog('any scheduling', 'before')
 
     this.scheduleDoubles('water', [1, 2, 3], 'bothMinAndMax')
-    this.schedulingLog('scheduleDoubles()', 'after')
+    // this.schedulingLog('scheduleDoubles()', 'after')
 
     this.scheduleSingles('water', [1, 2, 3], 'bothMinAndMax')
-    this.schedulingLog('scheduleSingles()', 'after')
+    // this.schedulingLog('scheduleSingles()', 'after')
 
     this.scheduleBelowMin('water')
-    this.schedulingLog('scheduleBelowMin()', 'after')
+    // this.schedulingLog('scheduleBelowMin()', 'after')
 
     // this.printDebugView('land')
     // this.printDebugView('water', true)

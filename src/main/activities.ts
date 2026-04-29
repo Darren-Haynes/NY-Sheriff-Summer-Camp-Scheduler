@@ -80,4 +80,29 @@ export const Activities: CampActivities = Object.freeze({
     sail: [6, 16, 2, 12, 32],
     swim: [6, 16, 2, 12, 32],
   },
+
+  waterActivitiesChoiceCount: {
+    swim: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
+    fish: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
+    canoe: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
+    snork: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
+    sail: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
+    pboard: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
+    kayak: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
+  },
+
+  landActivitiesChoiceCount: {
+    bball: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
+    vball: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
+    soc: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
+    arch: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
+    art: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
+    hike: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
+    cheer: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
+    pball: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
+    lax: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
+    fball: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
+    yoga: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
+    fris: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
+  },
 });

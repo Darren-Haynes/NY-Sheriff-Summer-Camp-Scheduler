@@ -22,6 +22,10 @@ type KidsChoices = {
   water3: string;
 };
 
+export interface Choice {
+  string: KidsChoices;
+}
+
 interface ActivityCounts {
   total: number;
   choice1: number;
