@@ -35,6 +35,13 @@ export type LandActivities =
 export type LandKids = Record<LandActivities, string[]>;
 export type WaterKids = Record<WaterActivities, string[]>;
 
+export interface ScheduledActivities {
+  water9am: WaterKids;
+  water10am: WaterKids;
+  land9am: LandKids;
+  land10am: LandKids;
+}
+
 const AllowedTimes = ['9am', '10am', 'both'] as const;
 export type AllowedTimes = (typeof AllowedTimes)[number];
 
@@ -63,4 +70,4 @@ const AllowedActivities = ['swim', 'fish', 'canoe', 'snork', 'sail', 'pboard', '
 export type AllowedActivities = (typeof AllowedActivities)[number];
 
 const AllowedActivityTimes = ['land9am', 'land10am', 'water9am', 'water10am'] as const;
-export type AllowedActivityTimes = (typeof AllowedActivities)[number];
+export type AllowedActivityTimes = (typeof AllowedActivityTimes)[number];

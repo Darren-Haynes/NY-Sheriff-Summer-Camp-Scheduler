@@ -14,6 +14,7 @@ import {
   AllowedChoiceNums,
   LandActivities,
   WaterActivities,
+  ScheduledActivities,
 } from '../types/schedule-types';
 import { KidsData } from '@src/types/kids-types';
 import { LandKidsAM, LandKidsPM, WaterKids } from '../types/camp-types';
@@ -39,10 +40,6 @@ export class Schedule {
   land9am: LandKidsAM;
   land10am: LandKidsPM;
 
-  private static readonly ALGOS: string[] = ['waterFirst'];
-  private static readonly LANDWATER: string[] = ['water', 'land'];
-  private static readonly LANDTYPES: string[] = ['land1', 'land2', 'land3'];
-  private static readonly WATERTYPES: string[] = ['water1', 'water2', 'water3'];
 
   // TODO: see if improvemets can be made using this resouce https://www.freecodecamp.org/news/how-to-use-the-builder-pattern-in-python-a-practical-guide-for-devs/
   constructor(kids: Kids, algo: string) {
@@ -63,6 +60,11 @@ export class Schedule {
     this.land9am = Activities.land9am;
     this.land10am = Activities.land10am;
   }
+
+  private static readonly ALGOS: string[] = ['waterFirst'];
+  private static readonly LANDWATER: string[] = ['water', 'land'];
+  private static readonly LANDTYPES: string[] = ['land1', 'land2', 'land3'];
+  private static readonly WATERTYPES: string[] = ['water1', 'water2', 'water3'];
 
   /**
    * Create map: keys are kids names and values are the time slots they can be scheduled for.
@@ -226,6 +228,80 @@ export class Schedule {
     return scheduledAboveMin;
   }
 
+  private getScheduledActivitiesNotFull(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): Map<string, number> {
+    const scheduledActivities = this.getActivityTypeTimeSlot(activityType, timeSlot);
+    const notFullActivities = new Map<string, number>();
+    const activityRange = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
+    for (const [activity, names] of Object.entries(scheduledActivities)) {
+      if (names.length < activityRange[activity][1] && names.length > 0) {
+        notFullActivities.set(activity, activityRange[activity][1] - names.length);
+      };
+    };
+    return new Map([...notFullActivities.entries()].sort((b, a) => a[1] - b[1]));
+  }
+
+  private removeNoChoicesFromScheduledNotFull(activityType: AllowedActivityTypes, scheduledNotFull: Map<string, number>, notScheduledAllNames: string[]): Map<string, number>{
+    const activities = activityType === 'land' ? Schedule.LANDTYPES : Schedule.WATERTYPES;
+    const chosenList: string[] = new Array
+    for (const name of notScheduledAllNames) {
+      for (const activity of activities) {
+        if (scheduledNotFull.has(this.kids.choices[name][activity])) {
+          if (chosenList.includes(this.kids.choices[name][activity])) {
+            continue
+          }
+          chosenList.push(this.kids.choices[name][activity])
+        }
+      }
+    }
+    for (const activity of scheduledNotFull.keys()) {
+      if (!chosenList.includes(activity)) {
+        scheduledNotFull.delete(activity)
+      }
+    }
+    return scheduledNotFull;
+  }
+
+  private getAllKidsChoiceByActivityType(name: string,activityType: AllowedActivityTypes): string[] {
+    const activities = activityType === 'land' ? Schedule.LANDTYPES : Schedule.WATERTYPES;
+    const choices = this.kids.choices[name];
+    const kidsChoices: string[] = new Array
+    for (const activity of activities) {
+      kidsChoices.push(choices[activity])
+    }
+    return kidsChoices
+  }
+
+  private scheduleTheChosen(scheduledChosen: Map<string, number>, activityType: AllowedActivityTypes): void {
+    const activities = activityType === 'land' ? Schedule.LANDTYPES : Schedule.WATERTYPES;
+    const notScheduledAllNames = activityType === 'land' ? this.notScheduledAllNamesLand : this.notScheduledAllNamesWater;
+    const chosenList: string[] = [...scheduledChosen.keys()];
+    const uniqueChoice = new Map<string, string[]>();
+    for (const activity of chosenList) {
+      console.log("THEM CHOICES")
+      for (const name of notScheduledAllNames) {
+        const kidsChoices = this.getAllKidsChoiceByActivityType(name, activityType);
+        if (kidsChoices.includes(activity)) {
+          const chosenListWithoutCurrentActivity = chosenList.filter(item => item !== activity);
+          const kidsChoicesWithoutCurrentActivity = kidsChoices.filter(item => item !== activity);
+          const areDisjoint = chosenListWithoutCurrentActivity.every(item => !kidsChoicesWithoutCurrentActivity.includes(item));
+          if (areDisjoint) {
+            if (uniqueChoice.has(activity)) {
+              uniqueChoice.set(activity, [...uniqueChoice.get(activity)!, name]);
+            } else {
+              uniqueChoice.set(activity, [name]);
+            }
+          }
+          console.log("ARE DISJOINT:", areDisjoint)
+          console.log("WITHOUT")
+          console.log(chosenListWithoutCurrentActivity)
+          console.log(name, activity)
+          console.log(name, kidsChoices)
+          console.log("UNIQUE CHOICE:", uniqueChoice)
+        }
+      }
+    }
+  }
+
   /**
    * Constructs Map of 'land' or 'water' activities that have not been scheduled yet with default count of 0.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
@@ -373,6 +449,7 @@ export class Schedule {
     return matchedKids;
   }
 
+
   /**
    * Filter scheduled activities that are below (but not equal to) max capacity,
    * so we can see which activities we can add more kids to.
@@ -382,7 +459,7 @@ export class Schedule {
    */
   private getActivitiesBelowMax(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): Map<string, number> {
     const openSlots = new Map<string, number>();
-    const scheduledCount = this.scheduledActivityCount(activityType, timeSlot, false)
+    const scheduledCount = Schedule.scheduledActivityCount(activityType, timeSlot, false)
     for (const [activity, count] of scheduledCount) {
       const activityMax = Activities.waterRanges[activity][1]
       if (count < activityMax) {
@@ -1061,6 +1138,30 @@ export class Schedule {
     }
   }
 
+  /**
+  * Precursor to scheduleDoubleMax and scheduleDoubleMin methods.
+  * @param {string} activityType - only 2 options: 'land' or 'water'.
+  * @param {number[]} choices - num of choices to count in any combo of 1 thru 3: [[1], [2], [3], [1, 2], [1, 2], [1, 3], [1, 2, 3]]
+  * @param {string}  maxOrMinSched - 3 options: 'maxOnly', 'minOnly', 'bothMinAndMax'
+  * @returns {boolean} true if 1 or more activities were scheduled, false if not activity is schedule.
+  */
+  private scheduleNotFull(activityType: AllowedActivityTypes): void {
+    const scheduledNotFull = this.getScheduledActivitiesNotFull(activityType, '9am');
+    console.log("SCHEDULED NOT FULL")
+    console.log(scheduledNotFull)
+    console.log("NOT SCHEDULED ALL NAMES WATER COUNT:", this.notScheduledAllNamesWater.length)
+
+    for (const name of this.notScheduledAllNamesWater) {
+      console.log(name, this.kids.choices[name])
+    }
+
+    const scheduledChosen = this.removeNoChoicesFromScheduledNotFull('water', scheduledNotFull, this.notScheduledAllNamesWater)
+    console.log("SCHEDULED CHOSEN")
+    console.log(scheduledChosen)
+
+    this.scheduleTheChosen(scheduledChosen, 'water')
+  }
+
   private printDebugView(activityType: AllowedActivityTypes, detailed: boolean = false): void {
     const notScheduled9am = activityType === 'water' ? this.notScheduled9amWater : this.notScheduled9amLand;
     const notScheduled10am = activityType === 'water' ? this.notScheduled10amWater : this.notScheduled10amLand;
@@ -1206,6 +1307,15 @@ export class Schedule {
 
     this.scheduleBelowMin('water')
     this.schedulingLog('scheduleBelowMin()', 'after')
+
+    this.scheduleNotFull('water')
+
+    // for (const hello in this.water10am) {
+    //   console.log(this.water10am[hello].length, hello, this.water10am[hello])
+    // }
+    // const scheduledNotFull10am = this.getScheduledActivitiesNotFull('water', '10am')
+    // console.log("SCHEDULED NOT FULL")
+    // console.log(scheduledNotFull10am)
 
     // this.printDebugView('land')
     // this.printDebugView('water', true)
