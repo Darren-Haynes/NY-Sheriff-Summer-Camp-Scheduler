@@ -1189,6 +1189,25 @@ export class Schedule {
     console.log("***********************\n\n")
   }
 
+  private scheduleLeastFullByTimeSlot(activityType: AllowedActivityTypes, timeSlot: AllowedTimes, name: string, kidsChoices: string[], scheduledActivities: Map<string, number>): string {
+    let notFullMatch = []
+    for (const choice of kidsChoices) {
+      if (scheduledActivities.has(choice)) {
+        notFullMatch.push(choice)
+      }
+    }
+    if (notFullMatch.length > 0) {
+      notFullMatch = notFullMatch.sort((a, b) => scheduledActivities.get(b) - scheduledActivities.get(a));
+    }
+    for (const activity of notFullMatch) {
+      if (scheduledActivities.get(activity) > 0) {
+        const kidsScheduledCount = this.scheduleKids(activityType, notFullMatch[0], timeSlot, [name])
+        return notFullMatch[0]
+      }
+    }
+    return "no match"
+  }
+
   private scheduleLeastFull(activityType: AllowedActivityTypes): void {
     console.log("\n\n\n\nAFTER AFTER AFTER UNIQUES UNIQUES")
     const scheduledActivitiesNotFull9am = this.getScheduledActivitiesNotFull(activityType, '9am');
@@ -1216,25 +1235,29 @@ export class Schedule {
     for (const name of notScheduledAllNames) {
       const kidsChoices = this.getAllKidsChoiceByActivityType(name, activityType);
       if (this.notScheduled9amWater.names.length >= this.notScheduled10amWater.names.length) {
-        let notFullMatch = []
-        for (const choice of kidsChoices) {
-          if (scheduledChosenActivities9am.has(choice)) {
-            notFullMatch.push(choice)
-          }
-        }
-        if (notFullMatch.length > 0) {
-          notFullMatch = notFullMatch.sort((a, b) => scheduledChosenActivities9am.get(b) - scheduledChosenActivities9am.get(a));
-        }
-        for (const activity of notFullMatch) {
-          if (scheduledChosenActivities9am.get(activity) > 0) {
-            const kidsScheduledCount9am = this.scheduleKids(activityType, notFullMatch[0], '9am', [name])
-            const activityOpenSlotCount = scheduledChosenActivities9am.get(notFullMatch[0])
-            scheduledChosenActivities9am.set(notFullMatch[0], activityOpenSlotCount - 1)
-            break
+        const matchActivity = this.scheduleLeastFullByTimeSlot(activityType, '9am', name, kidsChoices, scheduledChosenActivities9am)
+        if (matchActivity !== "no match") {
+          const activityOpenSlotCount = scheduledChosenActivities9am.get(matchActivity)
+          scheduledChosenActivities9am.set(matchActivity, activityOpenSlotCount - 1)
+        } else {
+          const matchActivity = this.scheduleLeastFullByTimeSlot(activityType, '10am', name, kidsChoices, scheduledChosenActivities10am)
+          if (matchActivity !== "no match") {
+            const activityOpenSlotCount = scheduledChosenActivities10am.get(matchActivity)
+            scheduledChosenActivities10am.set(matchActivity, activityOpenSlotCount - 1)
           }
         }
       } else {
-        console.log("10 am is bigger!!!")
+        const matchActivity = this.scheduleLeastFullByTimeSlot(activityType, '10am', name, kidsChoices, scheduledChosenActivities10am)
+        if (matchActivity !== "no match") {
+          const activityOpenSlotCount = scheduledChosenActivities10am.get(matchActivity)
+          scheduledChosenActivities10am.set(matchActivity, activityOpenSlotCount - 1)
+        } else {
+          const matchActivity = this.scheduleLeastFullByTimeSlot(activityType, '9am', name, kidsChoices, scheduledChosenActivities9am)
+          if (matchActivity !== "no match") {
+            const activityOpenSlotCount = scheduledChosenActivities9am.get(matchActivity)
+            scheduledChosenActivities9am.set(matchActivity, activityOpenSlotCount - 1)
+          }
+        }
       }
     }
   }
