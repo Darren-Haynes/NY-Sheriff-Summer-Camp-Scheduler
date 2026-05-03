@@ -1189,8 +1189,7 @@ export class Schedule {
     console.log("***********************\n\n")
   }
 
-  private scheduleNotFull(activityType: AllowedActivityTypes): void {
-    this.scheduleUniques(activityType)
+  private scheduleLeastFull(activityType: AllowedActivityTypes): void {
     console.log("\n\n\n\nAFTER AFTER AFTER UNIQUES UNIQUES")
     const scheduledActivitiesNotFull9am = this.getScheduledActivitiesNotFull(activityType, '9am');
     console.log("SCHEDULED NOT FULL 9AM")
@@ -1212,6 +1211,38 @@ export class Schedule {
     const scheduledChosenActivities10am = this.removeNotChosenActivitiesFromScheduledNotFull('water', scheduledActivitiesNotFull10am, this.notScheduledAllNamesWater)
     console.log("SCHEDULED CHOSEN 10AM")
     console.log(scheduledChosenActivities10am)
+
+    const notScheduledAllNames = activityType === 'water' ? [...this.notScheduledAllNamesWater] : [...this.notScheduledAllNamesLand];
+    for (const name of notScheduledAllNames) {
+      const kidsChoices = this.getAllKidsChoiceByActivityType(name, activityType);
+      if (this.notScheduled9amWater.names.length >= this.notScheduled10amWater.names.length) {
+        let notFullMatch = []
+        for (const choice of kidsChoices) {
+          if (scheduledChosenActivities9am.has(choice)) {
+            notFullMatch.push(choice)
+          }
+        }
+        if (notFullMatch.length > 0) {
+          notFullMatch = notFullMatch.sort((a, b) => scheduledChosenActivities9am.get(b) - scheduledChosenActivities9am.get(a));
+        }
+        for (const activity of notFullMatch) {
+          if (scheduledChosenActivities9am.get(activity) > 0) {
+            const kidsScheduledCount9am = this.scheduleKids(activityType, notFullMatch[0], '9am', [name])
+            const activityOpenSlotCount = scheduledChosenActivities9am.get(notFullMatch[0])
+            scheduledChosenActivities9am.set(notFullMatch[0], activityOpenSlotCount - 1)
+            break
+          }
+        }
+      } else {
+        console.log("10 am is bigger!!!")
+      }
+    }
+  }
+
+  private scheduleNotFull(activityType: AllowedActivityTypes): void {
+    this.scheduleUniques(activityType)
+    console.log("ENTERING LEAST FULL")
+    this.scheduleLeastFull(activityType)
   }
 
   private printDebugView(activityType: AllowedActivityTypes, detailed: boolean = false): void {
