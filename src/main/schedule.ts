@@ -1133,6 +1133,14 @@ export class Schedule {
     }
   }
 
+  /**
+    * Schedule kids for a given activity type and time slot.
+    * @param {string} activityType - only 2 options: 'land' or 'water'.
+    * @param {string} activity - land or water activities such as 'canoe', 'kayak', 'fball', etc.
+    * @param {string} timeSlot - only 2 options: '9am' or '10am'.
+    * @param {string[]} kidsNames - array of the kids to schedule for the given activity.
+    * @returns {Int} - number of kids scheduled for the given activity.
+    */
   private scheduleKids(activityType: AllowedActivityTypes, activity: WaterActivities | LandActivities, timeSlot: AllowedTimes, kidsNames: string[]): Int {
     const activityTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
     const activityRanges = activityType === 'water' ? Activities.waterRanges : Activities.landRanges;
@@ -1152,6 +1160,13 @@ export class Schedule {
     return kidsToSchedule.length
   }
 
+  /**
+    * Schedule kids who only have a single choice match for the activities that have open slots.
+    * Since they only have one option available, it's better to schedule them first than schedule kids with multiple choices.
+    * If we schedule the kids with multiple choices first, they could take the slot that the kids who only have a single choice could have taken.
+    * @param {string} activityType - only 2 options: 'land' or 'water'.
+    * @returns {void}
+    */
   private scheduleUniques(activityType: AllowedActivityTypes): void {
     const scheduledActivitiesNotFull9am = this.getScheduledActivitiesNotFull(activityType, '9am');
     const scheduledActivitiesNotFull10am = this.getScheduledActivitiesNotFull(activityType, '10am');
@@ -1189,6 +1204,15 @@ export class Schedule {
     console.log("***********************\n\n")
   }
 
+  /**
+    * Helper method for scheduleLeastFull() that divides scheduling into 9am and 10am slots.
+    * @param {string} activityType - only 2 options: 'land' or 'water'.
+    * @param {string} timeSlot - only 2 options: '9am' or '10am'.
+    * @param {string} name - name of the kid to schedule.
+    * @param {string[]} kidsChoices - array of the kids 3 choices, either 3 land or 3 water activities.
+    * @param {Map<string, number>} scheduledActivities - map of scheduled activities and their remaining slots, e.g {'canoe', 2, 'kayak', 1}
+    * @returns {string} - the activity that the kid was scheulded to or "no match" if kids choices are not available.
+    */
   private scheduleLeastFullByTimeSlot(activityType: AllowedActivityTypes, timeSlot: AllowedTimes, name: string, kidsChoices: string[], scheduledActivities: Map<string, number>): string {
     let notFullMatch = []
     for (const choice of kidsChoices) {
@@ -1208,6 +1232,14 @@ export class Schedule {
     return "no match"
   }
 
+  /**
+    * When scheduling kids to scheduled activities with open slots, match the kids to the activities
+    * with the most open slots first. This helps schedule the most amount of kids because if we schedule
+    * a kid to an activity that only has one open slot first (and not one that has multiple open slots)
+    * then that will eliminate the ability to schedule another kid to that activity.
+    * @param {string} activityType - only 2 options: 'land' or 'water'.
+    * @returns {void}
+    */
   private scheduleLeastFull(activityType: AllowedActivityTypes): void {
     console.log("\n\n\n\nAFTER AFTER AFTER UNIQUES UNIQUES")
     const scheduledActivitiesNotFull9am = this.getScheduledActivitiesNotFull(activityType, '9am');
@@ -1262,9 +1294,14 @@ export class Schedule {
     }
   }
 
+  /**
+    * For not scheduled kids, find activities that are already scheduled but have open slots and then attempt
+    * to schedule the kids to these open slots if the activities match thier choices.
+    * @param {string} activityType - only 2 options: 'land' or 'water'.
+    * @returns {void}
+    */
   private scheduleNotFull(activityType: AllowedActivityTypes): void {
     this.scheduleUniques(activityType)
-    console.log("ENTERING LEAST FULL")
     this.scheduleLeastFull(activityType)
   }
 
