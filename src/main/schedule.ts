@@ -229,6 +229,12 @@ export class Schedule {
     return scheduledAboveMin;
   }
 
+  /**
+    * Get list of all scheduled activities that have available slots for a given activity type and time slot.
+    * @param {string} activityType - only 2 options: 'land' or 'water'.
+    * @param {string} timeSlot - only 2 options: '9am' or '10am'.
+    * @returns {Map<string, number>} - map of scheduled activities and a count of their available time slots.
+    */
   private getScheduledActivitiesNotFull(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): Map<string, number> {
     const scheduledActivities = this.getActivityTypeTimeSlot(activityType, timeSlot);
     const notFullActivities = new Map<string, number>();
@@ -239,6 +245,42 @@ export class Schedule {
       };
     };
     return new Map([...notFullActivities.entries()].sort((b, a) => a[1] - b[1]));
+  }
+
+  /**
+    * Get list of all scheduled activities that have all their available slots filled for a given activity type and time slot.
+    * @param {string} activityType - only 2 options: 'land' or 'water'.
+    * @param {string} timeSlot - only 2 options: '9am' or '10am'.
+    * @returns {Map<string, number>} - map of scheduled activities and the count of their full time slots.
+    */
+  private getScheduledActivitiesFull(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): Map<string, number> {
+    const scheduledActivities = this.getActivityTypeTimeSlot(activityType, timeSlot);
+    const fullActivities = new Map<string, number>();
+    const activityRange = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
+    for (const [activity, names] of Object.entries(scheduledActivities)) {
+      if (names.length === activityRange[activity][1]) {
+        fullActivities.set(activity, activityRange[activity][1]);
+      };
+    };
+    return new Map([...fullActivities.entries()].sort((b, a) => a[1] - b[1]));
+  }
+
+  /**
+    * Get list of all not scheduled activities for a given activity type and time slot.
+    * @param {string} activityType - only 2 options: 'land' or 'water'.
+    * @param {string} timeSlot - only 2 options: '9am' or '10am'.
+    * @returns {Map<string, number>} - map of not scheduled activities and their remaining slots, e.g {'canoe', 10, 'pboard', 4}
+    */
+  private getNotScheduledActivities(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): Map<string, number> {
+    const scheduledActivities = this.getActivityTypeTimeSlot(activityType, timeSlot);
+    const notScheduledActivities = new Map<string, number>();
+    const activityRange = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
+    for (const [activity, names] of Object.entries(scheduledActivities)) {
+      if (names.length === 0) {
+        notScheduledActivities.set(activity, activityRange[activity][1]);
+      };
+    };
+    return new Map([...notScheduledActivities.entries()].sort((b, a) => a[1] - b[1]));
   }
 
   private removeNotChosenActivitiesFromScheduledNotFull(activityType: AllowedActivityTypes, scheduledNotFull: Map<string, number>, notScheduledAllNames: string[]): Map<string, number>{
@@ -1454,6 +1496,22 @@ export class Schedule {
     this.scheduleNotFull('water')
     this.schedulingLog('scheduleBelowMin()', 'after')
 
+    console.log("ALMOST AT THE END MY FRIEND")
+    for (const name of this.notScheduledAllNamesWater) {
+      console.log(name, this.kids.choices[name])
+    }
+    const scheduledActivitiesNotFull9am = this.getScheduledActivitiesNotFull('water', '9am');
+    console.log("scheduledActivitiesNotFull9am", scheduledActivitiesNotFull9am)
+    const scheduledActivitiesNotFull10am = this.getScheduledActivitiesNotFull('water', '10am');
+    console.log("scheduledActivitiesNotFull10am", scheduledActivitiesNotFull10am)
+    const scheduledActivitiesFull9am = this.getScheduledActivitiesFull('water', '9am');
+    console.log("scheduledActivitiesFull9am", scheduledActivitiesFull9am)
+    const scheduledActivitiesFull10am = this.getScheduledActivitiesFull('water', '10am');
+    console.log("scheduledActivitiesFull10am", scheduledActivitiesFull10am)
+    const notScheduledActivities9am = this.getNotScheduledActivities('water', '9am');
+    console.log("notScheduledActivities9am", notScheduledActivities9am)
+    const notScheduledActivities10am = this.getNotScheduledActivities('water', '10am');
+    console.log("notScheduledActivities10am", notScheduledActivities10am)
     // for (const hello in this.water10am) {
     //   console.log(this.water10am[hello].length, hello, this.water10am[hello])
     // }
