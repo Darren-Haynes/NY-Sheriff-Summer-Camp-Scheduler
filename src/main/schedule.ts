@@ -1455,21 +1455,13 @@ export class Schedule {
       for (const choice of choices) {
         if (scheduledActivitiesFull.has(choice)) {
           const fullNames = timeSlot === '9am' ? this.water9am[choice] : this.water10am[choice]
-          const fullNamesFirstChoices = this.getRescheduleMatches(fullNames, choice, activityType, timeSlot, 1)
-          const kidToScheduleData = {name: name, activity: choice, activityType: activityType, timeSlot: timeSlot}
-          if (fullNamesFirstChoices.hasOwnProperty('reScheduleKid')) {
-            this.scheduleNoChoicesMatchesFound(fullNamesFirstChoices, kidToScheduleData)
-            break mainChoiceLoop
-          }
-          const fullNamesSecondChoices = this.getRescheduleMatches(fullNames, choice, activityType, timeSlot, 2)
-          if (fullNamesSecondChoices.hasOwnProperty('reScheduleKid')) {
-            this.scheduleNoChoicesMatchesFound(fullNamesSecondChoices, kidToScheduleData)
-            break mainChoiceLoop
-          }
-          const fullNamesThirdChoices = this.getRescheduleMatches(fullNames, choice, activityType, timeSlot, 3)
-          if (fullNamesThirdChoices.hasOwnProperty('reScheduleKid')) {
-            this.scheduleNoChoicesMatchesFound(fullNamesThirdChoices, kidToScheduleData)
-            break mainChoiceLoop
+          for (const choiceNum of [1, 2, 3]) {
+            const fullNamesChoices = this.getRescheduleMatches(fullNames, choice, activityType, timeSlot, choiceNum)
+            if (fullNamesChoices.hasOwnProperty('reScheduleKid')) {
+              const kidToScheduleData = {name: name, activity: choice, activityType: activityType, timeSlot: timeSlot}
+              this.scheduleNoChoicesMatchesFound(fullNamesChoices, kidToScheduleData)
+              break mainChoiceLoop
+            }
           }
         }
       }
