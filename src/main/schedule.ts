@@ -1201,6 +1201,13 @@ export class Schedule {
     return kidsToSchedule.length
   }
 
+  /**
+    * Add kid to the appropriate not scheduled lists.
+    * @param {string} name - name of kid to remove from lists.
+    * @param {string} activityType - type of activity to remove from (water or land).
+    * @param {string} timeSlot - time slot to remove the kid from (9am or 10am).
+    * @returns {void}
+    */
   private addKidToNotScheduled(name: string, activityType: AllowedActivityTypes, timeSlot: AllowedTimes): void {
     const allNames = activityType === 'water' ? this.notScheduledAllNamesWater : this.notScheduledAllNamesLand;
     allNames.push(name);
@@ -1220,6 +1227,14 @@ export class Schedule {
     }
   }
 
+  /**
+    * Remove kid from an activity time slot (which is an array of kids names) e.g 'this.water9am['canoe']' of 'this.land10am['pboard']'
+    * @param {string} name - name of kid to remove from activity..
+    * @param {string} activity - activity to remove the kid from ('canoe, 'pboard', etc).
+    * @param {string} activityType - type of activity to remove from (water or land).
+    * @param {string} timeSlot - time slot to remove the kid from (9am or 10am).
+    * @returns {void}
+    */
   private removeKidFromActivity(name: string, activity: WaterActivities | LandActivities, activityType: AllowedActivityTypes, timeSlot: Allowed9and10Only): void {
     const activityTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
     const index = activityTimeSlot[activity].indexOf(name);
@@ -1228,23 +1243,53 @@ export class Schedule {
     }
   }
 
+  /**
+    * Add kid to an activity time slot (which is an array of kids names) e.g 'this.water9am['canoe']' of 'this.land10am['pboard']'
+    * @param {string} name - name of kid to add to activity.
+    * @param {string} activity - activity to schedule the kid to ('canoe, 'pboard', etc).
+    * @param {string} activityType - type of activity to schedule to (water or land).
+    * @param {string} timeSlot - time slot to schedule the kid to (9am or 10am).
+    * @returns {void}
+    */
   private addKidToActivity(name: string, activity: WaterActivities | LandActivities, activityType: AllowedActivityTypes, timeSlot: Allowed9and10Only): void {
     const activityTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
     activityTimeSlot[activity].push(name)
   }
 
+  /**
+    * Wrapper for the methods needed to fully schedule a kid
+    * @param {string} name - name of kid to schedule.
+    * @param {string} activity - activity to schedule the kid to ('canoe, 'pboard', etc).
+    * @param {string} activityType - type of activity to schedule to (water or land).
+    * @param {string} timeSlot - time slot to schedule the kid to (9am or 10am).
+    * @returns {void}
+    */
   private scheduleKid(name: string, activity: WaterActivities | LandActivities, activityType: AllowedActivityTypes, timeSlot: AllowedTimes): void {
     this.removeFromNotScheduled([name], activityType, activity, timeSlot);
     this.setKidsTimeSlot([name], activity, activityType + timeSlot)
     this.addKidToActivity(name, activity, activityType, timeSlot)
   }
 
+  /**
+    * Wrapper for the methods needed to fully unschedule a kid
+    * @param {string} name - name of kid to unschedule.
+    * @param {string} activity - activity to unschedule the kid from ('canoe, 'pboard', etc).
+    * @param {string} activityType - type of activity to unschedule (water or land).
+    * @param {string} timeSlot - time slot to unschedule the kid from (9am or 10am).
+    * @returns {void}
+    */
   private unScheduleKid(name: string, activity: WaterActivities | LandActivities, activityType: AllowedActivityTypes, timeSlot: Allowed9and10Only): void {
     this.setKidsTimeSlot([name], null, activityType + timeSlot)
     this.addKidToNotScheduled(name, activityType, timeSlot)
     this.removeKidFromActivity(name, activity, activityType, timeSlot)
   }
 
+  /**
+    * Wrapper method for scheduling kids from a no choices match scenario.
+    * @param {object} reScheduleData - data for re-scheduling a kid.
+    * @param {object} kidtoScheduleData - data for the scheduling (not resheduling) a kid.
+    * @returns {void}
+    */
   private scheduleNoChoicesMatchesFound(reScheduleData: Object, kidtoScheduleData: Object): void {
     const { reScheduleKid, fromActivity, toActivity } = reScheduleData;
     const { name: mainName, activity, activityType, timeSlot } = kidtoScheduleData;
