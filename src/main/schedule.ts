@@ -1407,6 +1407,15 @@ export class Schedule {
     }
   }
 
+  /**
+    * Find a kid who can be rescheduled from their current activity to a different activity but still an activiy that is one of their choices.
+    * @param {string[]} names - list of names of kids to search through.
+    * @param {LandActivities | WaterActivities} activity - current activity of the kid to reschedule.
+    * @param {string} activityType - only 2 options: 'land' or 'water'.
+    * @param {Allowed9and10Only} timeSlot - only 2 options: '9am' or '10am'.
+    * @param {1 | 2 | 3} choiceNum - the choice number of the activity to reschedule to.
+    * @returns {object} - an object containing the name of the kid who can be rescheduled and the activity they will be rescheduled to, or empty if no match.
+    */
   private getRescheduleMatches(names: string[], activity: LandActivities | WaterActivities, activityType: AllowedActivityTypes, timeSlot: Allowed9and10Only, choiceNum: 1 | 2 | 3): object {
     const scheduledActivitiesNotFull = this.getScheduledActivitiesNotFull(activityType, timeSlot);
     let fromActivity: LandActivities | WaterActivities
@@ -1421,6 +1430,13 @@ export class Schedule {
     return {}
   }
 
+  /**
+    * Scheduled kids who cannot be scheduled to their chosen activities because no open slots are available.
+    * To scheduled them we need to reschedule someone else to make a slot available so that the unscheduled kid(s)
+    * can be scheduled to one of their chosen activities.
+    * @param {string} activityType - only 2 options: 'land' or 'water'.
+    * @returns {void}
+    */
   private scheduleNoChoicesMatch(activityType: AllowedActivityTypes): void {
     const notScheduledAllNames = activityType === 'land' ? this.notScheduledAllNamesLand : this.notScheduledAllNamesWater
     const notScheduled9am = activityType === 'land' ? this.notScheduled9amLand : this.notScheduled9amWater
