@@ -1444,27 +1444,29 @@ export class Schedule {
     for (const name of notScheduledAllNames) {
       const choices = this.getAllKidsChoicesByActivityType(name, activityType)
       let scheduledActivitiesFull = null;
+      let timeSlot = '9am';
       if (notScheduled9am.length > notScheduled10am.length) {
         scheduledActivitiesFull = this.getScheduledActivitiesFull(activityType, '9am');
         } else {
         scheduledActivitiesFull= this.getScheduledActivitiesFull(activityType, '10am');
+        timeSlot = '10am';
       }
       mainChoiceLoop:
       for (const choice of choices) {
         if (scheduledActivitiesFull.has(choice)) {
-          const fullNames = this.water10am[choice]
-          const fullNamesFirstChoices = this.getRescheduleMatches(fullNames, choice, activityType, '10am', 1)
-          const kidToScheduleData = {name: name, activity: choice, activityType: activityType, timeSlot: '10am'}
+          const fullNames = timeSlot === '9am' ? this.water9am[choice] : this.water10am[choice]
+          const fullNamesFirstChoices = this.getRescheduleMatches(fullNames, choice, activityType, timeSlot, 1)
+          const kidToScheduleData = {name: name, activity: choice, activityType: activityType, timeSlot: timeSlot}
           if (fullNamesFirstChoices.hasOwnProperty('reScheduleKid')) {
             this.scheduleNoChoicesMatchesFound(fullNamesFirstChoices, kidToScheduleData)
             break mainChoiceLoop
           }
-          const fullNamesSecondChoices = this.getRescheduleMatches(fullNames, choice, activityType, '10am', 2)
+          const fullNamesSecondChoices = this.getRescheduleMatches(fullNames, choice, activityType, timeSlot, 2)
           if (fullNamesSecondChoices.hasOwnProperty('reScheduleKid')) {
             this.scheduleNoChoicesMatchesFound(fullNamesSecondChoices, kidToScheduleData)
             break mainChoiceLoop
           }
-          const fullNamesThirdChoices = this.getRescheduleMatches(fullNames, choice, activityType, '10am', 2)
+          const fullNamesThirdChoices = this.getRescheduleMatches(fullNames, choice, activityType, timeSlot, 3)
           if (fullNamesThirdChoices.hasOwnProperty('reScheduleKid')) {
             this.scheduleNoChoicesMatchesFound(fullNamesThirdChoices, kidToScheduleData)
             break mainChoiceLoop
