@@ -1468,6 +1468,25 @@ export class Schedule {
     }
   }
 
+  private scheduleSorryNoChoices(activityType: AllowedActivityTypes): void {
+    const noChoicesForYou = activityType === 'land' ? this.notScheduledAllNamesLand : this.notScheduledAllNamesWater
+    const notScheduled9am = activityType === 'land' ? this.notScheduled9amLand : this.notScheduled9amWater
+    const notScheduled10am = activityType === 'land' ? this.notScheduled10amLand : this.notScheduled10amWater
+    for (const name of noChoicesForYou) {
+      if (notScheduled9am.length > notScheduled10am.length) {
+        const scheduledActivitiesNotFull = this.getScheduledActivitiesNotFull(activityType, '9am').keys();
+        for (const activity of scheduledActivitiesNotFull) {
+          this.scheduleKid(name, activity, activityType, '10am');
+        }
+      } else {
+        const scheduledActivitiesNotFull = this.getScheduledActivitiesNotFull(activityType, '10am').keys();
+        for (const activity of scheduledActivitiesNotFull) {
+          this.scheduleKid(name, activity, activityType, '10am');
+        }
+      }
+    }
+  }
+
   /**
     * For not scheduled kids, find activities that are already scheduled but have open slots and then attempt
     * to schedule the kids to these open slots if the activities match thier choices.
@@ -1534,33 +1553,47 @@ export class Schedule {
 
     this.scheduleDoubles('water', [1, 2, 3], 'bothMinAndMax')
     this.schedulingLog('scheduleDoubles()', 'after')
+    if (this.notScheduledAllNamesWater.length === 0) {
+      this.finalCount('water')
+      return "success after scheduleDoubles()"
+    }
 
     this.scheduleSingles('water', [1, 2, 3], 'bothMinAndMax')
     this.schedulingLog('scheduleSingles()', 'after')
+    if (this.notScheduledAllNamesWater.length === 0) {
+      this.finalCount('water')
+      return "success after scheduleSingles()"
+    }
 
     this.scheduleBelowMin('water')
     this.schedulingLog('scheduleBelowMin()', 'after')
+    if (this.notScheduledAllNamesWater.length === 0) {
+      this.finalCount('water')
+      return "success after scheduleBelowMin()"
+    }
 
     this.scheduleNotFull('water')
     this.schedulingLog('scheduleBelowMin()', 'after')
-
-    console.log("ALMOST AT THE END MY FRIEND")
-    const scheduledActivitiesNotFull9am = this.getScheduledActivitiesNotFull('water', '9am');
-    console.log("scheduledActivitiesNotFull9am", scheduledActivitiesNotFull9am)
-    const scheduledActivitiesNotFull10am = this.getScheduledActivitiesNotFull('water', '10am');
-    console.log("scheduledActivitiesNotFull10am", scheduledActivitiesNotFull10am)
-    const scheduledActivitiesFull9am = this.getScheduledActivitiesFull('water', '9am');
-    console.log("scheduledActivitiesFull9am", scheduledActivitiesFull9am)
-    const scheduledActivitiesFull10am = this.getScheduledActivitiesFull('water', '10am');
-    console.log("scheduledActivitiesFull10am", scheduledActivitiesFull10am)
-    const notScheduledActivities9am = this.getNotScheduledActivities('water', '9am');
-    console.log("notScheduledActivities9am", notScheduledActivities9am)
-    const notScheduledActivities10am = this.getNotScheduledActivities('water', '10am');
-    console.log("notScheduledActivities10am", notScheduledActivities10am)
+    if (this.notScheduledAllNamesWater.length === 0) {
+      this.finalCount('water')
+      return "success after scheduleNotFull()"
+    }
 
     this.scheduleNoChoicesMatch('water')
-    this.schedulingLog('scheduleBelowMin()', 'after')
+    this.schedulingLog('scheduleNoChoicesMatch()', 'after')
+    if (this.notScheduledAllNamesWater.length === 0) {
+      this.finalCount('water')
+      return "success after scheduleNoChoicesMatch()"
+    }
+
+    this.scheduleSorryNoChoices('water')
+    this.schedulingLog('scheduleSorryNoChoices()', 'after')
+    if (this.notScheduledAllNamesWater.length === 0) {
+      this.finalCount('water')
+      return "success after scheduleSorryNoChoices()"
+    }
+
     this.finalCount('water')
-    return 'success';
+    return 'Somebodies didn\'t get scheduled';
   }
 }
