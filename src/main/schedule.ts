@@ -655,7 +655,19 @@ export class Schedule {
           activityObj = this.water10am
           break
       }
-      const nameIndex = activityObj[oldActivity].indexOf(name)
+
+      let nameIndex
+      try {
+        nameIndex = activityObj[oldActivity].indexOf(name)
+      } catch (error) {
+        console.log("ERROR:", error)
+        continue
+      }
+      if (nameIndex === -1) {
+        console.log("WHAT HAPPENDED")
+        console.log("OLD ACTIVYITY:", oldActivity)
+        console.log("NEW ACTIVYITY:", newActivity)
+      }
       activityObj[oldActivity].splice(nameIndex, 1)
     }
   }
@@ -873,9 +885,17 @@ export class Schedule {
     this.updateKidsScheduledActivity(randomKids, activity, timeSlot)
     this.setKidsTimeSlot(activityKids, activity, timeSlot)
     if (activityType === 'water') {
-      this.water9am[activity] = allKidsToSchedule;
+      if (activityTime === '9am') {
+        this.water9am[activity] = allKidsToSchedule;
+      } else {
+        this.water10am[activity] = allKidsToSchedule;
+      }
     } else {
-      this.land9am[activity] = allKidsToSchedule;
+      if (activityTime === '9am') {
+        this.land9am[activity] = allKidsToSchedule;
+      } else {
+        this.land10am[activity] = allKidsToSchedule;
+      }
     }
   }
 
@@ -1163,7 +1183,7 @@ export class Schedule {
       const kidsWhoCanReschedule10am = this.getKidsWhoCanReschedule(activityType, activity, '10am', [1, 2, 3]);
       if (notScheduledActivities10am.includes(activity)) {
         const count9am = notScheduledActivitiesCount9am.get(activity)
-        const count10am = notScheduledActivitiesCount9am.get(activity)
+        const count10am = notScheduledActivitiesCount10am.get(activity)
         const notScheduled9am = activityType === 'water' ? this.notScheduled9amWater : this.notScheduled9amLand;
         const notScheduled10am = activityType === 'water' ? this.notScheduled10amWater : this.notScheduled10amLand;
         const notScheduled9amCount = notScheduled9am.names.length - (this.kids.count / 2)
@@ -1539,7 +1559,7 @@ export class Schedule {
       for (const name of this.kids.names) {
         const result = this.getAssignedActivities(name)
         if (Object.keys(result).length > 0) {
-          console.log(name, this.getAssignedActivities(name))
+          // console.log(name, this.getAssignedActivities(name))
           assignedActvitiesCount += 1
         }
       }
