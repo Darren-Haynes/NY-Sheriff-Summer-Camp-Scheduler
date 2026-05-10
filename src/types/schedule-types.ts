@@ -13,6 +13,12 @@ export interface NotScheduledWater {
   waterActivities: string[];
 }
 
+export interface NotScheduledActivities {
+  activity: AllActivities;
+  shortFall: number;
+  timeSlot: AllowedTimes;
+}
+
 export type WaterActivities = 'swim' | 'fish' | 'canoe' | 'snork' | 'sail' | 'pboard' | 'kayak';
 // TODO: uncomment the 2 line below to try and increase type safety
 // type Land9amActivities = 'bball' | 'vball' | 'soc' | 'arch' | 'art' | 'hike' | 'cheer';
@@ -31,6 +37,8 @@ export type LandActivities =
   | 'fball'
   | 'yoga'
   | 'fris';
+
+export type AllActivities = LandActivities | WaterActivities;
 
 export type LandKids = Record<LandActivities, string[]>;
 export type WaterKids = Record<WaterActivities, string[]>;
