@@ -1537,35 +1537,53 @@ export class Schedule {
     const notScheduledAllNames = activityType === 'water' ? this.notScheduledAllNamesWater : this.notScheduledAllNamesLand;
     const totalKidsCount = this.kids.count - notScheduledAllNames.length
 
-    console.log("TIMESLOTS")
-    let scheduledCount = 0;
+    console.log("WATER TIMESLOTS")
+    let waterTotalCount = 0;
+    let water9amTotalCount = 0;
+    let water10amTotalCount = 0;
+    const unscheduleKids = []
+    const water9amActivityCount = { 'fish': 0, 'pboard': 0, 'snork': 0, 'canoe': 0, 'kayak': 0, 'sail': 0, 'swim': 0 };
+    const water10amActivityCount = { 'fish': 0, 'pboard': 0, 'snork': 0, 'canoe': 0, 'kayak': 0, 'sail': 0, 'swim': 0 };
     for (const name of this.kids.names) {
       const timeSlots = this.schedule.get(name)
-      for (const time in timeSlots) {
-        if (timeSlots[time] !== null) {
-          scheduledCount += 1;
+      if (timeSlots.timeSlots.water9am) {
+        water9amActivityCount[timeSlots.timeSlots.water9am] += 1;
+        water9amTotalCount += 1;
+      }
+      if (timeSlots.timeSlots.water10am) {
+        water10amActivityCount[timeSlots.timeSlots.water10am] += 1;
+        water10amTotalCount += 1;
+      }
+      let nullCount = 0;
+      for (const time in timeSlots.timeSlots) {
+        if (timeSlots.timeSlots[time] === null) {
+          nullCount += 1;
         }
+      }
+      if (nullCount === 4) {
+        unscheduleKids.push({ name: name, timeSlot: timeSlots.timeSlots })
       }
     }
 
-    if (scheduledCount !== totalKidsCount) {
+    waterTotalCount = water9amTotalCount + water10amTotalCount;
+
+    console.log("Water Total Count: ", waterTotalCount)
+    console.log("9am this.kids.names(get) total count:", water9amTotalCount)
+    console.log("9am this.kids.names(get) individual activity count:", water9amActivityCount)
+    console.log("10am this.kids.names(get) total count:", water10amTotalCount)
+    console.log("10am this.kids.names(get) individual activity count:", water10amActivityCount)
+
+    if (waterTotalCount !== totalKidsCount) {
       console.log("\n\nScheduled # mismatch. this.Kids.timeSlots != this.kids.totalKidsCount: ")
-      console.log(scheduledCount, "!==", totalKidsCount, "\n")
+      console.log(waterTotalCount, "!==", totalKidsCount, "\n")
     } else {
       console.log("Scheduled # MATCHES YAY. this.Kids.timeSlots == this.kids.totalKidsCount: ")
-      console.log(scheduledCount, "==", totalKidsCount, "\n\n")
+      console.log(waterTotalCount, "==", totalKidsCount, "\n\n")
     }
-
-      let assignedActvitiesCount = 0
-      for (const name of this.kids.names) {
-        const result = this.getAssignedActivities(name)
-        if (Object.keys(result).length > 0) {
-          // console.log(name, this.getAssignedActivities(name))
-          assignedActvitiesCount += 1
-        }
-      }
-      console.log("ASSIGNED ACTIVITES ACCOUNT:", assignedActvitiesCount)
-
+    console.log('TOTAL KIDS NOT SCHEDULED:', this.kids.count - totalKidsCount)
+    for (const kid of unscheduleKids) {
+      console.log(kid)
+    }
   }
 
   runAlgo(): string {
