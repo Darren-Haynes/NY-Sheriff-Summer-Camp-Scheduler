@@ -1540,9 +1540,6 @@ export class Schedule {
   }
 
   private finalCount(activityType: AllowedActivityTypes): void {
-    const notScheduled9am = activityType === 'water' ? this.notScheduled9amWater : this.notScheduled9amLand;
-    const notScheduled10am = activityType === 'water' ? this.notScheduled10amWater : this.notScheduled10amLand;
-    const activityProperty = activityType === 'water' ? 'waterActivities' : 'landActivities';
     const notScheduledAllNames = activityType === 'water' ? this.notScheduledAllNamesWater : this.notScheduledAllNamesLand;
     const totalKidsCount = this.kids.count - notScheduledAllNames.length
 
@@ -1575,12 +1572,47 @@ export class Schedule {
     }
 
     waterTotalCount = water9amTotalCount + water10amTotalCount;
-
     console.log("Water Total Count: ", waterTotalCount)
     console.log("9am this.kids.names(get) total count:", water9amTotalCount)
     console.log("9am this.kids.names(get) individual activity count:", water9amActivityCount)
     console.log("10am this.kids.names(get) total count:", water10amTotalCount)
     console.log("10am this.kids.names(get) individual activity count:", water10amActivityCount)
+
+    const water9amActivityCountAlt = { 'fish': 0, 'pboard': 0, 'snork': 0, 'canoe': 0, 'kayak': 0, 'sail': 0, 'swim': 0 };
+    const water10amActivityCountAlt = { 'fish': 0, 'pboard': 0, 'snork': 0, 'canoe': 0, 'kayak': 0, 'sail': 0, 'swim': 0 };
+    for (const activity in this.water9am) {
+      water9amActivityCountAlt[activity] = this.water9am[activity].length;
+    }
+    for (const activity in this.water9am) {
+      water10amActivityCountAlt[activity] = this.water10am[activity].length;
+    }
+
+    // Check if water9amActivityCountAlt and water9amActivityCount are equal
+    const keys1 = Object.keys(water9amActivityCountAlt).sort();
+    const keys2 = Object.keys(water9amActivityCount).sort();
+    const equalObjects9am =  keys1.every((key, index) =>
+        key === keys2[index] && water9amActivityCountAlt[key] === water9amActivityCount[key]
+      );
+
+    console.log("\nARE OBJECTS EQUAL?")
+    if (equalObjects9am) {
+      console.log("9AM objects THEY ARE EQAUL yaaay")
+    } else {
+      console.log("9AM objects THEY ARE not EQUAL!!!")
+    }
+
+    const keys1a = Object.keys(water10amActivityCountAlt).sort();
+    const keys2a = Object.keys(water10amActivityCount).sort();
+    const equalObjects10am =  keys1a.every((key, index) =>
+        key === keys2a[index] && water10amActivityCountAlt[key] === water10amActivityCount[key]
+      );
+
+    if (equalObjects10am) {
+      console.log("10AM objects THEY ARE EQAUL yaaay")
+    } else {
+      console.log("10AM objects THEY ARE not EQUAL!!!")
+    }
+    console.log("\n")
 
     if (waterTotalCount !== totalKidsCount) {
       console.log("\n\nScheduled # mismatch. this.Kids.timeSlots != this.kids.totalKidsCount: ")
