@@ -3,6 +3,8 @@ import { Activities } from './activities';
 import {
   NotScheduledLand,
   NotScheduledWater,
+  NotScheduledActivities,
+  AllActivities,
   AllowedTimes,
   Allowed9and10Only,
   AllowedActivityTypes,
@@ -655,19 +657,7 @@ export class Schedule {
           activityObj = this.water10am
           break
       }
-
-      let nameIndex
-      try {
-        nameIndex = activityObj[oldActivity].indexOf(name)
-      } catch (error) {
-        console.log("ERROR:", error)
-        continue
-      }
-      if (nameIndex === -1) {
-        console.log("WHAT HAPPENDED")
-        console.log("OLD ACTIVYITY:", oldActivity)
-        console.log("NEW ACTIVYITY:", newActivity)
-      }
+      const nameIndex = activityObj[oldActivity].indexOf(name)
       activityObj[oldActivity].splice(nameIndex, 1)
     }
   }
@@ -880,10 +870,10 @@ export class Schedule {
   ): void {
     const randomKids = this.randomChoices(kidsWhoCanReschedule, notScheduledCount)
     const allKidsToSchedule = activityKids.concat(randomKids)
-    const timeSlot = activityType + activityTime
+    const activityTimeSlot = activityType + activityTime
     this.removeFromNotScheduled(activityKids, activityType, activity, activityTime)
-    this.updateKidsScheduledActivity(randomKids, activity, timeSlot)
-    this.setKidsTimeSlot(activityKids, activity, timeSlot)
+    this.updateKidsScheduledActivity(randomKids, activity, activityTimeSlot)
+    this.setKidsTimeSlot(activityKids, activity, activityTimeSlot)
     if (activityType === 'water') {
       if (activityTime === '9am') {
         this.water9am[activity] = allKidsToSchedule;
@@ -1162,6 +1152,26 @@ export class Schedule {
     return activityKids
   }
 
+  private scheduleBelowMinTimeSlot(activityType: AllowedActivityTypes, timeSlot: AllowedTimes, notScheduledActivities: Array<NotScheduledActivities>): Array<NotScheduledActivities> {
+    let activity: AllActivities
+    let shortfallCount: number;
+    for (const activityObj of notScheduledActivities) {
+      if (activityObj.timeSlot === timeSlot) {
+        activity = activityObj.activity
+        shortfallCount = activityObj.shortFall
+        break
+      }
+    if (!activity) {
+      continue
+    }
+    const activityKids = this.getNotScheduledKidsBelowMin(activityType, [activity]);
+    const kidsWhoCanReschedule= this.getKidsWhoCanReschedule(activityType, activity, timeSlot, [1, 2, 3]);
+    this.scheduleBelowMinActivities(kidsWhoCanReschedule, shortfallCount, activityKids[activity], activityType, timeSlot, activity)
+    }
+    notScheduledActivities = notScheduledActivities.filter(obj => obj.activity !== activity);
+    return notScheduledActivities
+  }
+
   /**
    * Schedule activities where there are not enough kids to reach the minumum number of kids required.
    * Kids are taken from other activities to reach the minimum number required.
@@ -1170,29 +1180,20 @@ export class Schedule {
   private scheduleBelowMin(activityType: AllowedActivityTypes): void {
     const notScheduledActivitiesCount9am = this.getActivitiesBelowMin(activityType, '9am');
     const notScheduledActivitiesCount10am = this.getActivitiesBelowMin(activityType, '10am');
-
-    const notScheduledActivities9am = [...notScheduledActivitiesCount9am.keys()];
-    const notScheduledActivities10am = [...notScheduledActivitiesCount10am.keys()];
-
-    const activityKids9am = this.getNotScheduledKidsBelowMin(activityType, notScheduledActivities9am);
-    const activityKids10am = this.getNotScheduledKidsBelowMin(activityType, notScheduledActivities10am);
-
-    let randomKids = [];
-    for (const activity of notScheduledActivities9am) {
-      const kidsWhoCanReschedule9am = this.getKidsWhoCanReschedule(activityType, activity, '9am', [1, 2, 3]);
-      const kidsWhoCanReschedule10am = this.getKidsWhoCanReschedule(activityType, activity, '10am', [1, 2, 3]);
-      if (notScheduledActivities10am.includes(activity)) {
-        const count9am = notScheduledActivitiesCount9am.get(activity)
-        const count10am = notScheduledActivitiesCount10am.get(activity)
-        const notScheduled9am = activityType === 'water' ? this.notScheduled9amWater : this.notScheduled9amLand;
-        const notScheduled10am = activityType === 'water' ? this.notScheduled10amWater : this.notScheduled10amLand;
-        const notScheduled9amCount = notScheduled9am.names.length - (this.kids.count / 2)
-        const notScheduled10amCount = notScheduled10am.names.length - (this.kids.count / 2)
-        if (notScheduled9amCount >= notScheduled10amCount) {
-          this.scheduleBelowMinActivities(kidsWhoCanReschedule9am, count9am, activityKids9am[activity], activityType, '9am', activity)
-        } else {
-          this.scheduleBelowMinActivities(kidsWhoCanReschedule10am, count10am, activityKids10am[activity], activityType, '10am', activity)
-        }
+    let notScheduledActivities: Array<NotScheduledActivities> = [];
+    for (const [activity, count] of notScheduledActivitiesCount9am) {
+      const activityObj: NotScheduledActivities = { activity: activity, shortFall: count, timeSlot: '9am'}
+      notScheduledActivities.push(activityObj)
+    }
+    for (const [activity, count] of notScheduledActivitiesCount10am) {
+      const activityObj: NotScheduledActivities = { activity: activity, shortFall: count, timeSlot: '10am'}
+      notScheduledActivities.push(activityObj)
+    }
+    while (notScheduledActivities.length > 0) {
+      if (this.notScheduled9amWater.names.length >= this.notScheduled10amWater.names.length) {
+        notScheduledActivities = this.scheduleBelowMinTimeSlot(activityType, '9am', notScheduledActivities)
+      } else {
+        notScheduledActivities = this.scheduleBelowMinTimeSlot(activityType, '10am', notScheduledActivities)
       }
     }
   }
