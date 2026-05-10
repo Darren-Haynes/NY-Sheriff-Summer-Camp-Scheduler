@@ -1489,20 +1489,29 @@ export class Schedule {
     }
   }
 
+  private scheduleSorryNoChoicesTimeSlot(name: string, activityType: AllowedActivityTypes, timeSlot: AllowedTimes): boolean {
+    const scheduledActivitiesNotFull = this.getScheduledActivitiesNotFull(activityType, timeSlot)
+    if (scheduledActivitiesNotFull.size === 0) {return false}
+    innerloop:
+    for (const activity of scheduledActivitiesNotFull.keys()) {
+      this.scheduleKid(name, activity, activityType, timeSlot);
+      break innerloop
+    }
+    return true
+  }
+
   private scheduleSorryNoChoices(activityType: AllowedActivityTypes): void {
-    const noChoicesForYou = activityType === 'land' ? this.notScheduledAllNamesLand : this.notScheduledAllNamesWater
-    const notScheduled9am = activityType === 'land' ? this.notScheduled9amLand : this.notScheduled9amWater
-    const notScheduled10am = activityType === 'land' ? this.notScheduled10amLand : this.notScheduled10amWater
+    const noChoicesForYou = activityType === 'land' ? [...this.notScheduledAllNamesLand] : [...this.notScheduledAllNamesWater]
     for (const name of noChoicesForYou) {
-      if (notScheduled9am.length > notScheduled10am.length) {
-        const scheduledActivitiesNotFull = this.getScheduledActivitiesNotFull(activityType, '9am').keys();
-        for (const activity of scheduledActivitiesNotFull) {
-          this.scheduleKid(name, activity, activityType, '10am');
+      const notScheduled9am = activityType === 'land' ? this.notScheduled9amLand : this.notScheduled9amWater
+      const notScheduled10am = activityType === 'land' ? this.notScheduled10amLand : this.notScheduled10amWater
+      if (notScheduled9am.names.length > notScheduled10am.names.length) {
+        if (!this.scheduleSorryNoChoicesTimeSlot(name, activityType, '9am')) {
+          this.scheduleSorryNoChoicesTimeSlot(name, activityType, '10am')
         }
       } else {
-        const scheduledActivitiesNotFull = this.getScheduledActivitiesNotFull(activityType, '10am').keys();
-        for (const activity of scheduledActivitiesNotFull) {
-          this.scheduleKid(name, activity, activityType, '10am');
+        if (!this.scheduleSorryNoChoicesTimeSlot(name, activityType, '10am')) {
+          this.scheduleSorryNoChoicesTimeSlot(name, activityType, '9am')
         }
       }
     }
