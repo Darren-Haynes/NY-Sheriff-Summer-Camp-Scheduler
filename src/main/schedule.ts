@@ -58,10 +58,10 @@ export class Schedule {
     this.notScheduled9amLand = this.notScheduledConstructor(true);
     this.notScheduled10amLand = this.notScheduledConstructor(false);
     this.notScheduledAllNamesLand = structuredClone(this.kids.names);
-    this.water9am = Activities.water9am;
-    this.water10am = Activities.water10am;
-    this.land9am = Activities.land9am;
-    this.land10am = Activities.land10am;
+    this.water9am = structuredClone(Activities.water9am);
+    this.water10am = structuredClone(Activities.water10am);
+    this.land9am = structuredClone(Activities.land9am);
+    this.land10am = structuredClone(Activities.land10am);
   }
 
   private static readonly ALGOS: string[] = ['waterFirst'];
@@ -1539,10 +1539,11 @@ export class Schedule {
     console.log("\n")
   }
 
-  private finalCount(activityType: AllowedActivityTypes): void {
+  private testScheduling(activityType: AllowedActivityTypes, func_name: string): void {
     const notScheduledAllNames = activityType === 'water' ? this.notScheduledAllNamesWater : this.notScheduledAllNamesLand;
     const totalKidsCount = this.kids.count - notScheduledAllNames.length
 
+    console.log("TEST SCHEDULING: ", func_name)
     console.log("WATER TIMESLOTS")
     let waterTotalCount = 0;
     let water9amTotalCount = 0;
@@ -1572,11 +1573,8 @@ export class Schedule {
     }
 
     waterTotalCount = water9amTotalCount + water10amTotalCount;
-    console.log("Water Total Count: ", waterTotalCount)
-    console.log("9am this.kids.names(get) total count:", water9amTotalCount)
-    console.log("9am this.kids.names(get) individual activity count:", water9amActivityCount)
-    console.log("10am this.kids.names(get) total count:", water10amTotalCount)
-    console.log("10am this.kids.names(get) individual activity count:", water10amActivityCount)
+    console.log("9am this.kids.names(get) count:", water9amActivityCount)
+    console.log("10am this.kids.names(get) count:", water10amActivityCount)
 
     const water9amActivityCountAlt = { 'fish': 0, 'pboard': 0, 'snork': 0, 'canoe': 0, 'kayak': 0, 'sail': 0, 'swim': 0 };
     const water10amActivityCountAlt = { 'fish': 0, 'pboard': 0, 'snork': 0, 'canoe': 0, 'kayak': 0, 'sail': 0, 'swim': 0 };
@@ -1586,6 +1584,8 @@ export class Schedule {
     for (const activity in this.water9am) {
       water10amActivityCountAlt[activity] = this.water10am[activity].length;
     }
+    console.log("9am this.water9am count ALT:", water9amActivityCountAlt)
+    console.log("10am this.water10am count ALT:", water10amActivityCountAlt)
 
     // Check if water9amActivityCountAlt and water9amActivityCount are equal
     const keys1 = Object.keys(water9amActivityCountAlt).sort();
@@ -1621,9 +1621,17 @@ export class Schedule {
       console.log("Scheduled # MATCHES YAY. this.Kids.timeSlots == this.kids.totalKidsCount: ")
       console.log(waterTotalCount, "==", totalKidsCount, "\n\n")
     }
-    console.log('TOTAL KIDS NOT SCHEDULED:', this.kids.count - totalKidsCount)
-    for (const kid of unscheduleKids) {
-      console.log(kid)
+
+    if (func_name == 'end log') {
+      console.log('TOTAL KIDS NOT SCHEDULED:', this.kids.count - totalKidsCount)
+      for (const kid of unscheduleKids) {
+        console.log(kid)
+      }
+
+      const allNotInTarget = this.notScheduled9amWater.names.every(element => !this.notScheduled10amWater.names.includes(element));
+      console.log("this.notScheduled9amWater.names !== this.notScheduled10amWater.names:", allNotInTarget); // true
+      const allNamesEmpty = this.notScheduledAllNamesWater.length === 0
+      console.log("this.notScheduledAllNamesWater.length === 0:", allNamesEmpty); // true
     }
   }
 
@@ -1631,49 +1639,31 @@ export class Schedule {
     console.log(`${this.algo} algorithm initiated`);
     this.schedulingLog('any scheduling', 'before')
 
-    this.scheduleDoubles('water', [1, 2, 3], 'bothMinAndMax')
-    this.schedulingLog('scheduleDoubles()', 'after')
-    if (this.notScheduledAllNamesWater.length === 0) {
-      this.finalCount('water')
-      return "success after scheduleDoubles()"
+    const methods = [
+      this.scheduleDoubles.bind(this),
+      this.scheduleSingles.bind(this),
+      this.scheduleBelowMin.bind(this),
+      this.scheduleNotFull.bind(this),
+      this.scheduleNoChoicesMatch.bind(this),
+      this.scheduleSorryNoChoices.bind(this)
+    ];
+    const methodArgs = [
+      ['water', [1, 2, 3], 'bothMinAndMax'],
+      ['water', [1, 2, 3], 'bothMinAndMax'],
+      ['water'],
+      ['water'],
+      ['water'],
+      ['water'],
+    ];
+
+    for (let i = 0; i < methods.length; i++) {
+      console.log("ENTERING: " + methods[i].name + "()")
+      methods[i](...methodArgs[i])
+      this.schedulingLog(methods[i].name + "()", 'after')
+      this.testScheduling('water', methods[i].name + "()")
     }
 
-    this.scheduleSingles('water', [1, 2, 3], 'bothMinAndMax')
-    this.schedulingLog('scheduleSingles()', 'after')
-    if (this.notScheduledAllNamesWater.length === 0) {
-      this.finalCount('water')
-      return "success after scheduleSingles()"
-    }
-
-    this.scheduleBelowMin('water')
-    this.schedulingLog('scheduleBelowMin()', 'after')
-    if (this.notScheduledAllNamesWater.length === 0) {
-      this.finalCount('water')
-      return "success after scheduleBelowMin()"
-    }
-
-    this.scheduleNotFull('water')
-    this.schedulingLog('scheduleBelowMin()', 'after')
-    if (this.notScheduledAllNamesWater.length === 0) {
-      this.finalCount('water')
-      return "success after scheduleNotFull()"
-    }
-
-    this.scheduleNoChoicesMatch('water')
-    this.schedulingLog('scheduleNoChoicesMatch()', 'after')
-    if (this.notScheduledAllNamesWater.length === 0) {
-      this.finalCount('water')
-      return "success after scheduleNoChoicesMatch()"
-    }
-
-    this.scheduleSorryNoChoices('water')
-    this.schedulingLog('scheduleSorryNoChoices()', 'after')
-    if (this.notScheduledAllNamesWater.length === 0) {
-      this.finalCount('water')
-      return "success after scheduleSorryNoChoices()"
-    }
-
-    this.finalCount('water')
-    return 'Somebodies didn\'t get scheduled';
+    this.testScheduling('water', 'end log')
+    return 'Algo complete';
   }
 }
