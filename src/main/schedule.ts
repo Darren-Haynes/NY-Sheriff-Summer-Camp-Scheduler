@@ -332,8 +332,12 @@ export class Schedule {
     return kidsChoices
   }
 
+  /**
+    * Schedule kids who only have a single choice match for the activities that have open slots.
+    * @param {string} activityType - only 2 options: 'land' or 'water'.
+    * @returns {void}
+    */
   private scheduleTheChosen(scheduledChosen: Map<string, number>, activityType: AllowedActivityTypes): Map<string, string[]> {
-    const activities = activityType === 'land' ? Schedule.LANDTYPES : Schedule.WATERTYPES;
     const notScheduledAllNames = activityType === 'land' ? this.notScheduledAllNamesLand : this.notScheduledAllNamesWater;
     const chosenList: string[] = [...scheduledChosen.keys()];
     const uniqueChoice = new Map<string, string[]>();
@@ -436,6 +440,14 @@ export class Schedule {
       } else {
         return this.notScheduledAllNamesLand
       }
+    }
+  }
+
+  private getScheduledKidsList(activityType: AllowedActivityTypes, timeSlot: Allowed9and10Only): string[] {
+    if (activityType === 'land') {
+      return timeSlot === '9am' ? this.scheduled9amLand.names : this.scheduled10amLand.names;
+    } else {
+      return timeSlot === '9am' ? this.scheduled9amWater.names : this.scheduled10amWater.names;
     }
   }
 
@@ -1352,6 +1364,14 @@ export class Schedule {
     this.addKidToActivity(name, activity, activityType, timeSlot)
   }
 
+  private removeKidFromScheduled(name: string, activityType: AllowedActivityTypes, timeSlot: AllowedTimes): void {
+    const scheduledKids = this.getScheduledKidsList(activityType, timeSlot)
+    const index = scheduledKids.indexOf(name)
+    if (index !== -1) {
+      scheduledKids.splice(index, 1)
+    }
+  }
+
   /**
     * Wrapper for the methods needed to fully unschedule a kid
     * @param {string} name - name of kid to unschedule.
@@ -1363,6 +1383,7 @@ export class Schedule {
   private unScheduleKid(name: string, activity: WaterActivities | LandActivities, activityType: AllowedActivityTypes, timeSlot: Allowed9and10Only): void {
     this.setKidsTimeSlot([name], null, activityType + timeSlot)
     this.addKidToNotScheduled(name, activityType, timeSlot)
+    this.removeKidFromScheduled(name, activityType, timeSlot)
     this.removeKidFromActivity(name, activity, activityType, timeSlot)
   }
 
@@ -1659,7 +1680,7 @@ export class Schedule {
 
     console.log("\nARE OBJECTS EQUAL?")
     if (equalObjects9am) {
-      console.log("9AM objects THEY ARE EQAUL yaaay")
+      console.log("9AM objects THEY ARE EQUAL yaaay")
     } else {
       console.log("9AM objects THEY ARE not EQUAL!!!")
     }
@@ -1671,9 +1692,25 @@ export class Schedule {
       );
 
     if (equalObjects10am) {
-      console.log("10AM objects THEY ARE EQAUL yaaay")
+      console.log("10AM objects THEY ARE EQUAL yaaay")
     } else {
-      console.log("10AM objects THEY ARE not EQUAL!!!")
+      console.log("10AM objects THEY ARE not EQAUL!!!")
+    }
+    console.log("\n")
+
+    console.log("\nLENGTHS TOTALS")
+    const water9amTotalLength = this.notScheduled9amWater.names.length + this.scheduled9amWater.names.length === this.kids.count;
+    const water10amTotalLength = this.notScheduled10amWater.names.length + this.scheduled10amWater.names.length === this.kids.count;
+    console.log("water9amTotalLength:", water9amTotalLength, "\nwater10amTotalLength:", water10amTotalLength)
+    console.log("water 9am Unscheduled Names Length=", this.notScheduled9amWater.names.length, "\nwater 9am SCHEDULED Names Length=", this.scheduled9amWater.names.length)
+    console.log("Water 9am unscheduled plus scheduled = ", water9amTotalLength)
+    console.log("water 10am Unscheduled Names Length=", this.notScheduled10amWater.names.length, "\nwater 10am SCHEDULED Names Length=", this.scheduled10amWater.names.length)
+    console.log("Water 10am unscheduled plus scheduled = ", water10amTotalLength)
+
+    if (water9amTotalLength && water10amTotalLength) {
+      console.log("\n\nLENGTHS TOTALS MATCH YAY")
+    } else {
+      console.log("\n\nLENGTHS TOTALS DO NOT MATCH!!!")
     }
     console.log("\n")
 
@@ -1733,6 +1770,7 @@ export class Schedule {
       this.testScheduling('water', methods[i].name + "()")
     }
 
+    // this.scheduleSingles('land', [1, 2, 3], 'bothMinAndMax')
     this.testScheduling('water', 'end log')
     return 'Algo complete';
   }
