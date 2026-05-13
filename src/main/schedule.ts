@@ -52,6 +52,7 @@ export class Schedule {
   water10am: WaterKids;
   land9am: LandKidsAM;
   land10am: LandKidsPM;
+  isLandFirst: boolean;
 
 
   // TODO: see if improvemets can be made using this resouce https://www.freecodecamp.org/news/how-to-use-the-builder-pattern-in-python-a-practical-guide-for-devs/
@@ -76,6 +77,7 @@ export class Schedule {
     this.scheduled9amLand = {names: [], landActivities: []}
     this.scheduled10amWater = {names: [], waterActivities: []}
     this.scheduled10amLand = {names: [], landActivities: []}
+    this.isLandFirst = false;
   }
 
   private static readonly ALGOS: string[] = ['waterFirst'];
@@ -415,15 +417,38 @@ export class Schedule {
   }
 
   /**
+   * Get the right list of unscheduled kids based on activity type, time slot and
+   * whether land or water activities were scheduled first.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {string} timeSlot - only 2 options: '9am' or '10am'.
+   * @returns {Map} - e.g {'swim': 39, 'fish': 9, ...} how many unscheduled kids chose each activity
+   */
+  private getUnscheduledKidsList(activityType: AllowedActivityTypes, timeSlot: Allowed9and10Only): string[] {
+    if (!this.isLandFirst) {
+      if (activityType === 'land') {
+        return timeSlot === '9am' ? this.notScheduled9amLand.names : this.notScheduled10amLand.names;
+      } else {
+        return this.notScheduledAllNamesWater
+      }
+    } else {
+      if (activityType === 'water') {
+        return timeSlot === '9am' ? this.notScheduled9amWater.names : this.notScheduled10amWater.names;
+      } else {
+        return this.notScheduledAllNamesLand
+      }
+    }
+  }
+
+  /**
    * Counts how many times unscheduled kids have chosen a specfic activity.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {number[]} choices - num of choices to count between 1 - 3.
    * @param {string} timeSlot - only 2 options: '9am' or '10am'.
    * @returns {Map} - e.g {'swim': 39, 'fish': 9, ...} how many unscheduled kids chose each activity
    */
-  private countActivityChoices(activityType: AllowedActivityTypes, choices: AllowedChoices, timeSlot: AllowedTimes) {
+  private countActivityChoices(activityType: AllowedActivityTypes, choices: AllowedChoices, timeSlot: Allowed9and10Only) {
     const ACTIVITY_TYPES = activityType === 'water' ? Schedule.WATERTYPES : Schedule.LANDTYPES;
-    const UNSCHEDULED_NAMES = activityType === 'water' ? this.notScheduledAllNamesWater : this.notScheduledAllNamesLand;
+    const UNSCHEDULED_NAMES = this.getUnscheduledKidsList(activityType, timeSlot);
     const activitiesChoicesCount = this.activityTemplate(activityType, timeSlot);
     for (let i = 0; i < choices.length; i++) {
       UNSCHEDULED_NAMES.forEach(kid => {
@@ -777,7 +802,7 @@ export class Schedule {
       }
 
       if (activityType === 'water') {
-        const timeSlot = this.notScheduled10amWater.names.length >= this.notScheduled9amWater.names.length ? '10am' : '9am';
+        const timeSlot = this.scheduled9amWater.names.length >= this.notScheduled10amWater.names.length ? '10am' : '9am';
         if (timeSlot === '9am') {
           this.water9am[activity] = kidsTimeSlot;
           this.removeFromNotScheduled(kidsTimeSlot, activityType, activity, '9am');
@@ -793,7 +818,7 @@ export class Schedule {
       }
 
       if (activityType === 'land') {
-        const timeSlot = this.notScheduled10amWater.names.length >= this.notScheduled9amWater.names.length ? '10am' : '9am';
+        const timeSlot = this.scheduled9amLand.names.length >= this.scheduled10amLand.names.length ? '10am' : '9am';
         if (timeSlot === '9am') {
           this.land9am[activity] = kidsTimeSlot;
           this.removeFromNotScheduled(kidsTimeSlot, activityType, activity, '9am');
@@ -852,7 +877,7 @@ export class Schedule {
       if (maxOrMin === 'min') {
         let halfTheKids = kidsByActivityChoice.length / 2;
         // If there are more kids not scheduled for 9am than 10am, this helps keep equal numbers of kids between AM and PM activities.
-        if (this.notScheduled9amWater.names.length > this.notScheduled10amWater.names.length) {
+        if (this.scheduled10amWater.names.length > this.scheduled9amWater.names.length) {
           halfTheKids = Math.ceil(halfTheKids);
         }
         kidsNineAM = kidsByActivityChoice.slice(0, halfTheKids);
@@ -1676,6 +1701,7 @@ export class Schedule {
   }
 
   runAlgo(): string {
+    this.isLandFirst = false;
     console.log(`${this.algo} algorithm initiated`);
     this.schedulingLog('any scheduling', 'before')
 
