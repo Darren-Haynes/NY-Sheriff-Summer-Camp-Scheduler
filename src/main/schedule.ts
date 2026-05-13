@@ -1247,10 +1247,12 @@ export class Schedule {
       notScheduledActivities.push(activityObj)
     }
     while (notScheduledActivities.length > 0) {
-      if (this.notScheduled9amWater.names.length >= this.notScheduled10amWater.names.length) {
-        notScheduledActivities = this.scheduleBelowMinTimeSlot(activityType, '9am', notScheduledActivities)
-      } else {
-        notScheduledActivities = this.scheduleBelowMinTimeSlot(activityType, '10am', notScheduledActivities)
+      if (activityType === 'water') {
+        if (this.scheduled10amWater.names.length >= this.scheduled9amWater.names.length) {
+          notScheduledActivities = this.scheduleBelowMinTimeSlot(activityType, '9am', notScheduledActivities)
+        } else {
+          notScheduledActivities = this.scheduleBelowMinTimeSlot(activityType, '10am', notScheduledActivities)
+        }
       }
     }
   }
@@ -1459,7 +1461,9 @@ export class Schedule {
     const notScheduledAllNames = activityType === 'water' ? [...this.notScheduledAllNamesWater] : [...this.notScheduledAllNamesLand];
     for (const name of notScheduledAllNames) {
       const kidsChoices = this.getAllKidsChoicesByActivityType(name, activityType);
-      if (this.notScheduled9amWater.names.length >= this.notScheduled10amWater.names.length) {
+      const unScheduled9amNames = this.getUnscheduledKidsList(activityType, '9am')
+      const unScheduled10amNames = this.getUnscheduledKidsList(activityType, '10am')
+      if (unScheduled9amNames.length >= unScheduled10amNames.length) {
         const matchActivity = this.scheduleLeastFullByTimeSlot(activityType, '9am', name, kidsChoices, scheduledChosenActivities9am)
         if (matchActivity !== "no match") {
           const activityOpenSlotCount = scheduledChosenActivities9am.get(matchActivity)
