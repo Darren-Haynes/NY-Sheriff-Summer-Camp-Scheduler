@@ -362,36 +362,13 @@ export class Schedule {
    */
   private activityTemplate(activityType: AllowedActivityTypes, timeSlot: Allowed9and10Only): Map<string, number> {
     const choicesCount = new Map<string, number>();
-    if (activityType === 'land') {
-      let notScheduledLandActivities: string[]
-      if (timeSlot === "9am") {
-        notScheduledLandActivities = [...new Set([...this.notScheduled9amWater.landActivities])];
-      } else if (timeSlot === "10am") {
-        notScheduledLandActivities = [...new Set([...this.notScheduled10amWater.landActivities])];
-      } else {
-        notScheduledLandActivities = [...new Set([...this.notScheduled9amWater.landActivities, ...this.notScheduled10amWater.landActivities])];
+    const scheduledTimeActivity = activityType === "water" ? this.scheduled9amWater.waterActivities : timeSlot === "9am" ? this.scheduled9amLand.landActivities : this.scheduled10amLand.landActivities;
+    const activitiesActs = activityType === 'water' ? Activities.waterActs : timeSlot === '9am' ? Activities.land9amActs : Activities.land10amActs;
+    activitiesActs.forEach(activity => {
+      if (!scheduledTimeActivity.includes(activity)) {
+        choicesCount.set(activity, 0);
       }
-      Activities.landActs.forEach(activity => {
-        if (notScheduledLandActivities.includes(activity)) {
-          choicesCount.set(activity, 0);
-        }
-      });
-    }
-    if (activityType === 'water') {
-      let notScheduledWaterActivities: string[]
-      if (timeSlot === "9am") {
-        notScheduledWaterActivities = [...new Set([...this.notScheduled9amWater.waterActivities])];
-      } else if (timeSlot === "10am") {
-        notScheduledWaterActivities = [...new Set([...this.notScheduled10amWater.waterActivities])];
-      } else {
-        notScheduledWaterActivities = [...new Set([...this.notScheduled9amWater.waterActivities, ...this.notScheduled10amWater.landActivities])];
-      }
-      Activities.waterActs.forEach(activity => {
-        if (notScheduledWaterActivities.includes(activity)) {
-          choicesCount.set(activity, 0);
-        }
-      });
-    }
+    });
     return choicesCount;
   }
 
