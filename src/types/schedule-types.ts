@@ -8,9 +8,25 @@ export interface NotScheduledLand {
   names: string[];
   landActivities: string[];
 }
+
 export interface NotScheduledWater {
   names: string[];
-  waterActivities: string[];
+  waterActivities: WaterActivities[];
+}
+
+export interface ScheduledWater {
+  names: string[];
+  waterActivities: WaterActivities[];
+}
+
+export interface ScheduledLand9am {
+  names: string[];
+  landActivities: LandActivities9am[];
+}
+
+export interface ScheduledLand10am {
+  names: string[];
+  landActivities: LandActivities10am[];
 }
 
 export interface NotScheduledActivities {
@@ -38,6 +54,17 @@ export type LandActivities =
   | 'yoga'
   | 'fris';
 
+export type LandActivities9am = 'art' | 'hike' | 'bball' | 'cheer' | 'soc' | 'vball' | 'arch';
+export type LandActivities10am =
+  | 'fris'
+  | 'art'
+  | 'hike'
+  | 'pball'
+  | 'fball'
+  | 'lax'
+  | 'yoga'
+  | 'arch';
+
 export type AllActivities = LandActivities | WaterActivities;
 
 export type LandKids = Record<LandActivities, string[]>;
@@ -58,6 +85,9 @@ export type Allowed9and10Only = (typeof AllowedTimes)[number];
 
 const AllowedActivityTypes = ['land', 'water'] as const;
 export type AllowedActivityTypes = (typeof AllowedActivityTypes)[number];
+
+const WaterOnly = 'water' as const;
+export type WaterOnly = (typeof WaterOnly)[number];
 
 const AllowedChoices = [[1], [2], [3], [1, 2], [1, 2], [1, 3], [1, 2, 3]] as const;
 export type AllowedChoices = (typeof AllowedChoices)[number];
