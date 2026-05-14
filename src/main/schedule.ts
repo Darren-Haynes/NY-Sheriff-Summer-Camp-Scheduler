@@ -1628,7 +1628,7 @@ export class Schedule {
     const totalKidsCount = this.kids.count - notScheduledAllNames.length
 
     console.log("TEST SCHEDULING: ", func_name)
-    console.log("WATER TIMESLOTS")
+    console.log("\n\nWATER TIMESLOTS")
     let waterTotalCount = 0;
     let water9amTotalCount = 0;
     let water10amTotalCount = 0;
@@ -1656,9 +1656,10 @@ export class Schedule {
       }
     }
 
+    console.log("WATER 9am and 10am CHECKS")
     waterTotalCount = water9amTotalCount + water10amTotalCount;
-    console.log("9am this.kids.names(get) count:", water9amActivityCount)
-    console.log("10am this.kids.names(get) count:", water10amActivityCount)
+    console.log("WATER 9am this.kids.names(get) count:", water9amActivityCount)
+    console.log("WATER 10am this.kids.names(get) count:", water10amActivityCount)
 
     const water9amActivityCountAlt = { 'fish': 0, 'pboard': 0, 'snork': 0, 'canoe': 0, 'kayak': 0, 'sail': 0, 'swim': 0 };
     const water10amActivityCountAlt = { 'fish': 0, 'pboard': 0, 'snork': 0, 'canoe': 0, 'kayak': 0, 'sail': 0, 'swim': 0 };
@@ -1678,11 +1679,11 @@ export class Schedule {
         key === keys2[index] && water9amActivityCountAlt[key] === water9amActivityCount[key]
       );
 
-    console.log("\nARE OBJECTS EQUAL?")
+    console.log("\nWATER: ARE OBJECTS EQUAL?")
     if (equalObjects9am) {
-      console.log("9AM objects THEY ARE EQUAL yaaay")
+      console.log("WATER 9AM objects THEY ARE EQUAL yaaay")
     } else {
-      console.log("9AM objects THEY ARE not EQUAL!!!")
+      console.log("WATER 9AM objects THEY ARE not EQUAL!!!")
     }
 
     const keys1a = Object.keys(water10amActivityCountAlt).sort();
@@ -1692,35 +1693,106 @@ export class Schedule {
       );
 
     if (equalObjects10am) {
-      console.log("10AM objects THEY ARE EQUAL yaaay")
+      console.log("WATER 10AM objects THEY ARE EQUAL yaaay")
     } else {
-      console.log("10AM objects THEY ARE not EQAUL!!!")
+      console.log("WATER 10AM objects THEY ARE not EQAUL!!!")
     }
     console.log("\n")
 
-    console.log("\nLENGTHS TOTALS")
-    const water9amTotalLength = this.notScheduled9amWater.names.length + this.scheduled9amWater.names.length === this.kids.count;
-    const water10amTotalLength = this.notScheduled10amWater.names.length + this.scheduled10amWater.names.length === this.kids.count;
-    console.log("water9amTotalLength:", water9amTotalLength, "\nwater10amTotalLength:", water10amTotalLength)
-    console.log("water 9am Unscheduled Names Length=", this.notScheduled9amWater.names.length, "\nwater 9am SCHEDULED Names Length=", this.scheduled9amWater.names.length)
-    console.log("Water 9am unscheduled plus scheduled = ", water9amTotalLength)
-    console.log("water 10am Unscheduled Names Length=", this.notScheduled10amWater.names.length, "\nwater 10am SCHEDULED Names Length=", this.scheduled10amWater.names.length)
-    console.log("Water 10am unscheduled plus scheduled = ", water10amTotalLength)
+    console.log("LAND TIMESLOTS")
+    let landTotalCount = 0;
+    let land9amTotalCount = 0;
+    let land10amTotalCount = 0;
+    const unscheduleKidsLand = []
+    const land9amActivityCount = { 'art': 0, 'hike': 0, 'bball': 0, 'cheer': 0, 'soc': 0, 'vball': 0, 'arch': 0 };
+    const land10amActivityCount = { 'fris': 0, 'art': 0, 'hike': 0, 'pball': 0, 'fball': 0, 'lax': 0, 'yoga': 0, 'arch': 0 };
 
-    if (water9amTotalLength && water10amTotalLength) {
-      console.log("\n\nLENGTHS TOTALS MATCH YAY")
-    } else {
-      console.log("\n\nLENGTHS TOTALS DO NOT MATCH!!!")
+    for (const name of this.kids.names) {
+      const timeSlots = this.schedule.get(name)
+      if (timeSlots.timeSlots.land9am) {
+        land9amActivityCount[timeSlots.timeSlots.land9am] += 1;
+        land9amTotalCount += 1;
+      }
+      if (timeSlots.timeSlots.land10am) {
+        land10amActivityCount[timeSlots.timeSlots.land10am] += 1;
+        land10amTotalCount += 1;
+      }
+      let nullCount = 0;
+      for (const time in timeSlots.timeSlots) {
+        if (timeSlots.timeSlots[time] === null) {
+          nullCount += 1;
+        }
+      }
+      if (nullCount === 4) {
+        unscheduleKids.push({ name: name, timeSlot: timeSlots.timeSlots })
+      }
     }
-    console.log("\n")
 
-    if (waterTotalCount !== totalKidsCount) {
-      console.log("\n\nScheduled # mismatch. this.Kids.timeSlots != this.kids.totalKidsCount: ")
-      console.log(waterTotalCount, "!==", totalKidsCount, "\n")
-    } else {
-      console.log("Scheduled # MATCHES YAY. this.Kids.timeSlots == this.kids.totalKidsCount: ")
-      console.log(waterTotalCount, "==", totalKidsCount, "\n\n")
+    landTotalCount = land9amTotalCount + land10amTotalCount;
+    console.log("LAND 9am this.kids.names(get) count:", land9amActivityCount)
+    console.log("LAND 10am this.kids.names(get) count:", land10amActivityCount)
+
+    const land9amActivityCountAlt = { 'art': 0, 'hike': 0, 'bball': 0, 'cheer': 0, 'soc': 0, 'vball': 0, 'arch': 0 };
+    const land10amActivityCountAlt = { 'fris': 0, 'art': 0, 'hike': 0, 'pball': 0, 'fball': 0, 'lax': 0, 'yoga': 0, 'arch': 0 };
+    for (const activity in this.land9am) {
+      land9amActivityCountAlt[activity] = this.land9am[activity].length;
     }
+    for (const activity in this.land10am) {
+      land10amActivityCountAlt[activity] = this.land10am[activity].length;
+    }
+    console.log("9am this.land9am count ALT:", land9amActivityCountAlt)
+    console.log("10am this.land10am count ALT:", land10amActivityCountAlt)
+
+    // Check if land9amActivityCountAlt and land9amActivityCount are equal
+    const keys1Land = Object.keys(land9amActivityCountAlt).sort();
+    const keys2Land = Object.keys(land9amActivityCount).sort();
+    const equalObjects9amLand =  keys1Land.every((key, index) =>
+        key === keys2Land[index] && land9amActivityCountAlt[key] === land9amActivityCount[key]
+      );
+
+    console.log("\nLAND: ARE OBJECTS EQUAL?")
+    if (equalObjects9amLand) {
+      console.log("LAND 9AM objects THEY ARE EQUAL yaaay")
+    } else {
+      console.log("LAND 9AM objects THEY ARE not EQUAL!!!")
+    }
+
+    const keys1aLand = Object.keys(land10amActivityCountAlt).sort();
+    const keys2aLand = Object.keys(land10amActivityCount).sort();
+    const equalObjects10amLand =  keys1aLand.every((key, index) =>
+        key === keys2aLand[index] && land10amActivityCountAlt[key] === land10amActivityCount[key]
+      );
+
+    if (equalObjects10amLand) {
+      console.log("LAND 10AM objects THEY ARE EQUAL yaaay")
+    } else {
+      console.log("LAND 10AM objects THEY ARE not EQAUL!!!")
+    }
+    console.log("LAND 9am and 10am CHECKS")
+
+    console.log("\nLAND LENGTHS TOTALS")
+    const land9amTotalLength = this.notScheduled9amLand.names.length + this.scheduled9amLand.names.length === this.kids.count;
+    const land10amTotalLength = this.notScheduled10amLand.names.length + this.scheduled10amLand.names.length === this.kids.count;
+    console.log("land9amTotalLength:", land9amTotalLength, "\nland10amTotalLength:", land10amTotalLength)
+    console.log("land 9am Unscheduled Names Length=", this.notScheduled9amLand.names.length, "\nland 9am SCHEDULED Names Length=", this.scheduled9amLand.names.length)
+    console.log("Land 9am unscheduled plus scheduled = ", land9amTotalLength)
+    console.log("land 10am Unscheduled Names Length=", this.notScheduled10amLand.names.length, "\nland 10am SCHEDULED Names Length=", this.scheduled10amLand.names.length)
+    console.log("Land 10am unscheduled plus scheduled = ", land10amTotalLength)
+
+    // if (land9amTotalLength && land10amTotalLength) {
+    //   console.log("\n\nLENGTHS TOTALS MATCH YAY")
+    // } else {
+    //   console.log("\n\nLENGTHS TOTALS DO NOT MATCH!!!")
+    // }
+    // console.log("\n")
+
+    // if (landTotalCount !== totalKidsCount) {
+    //   console.log("\n\nScheduled # mismatch. this.Kids.timeSlots != this.kids.totalKidsCount: ")
+    //   console.log(landTotalCount, "!==", totalKidsCount, "\n")
+    // } else {
+    //   console.log("Scheduled # MATCHES YAY. this.Kids.timeSlots == this.kids.totalKidsCount: ")
+    //   console.log(landTotalCount, "==", totalKidsCount, "\n\n")
+    // }
 
     if (func_name == 'end log') {
       console.log('TOTAL KIDS NOT SCHEDULED:', this.kids.count - totalKidsCount)
@@ -1735,10 +1807,14 @@ export class Schedule {
     }
 
     console.log("SCHEDULED LISTS")
-    const oppositesEqualWater = this.notScheduled9amWater.names.every(element => this.scheduled10amWater.names.includes(element));
-    console.log("this.notScheduled9amWater.names === this.Scheduled10amWater.names:", oppositesEqualWater);
-    const oppositesEqualWater2 = this.notScheduled10amWater.names.every(element => this.scheduled9amWater.names.includes(element));
-    console.log("this.notScheduled10amWater.names === this.Scheduled9amWater.names:", oppositesEqualWater2);
+    const oppositesEqualWaterString = JSON.stringify(this.notScheduled9amWater.names.sort()) === JSON.stringify(this.scheduled10amWater.names.sort())
+    const oppositesEqualWaterString2 = JSON.stringify(this.notScheduled9amWater.names.sort()) === JSON.stringify(this.scheduled10amWater.names.sort())
+    console.log("STRINGIFY COMPARE WATER notScheduled9amWater.names == scheduled10amWater.names:", oppositesEqualWaterString);
+    console.log("STRINGIFY COMPARE WATER notScheduled10amWater.names == scheduled9amWater.names:", oppositesEqualWaterString2);
+    const oppositesEqualLandString = JSON.stringify(this.notScheduled9amLand.names.sort()) === JSON.stringify(this.scheduled10amLand.names.sort())
+    const oppositesEqualLandString2 = JSON.stringify(this.notScheduled9amLand.names.sort()) === JSON.stringify(this.scheduled10amLand.names.sort())
+    console.log("STRINGIFY COMPARE LAND notScheduled9amLand.names == scheduled10amLand.names:", oppositesEqualLandString);
+    console.log("STRINGIFY COMPARE LAND notScheduled10amLand.names == scheduled9amLand.names:", oppositesEqualLandString2);
   }
 
   runAlgo(): string {
