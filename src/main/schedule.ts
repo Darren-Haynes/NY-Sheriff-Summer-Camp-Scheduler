@@ -715,33 +715,40 @@ export class Schedule {
     timeSlot: AllowedTimes
   ): void {
     // TODO: fix all type errors within this method
-    this.removeElementsFromArray(this.notScheduledAllNamesWater, names);
+    if (activityType === 'water') {
+      this.removeElementsFromArray(this.notScheduledAllNamesWater, names);
+    }
+    if (activityType === 'land') {
+      this.removeElementsFromArray(this.notScheduledAllNamesLand, names);
+    }
       // Remove names and activities from 9am timeslots
     if (timeSlot === '9am') {
-      this.removeElementsFromArray(this.notScheduled9amWater.names, names);
       if (activityType === 'water') {
+        this.removeElementsFromArray(this.notScheduled9amWater.names, names);
         const activityIdx = this.notScheduled9amWater.waterActivities.indexOf(activity)
         if (activityIdx !== -1) {
           this.notScheduled9amWater.waterActivities.splice(activityIdx, 1)
         }
       }
       if (activityType === 'land') {
-        const activityIdx = this.notScheduled9amWater.landActivities.indexOf(activity)
+        this.removeElementsFromArray(this.notScheduled9amLand.names, names);
+        const activityIdx = this.notScheduled9amLand.landActivities.indexOf(activity)
         if (activityIdx !== -1) {
-          this.notScheduled9amWater.landActivities.splice(activityIdx, 1)
+          this.notScheduled9amLand.landActivities.splice(activityIdx, 1)
         }
       }
     }
-      // Remove names and activities from 10am timeslots
-      if (timeSlot === '10am') {
-        this.removeElementsFromArray(this.notScheduled10amWater.names, names);
+    // Remove names and activities from 10am timeslots
+    if (timeSlot === '10am') {
       if (activityType === 'land') {
-        const activityIdx = this.notScheduled10amWater.landActivities.indexOf(activity)
-        if (activityIdx !== -1) {
-          this.notScheduled10amWater.landActivities.splice(activityIdx, 1)
+        this.removeElementsFromArray(this.notScheduled10amLand.names, names);
+        const activityIdx = this.notScheduled10amLand.landActivities.indexOf(activity)
+          if (activityIdx !== -1) {
+            this.notScheduled10amLand.landActivities.splice(activityIdx, 1)
+          }
         }
-      }
       if (activityType === 'water') {
+        this.removeElementsFromArray(this.notScheduled10amWater.names, names);
         const activityIdx = this.notScheduled10amWater.waterActivities.indexOf(activity)
         if (activityIdx !== -1) {
           this.notScheduled10amWater.waterActivities.splice(activityIdx, 1)
@@ -1875,8 +1882,9 @@ export class Schedule {
 
     this.notScheduled9amLand.names = [...this.scheduled10amWater.names]
     this.notScheduled10amLand.names = [...this.scheduled9amWater.names]
-    this.scheduleSingles('land', [1, 2, 3], 'bothMinAndMax', '9am')
+    // this.scheduleSingles('land', [1, 2, 3], 'bothMinAndMax', '9am')
     this.testScheduling('water', 'end log')
+    console.log("Not so fast")
     return 'Algo complete';
   }
 }
