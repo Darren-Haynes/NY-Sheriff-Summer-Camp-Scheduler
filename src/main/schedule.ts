@@ -77,6 +77,7 @@ export class Schedule {
     this.scheduled9amLand = {names: [], landActivities: []}
     this.scheduled10amWater = {names: [], waterActivities: []}
     this.scheduled10amLand = {names: [], landActivities: []}
+
     this.isLandFirst = false;
   }
 
@@ -831,6 +832,10 @@ export class Schedule {
         kidsTimeSlot = kidsByActivityChoice
       }
 
+      if (kidsTimeSlot.length < activityMaxOrMin) {
+        return
+      }
+
       if (activityType === 'water') {
         if (timeSlot === '9am') {
           this.water9am[activity] = kidsTimeSlot;
@@ -1014,7 +1019,7 @@ export class Schedule {
   ): string[] {
     const countedChoices = this.countActivityChoices(activityType, choices, timeSlot);
     const qualifiedActivities: string[] = [];
-    const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
+    const ranges = activityType === 'water' ? Activities.waterRanges : timeSlot === '9am' ? Activities.landRanges9am : Activities.landRanges10am;
     const minCountQualifier = this.getActivityCountQualifier(maxOrMin, doubleOrSingle);
     for (const [activity, range] of Object.entries(ranges)) {
       if (countedChoices.get(activity) >= range[minCountQualifier]) {
@@ -1039,7 +1044,7 @@ export class Schedule {
     maxOrMin: AllowedMaxMin,
     timeSlot: AllowedTimes
   ): boolean {
-    const activitiesAboveSingleMin: string[] = this.getActivities(activityType, choices, maxOrMin, 'single', 'both');
+    const activitiesAboveSingleMin: string[] = this.getActivities(activityType, choices, maxOrMin, 'single', timeSlot);
     if (activitiesAboveSingleMin.length > 0) {
       console.log('Activities above single minimum:', activitiesAboveSingleMin);
       this.scheduleSingleActivities(activitiesAboveSingleMin, activityType, choices, maxOrMin, timeSlot);
@@ -1795,8 +1800,9 @@ export class Schedule {
     console.log("LAND 9am and 10am CHECKS")
 
     console.log("\nLAND LENGTHS TOTALS")
-    const land9amTotalLength = this.notScheduled9amLand.names.length + this.scheduled9amLand.names.length === this.kids.count;
-    const land10amTotalLength = this.notScheduled10amLand.names.length + this.scheduled10amLand.names.length === this.kids.count;
+    console.log('Kids total count / 2 = ', this.kids.count / 2)
+    const land9amTotalLength = this.notScheduled9amLand.names.length + this.scheduled9amLand.names.length === this.kids.count / 2;
+    const land10amTotalLength = this.notScheduled10amLand.names.length + this.scheduled10amLand.names.length === this.kids.count / 2;
     console.log("land9amTotalLength:", land9amTotalLength, "\nland10amTotalLength:", land10amTotalLength)
     console.log("land 9am Unscheduled Names Length=", this.notScheduled9amLand.names.length, "\nland 9am SCHEDULED Names Length=", this.scheduled9amLand.names.length)
     console.log("Land 9am unscheduled plus scheduled = ", land9amTotalLength)
@@ -1882,7 +1888,7 @@ export class Schedule {
 
     this.notScheduled9amLand.names = [...this.scheduled10amWater.names]
     this.notScheduled10amLand.names = [...this.scheduled9amWater.names]
-    // this.scheduleSingles('land', [1, 2, 3], 'bothMinAndMax', '9am')
+    this.scheduleSingles('land', [1, 2, 3], 'bothMinAndMax', '9am')
     this.testScheduling('water', 'end log')
     console.log("Not so fast")
     return 'Algo complete';
