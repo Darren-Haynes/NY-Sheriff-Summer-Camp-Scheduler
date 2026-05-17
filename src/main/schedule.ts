@@ -1889,6 +1889,7 @@ export class Schedule {
     this.notScheduled9amLand.names = [...this.scheduled10amWater.names]
     this.notScheduled10amLand.names = [...this.scheduled9amWater.names]
     this.scheduleSingles('land', [1, 2, 3], 'bothMinAndMax', '9am')
+    this.scheduleSingles('land', [1, 2, 3], 'bothMinAndMax', '10am')
     this.testScheduling('water', 'end log')
     console.log("Not so fast")
     return 'Algo complete';
