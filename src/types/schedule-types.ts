@@ -67,14 +67,15 @@ export type LandActivities10am =
 
 export type AllActivities = LandActivities | WaterActivities;
 
-export type LandKids = Record<LandActivities, string[]>;
+export type LandKids9am = Record<LandActivities9am, string[]>;
+export type LandKids10am = Record<LandActivities10am, string[]>;
 export type WaterKids = Record<WaterActivities, string[]>;
 
 export interface ScheduledActivities {
   water9am: WaterKids;
   water10am: WaterKids;
-  land9am: LandKids;
-  land10am: LandKids;
+  land9am: LandKids9am;
+  land10am: LandKids10am;
 }
 
 const AllowedTimes = ['9am', '10am', 'both'] as const;
