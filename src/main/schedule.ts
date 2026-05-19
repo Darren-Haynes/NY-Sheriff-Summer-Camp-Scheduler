@@ -716,6 +716,7 @@ export class Schedule {
     timeSlot: AllowedTimes
   ): void {
     // TODO: fix all type errors within this method
+    // TODO: refactor this method to remove excess if statements and less DRY
     if (activityType === 'water') {
       this.removeElementsFromArray(this.notScheduledAllNamesWater, names);
     }
@@ -1257,14 +1258,11 @@ export class Schedule {
       if (activityObj.timeSlot === timeSlot) {
         activity = activityObj.activity
         shortfallCount = activityObj.shortFall
+        const activityKids = this.getNotScheduledKidsBelowMin(activityType, [activity]);
+        const kidsWhoCanReschedule= this.getKidsWhoCanReschedule(activityType, activity, timeSlot, [1, 2, 3]);
+        this.scheduleBelowMinActivities(kidsWhoCanReschedule, shortfallCount, activityKids[activity], activityType, timeSlot, activity)
         break
       }
-    if (!activity) {
-      continue
-    }
-    const activityKids = this.getNotScheduledKidsBelowMin(activityType, [activity]);
-    const kidsWhoCanReschedule= this.getKidsWhoCanReschedule(activityType, activity, timeSlot, [1, 2, 3]);
-    this.scheduleBelowMinActivities(kidsWhoCanReschedule, shortfallCount, activityKids[activity], activityType, timeSlot, activity)
     }
     notScheduledActivities = notScheduledActivities.filter(obj => obj.activity !== activity);
     return notScheduledActivities
