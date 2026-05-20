@@ -11,12 +11,13 @@
     "outDir": "dist",
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "strictNullChecks": true,
     "jsx": "react-jsx",
     "paths": {
       "*": ["node_modules/*"],
       "@src/*": ["src/*"],
       "@assets/*": ["assets/*"],
-    }
+    },
   },
-  "include": ["src/**/*", "assets/*", "src/renderer/**/*.d.ts"]
+  "include": ["src/**/*", "assets/*", "src/renderer/**/*.d.ts"],
 }
