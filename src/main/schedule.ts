@@ -1691,6 +1691,13 @@ export class Schedule {
     return true
   }
 
+  private scheduleSorryNoChoicesLand(activityType: 'land', timeSlot: Allowed9and10Only): void {
+    const noChoicesForYou = timeSlot === '9am' ? [...this.notScheduled9amLand.names] : [...this.notScheduled10amLand.names]
+    for (const name of noChoicesForYou) {
+      this.scheduleSorryNoChoicesTimeSlot(name, activityType, timeSlot)
+    }
+  }
+
   private scheduleSorryNoChoices(activityType: AllowedActivityTypes): void {
     const noChoicesForYou = activityType === 'land' ? [...this.notScheduledAllNamesLand] : [...this.notScheduledAllNamesWater]
     for (const name of noChoicesForYou) {
@@ -1706,17 +1713,6 @@ export class Schedule {
         }
       }
     }
-  }
-
-  /**
-    * For not scheduled kids, find activities that are already scheduled but have open slots and then attempt
-    * to schedule the kids to these open slots if the activities match thier choices.
-    * @param {string} activityType - only 2 options: 'land' or 'water'.
-    * @returns {void}
-    */
-  private scheduleNotFull(activityType: AllowedActivityTypes): void {
-    this.scheduleUniques(activityType)
-    this.scheduleLeastFull(activityType)
   }
 
   schedulingLog(func_name: string, when: string): void {
@@ -1971,10 +1967,12 @@ export class Schedule {
       const oppositesEqualWaterString2 = JSON.stringify(this.notScheduled9amWater.names.sort()) === JSON.stringify(this.scheduled10amWater.names.sort())
       console.log("STRINGIFY COMPARE WATER notScheduled9amWater.names == scheduled10amWater.names:", oppositesEqualWaterString);
       console.log("STRINGIFY COMPARE WATER notScheduled10amWater.names == scheduled9amWater.names:", oppositesEqualWaterString2);
-      const oppositesEqualLandString = JSON.stringify(this.notScheduled9amLand.names.sort()) === JSON.stringify(this.scheduled10amLand.names.sort())
-      const oppositesEqualLandString2 = JSON.stringify(this.notScheduled9amLand.names.sort()) === JSON.stringify(this.scheduled10amLand.names.sort())
-      console.log("STRINGIFY COMPARE LAND notScheduled9amLand.names == scheduled10amLand.names:", oppositesEqualLandString);
-      console.log("STRINGIFY COMPARE LAND notScheduled10amLand.names == scheduled9amLand.names:", oppositesEqualLandString2);
+
+      console.log("\nWater and Land opposite times should equal")
+      const EqualWaterString = JSON.stringify(this.scheduled9amWater.names.sort()) === JSON.stringify(this.scheduled10amLand.names.sort())
+      const EqualWaterString2 = JSON.stringify(this.scheduled10amWater.names.sort()) === JSON.stringify(this.scheduled9amLand.names.sort())
+      console.log("STRINGIFY COMPARE WATER to LAND this.scheduled9amWater.names == this.scheduled10amLand.names:", EqualWaterString);
+      console.log("STRINGIFY COMPARE WATER to Land this.scheduled10amWater.names == this.scheduled9amLand.names:", EqualWaterString2);
     }
   }
 
@@ -2030,7 +2028,8 @@ export class Schedule {
       this.scheduleLeastFullLand.bind(this),
       this.scheduleNoChoicesMatchLand.bind(this),
       this.scheduleNoChoicesMatchLand.bind(this),
-      // this.scheduleSorryNoChoices.bind(this)
+      this.scheduleSorryNoChoicesLand.bind(this),
+      this.scheduleSorryNoChoicesLand.bind(this)
     ];
 
     const landMethodArgs = [
@@ -2042,7 +2041,8 @@ export class Schedule {
       ['land', '10am'],
       ['land', '9am'],
       ['land', '10am'],
-      // ['land'],
+      ['land', '9am'],
+      ['land', '10am'],
     ];
 
     for (let i = 0; i < landMethods.length; i++) {
