@@ -93,3 +93,25 @@ export type LandKids10am = {
   yoga: Array<string>;
   arch: Array<string>;
 };
+
+export type AllLandWaterKids9am10am = {
+  swim?: Array<string>;
+  fish?: Array<string>;
+  canoe?: Array<string>;
+  snork?: Array<string>;
+  sail?: Array<string>;
+  pboard?: Array<string>;
+  kayak?: Array<string>;
+  art?: Array<string>;
+  hike?: Array<string>;
+  bball?: Array<string>;
+  cheer?: Array<string>;
+  soc?: Array<string>;
+  vball?: Array<string>;
+  arch?: Array<string>;
+  fris?: Array<string>;
+  pball?: Array<string>;
+  fball?: Array<string>;
+  lax?: Array<string>;
+  yoga?: Array<string>;
+};
