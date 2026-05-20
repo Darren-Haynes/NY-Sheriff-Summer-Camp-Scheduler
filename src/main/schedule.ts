@@ -1618,6 +1618,29 @@ export class Schedule {
     return {}
   }
 
+  private scheduleNoChoicesMatchLand(activityType: AllowedActivityTypes, timeSlot: Allowed9and10Only): void {
+    const notScheduled = timeSlot === '9am' ? this.notScheduled9amLand : this.notScheduled10amLand
+    for (const name of notScheduled.names) {
+      const choices = this.getAllKidsChoicesByActivityType(name, activityType)
+      let scheduledActivitiesFull = null;
+        scheduledActivitiesFull = this.getScheduledActivitiesFull(activityType, timeSlot);
+      mainChoiceLoop:
+      for (const choice of choices) {
+        if (scheduledActivitiesFull.has(choice)) {
+          const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot)
+          const fullNames = activityTypeTimeSlot[choice]
+          for (const choiceNum of [1, 2, 3]) {
+            const fullNamesChoices = this.getRescheduleMatches(fullNames, choice, activityType, timeSlot, choiceNum)
+            if (fullNamesChoices.hasOwnProperty('reScheduleKid')) {
+              const kidToScheduleData = {name: name, activity: choice, activityType: activityType, timeSlot: timeSlot}
+              this.scheduleNoChoicesMatchesFound(fullNamesChoices, kidToScheduleData)
+              break mainChoiceLoop
+            }
+          }
+        }
+      }
+    }
+  }
   /**
     * Scheduled kids who cannot be scheduled to their chosen activities because no open slots are available.
     * To scheduled them we need to reschedule someone else to make a slot available so that the unscheduled kid(s)
@@ -1746,8 +1769,9 @@ export class Schedule {
       console.log("NOT SCHEDULED 10AM LAND ACTIVITIS: ", this.notScheduled10amLand.landActivities)
       console.log("\n")
     }
-    const notScheduledAllNames = activityType === 'water' ? this.notScheduledAllNamesWater : this.notScheduledAllNamesLand;
-    const totalKidsCount = this.kids.count - notScheduledAllNames.length
+    // const notScheduledAllNames = activityType === 'water' ? this.notScheduledAllNamesWater : this.notScheduledAllNamesLand;
+    const totalKidsCountWater = this.kids.count - this.notScheduledAllNamesWater.length
+    const totalKidsCountLand = this.kids.count - this.notScheduledAllNamesLand.length
 
     let waterTotalCount = 0;
     let water9amTotalCount = 0;
@@ -1908,28 +1932,29 @@ export class Schedule {
 
     if (activityType === 'water' || activityType === 'final log') {
       console.log("\nWater totals:")
-      if (waterTotalCount !== totalKidsCount) {
-        console.log("Land Scheduled # mismatch. this.Kids.timeSlots != this.kids.totalKidsCount: ")
-        console.log(waterTotalCount, "!==", totalKidsCount)
+      if (waterTotalCount !== totalKidsCountWater) {
+        console.log("Water Scheduled # mismatch. this.Kids.timeSlots != this.kids.totalKidsCount: ")
+        console.log(waterTotalCount, "!==", totalKidsCountWater)
       } else {
         console.log("Land Scheduled # MATCHES: this.Kids.timeSlots == this.kids.totalKidsCount: ")
-        console.log(waterTotalCount, "==", totalKidsCount)
+        console.log(waterTotalCount, "==", totalKidsCountWater)
       }
     }
 
     if (activityType === 'land' || activityType === 'final log') {
       console.log("\nLand totals:")
-      if (landTotalCount !== totalKidsCount) {
+      if (landTotalCount !== totalKidsCountLand) {
         console.log("\n\nLand Scheduled # mismatch. this.Kids.timeSlots != this.kids.totalKidsCount: ")
-        console.log(landTotalCount, "!==", totalKidsCount)
+        console.log(landTotalCount, "!==", totalKidsCountLand)
       } else {
         console.log("Land Scheduled # MATCHES:  this.Kids.timeSlots == this.kids.totalKidsCount: ")
-        console.log(landTotalCount, "==", totalKidsCount)
+        console.log(landTotalCount, "==", totalKidsCountLand)
       }
     }
 
     if (func_name == 'end log') {
-      console.log('\nTOTAL KIDS NOT SCHEDULED:', this.kids.count - totalKidsCount)
+      console.log('\nTOTAL KIDS NOT SCHEDULED Water:', this.kids.count - totalKidsCountWater)
+      console.log('\nTOTAL KIDS NOT SCHEDULED Land:', this.kids.count - totalKidsCountLand)
       for (const kid of unscheduleKids) {
         console.log(kid)
       }
@@ -2003,8 +2028,9 @@ export class Schedule {
       this.scheduleUniques.bind(this),
       this.scheduleLeastFullLand.bind(this),
       this.scheduleLeastFullLand.bind(this),
-      this.scheduleNoChoicesMatch.bind(this),
-      this.scheduleSorryNoChoices.bind(this)
+      this.scheduleNoChoicesMatchLand.bind(this),
+      this.scheduleNoChoicesMatchLand.bind(this),
+      // this.scheduleSorryNoChoices.bind(this)
     ];
 
     const landMethodArgs = [
@@ -2014,8 +2040,9 @@ export class Schedule {
       ['land'],
       ['land', '9am'],
       ['land', '10am'],
-      ['land'],
-      ['land'],
+      ['land', '9am'],
+      ['land', '10am'],
+      // ['land'],
     ];
 
     for (let i = 0; i < landMethods.length; i++) {
