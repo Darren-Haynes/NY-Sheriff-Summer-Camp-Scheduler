@@ -102,7 +102,7 @@ export type AllowedMaxMinSched = (typeof AllowedMaxMinSched)[number];
 const AllowedDoubleSingle = ['double', 'single'] as const;
 export type AllowedDoubleSingle = (typeof AllowedDoubleSingle)[number];
 
-const AllowedChoiceNums = [1, 2, 3] as const;
+const AllowedChoiceNums = 1 | 2 | (3 as const);
 export type AllowedChoiceNums = (typeof AllowedChoiceNums)[number];
 
 const AllowedActivities = ['swim', 'fish', 'canoe', 'snork', 'sail', 'pboard', 'kayak'] as const;
