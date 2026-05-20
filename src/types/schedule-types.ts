@@ -8,9 +8,25 @@ export interface NotScheduledLand {
   names: string[];
   landActivities: string[];
 }
+
 export interface NotScheduledWater {
   names: string[];
-  waterActivities: string[];
+  waterActivities: WaterActivities[];
+}
+
+export interface ScheduledWater {
+  names: string[];
+  waterActivities: WaterActivities[];
+}
+
+export interface ScheduledLand9am {
+  names: string[];
+  landActivities: LandActivities9am[];
+}
+
+export interface ScheduledLand10am {
+  names: string[];
+  landActivities: LandActivities10am[];
 }
 
 export interface NotScheduledActivities {
@@ -38,16 +54,28 @@ export type LandActivities =
   | 'yoga'
   | 'fris';
 
+export type LandActivities9am = 'art' | 'hike' | 'bball' | 'cheer' | 'soc' | 'vball' | 'arch';
+export type LandActivities10am =
+  | 'fris'
+  | 'art'
+  | 'hike'
+  | 'pball'
+  | 'fball'
+  | 'lax'
+  | 'yoga'
+  | 'arch';
+
 export type AllActivities = LandActivities | WaterActivities;
 
-export type LandKids = Record<LandActivities, string[]>;
+export type LandKids9am = Record<LandActivities9am, string[]>;
+export type LandKids10am = Record<LandActivities10am, string[]>;
 export type WaterKids = Record<WaterActivities, string[]>;
 
 export interface ScheduledActivities {
   water9am: WaterKids;
   water10am: WaterKids;
-  land9am: LandKids;
-  land10am: LandKids;
+  land9am: LandKids9am;
+  land10am: LandKids10am;
 }
 
 const AllowedTimes = ['9am', '10am', 'both'] as const;
@@ -58,6 +86,9 @@ export type Allowed9and10Only = (typeof AllowedTimes)[number];
 
 const AllowedActivityTypes = ['land', 'water'] as const;
 export type AllowedActivityTypes = (typeof AllowedActivityTypes)[number];
+
+const WaterOnly = 'water' as const;
+export type WaterOnly = (typeof WaterOnly)[number];
 
 const AllowedChoices = [[1], [2], [3], [1, 2], [1, 2], [1, 3], [1, 2, 3]] as const;
 export type AllowedChoices = (typeof AllowedChoices)[number];
@@ -71,7 +102,7 @@ export type AllowedMaxMinSched = (typeof AllowedMaxMinSched)[number];
 const AllowedDoubleSingle = ['double', 'single'] as const;
 export type AllowedDoubleSingle = (typeof AllowedDoubleSingle)[number];
 
-const AllowedChoiceNums = [1, 2, 3] as const;
+const AllowedChoiceNums = 1 | 2 | (3 as const);
 export type AllowedChoiceNums = (typeof AllowedChoiceNums)[number];
 
 const AllowedActivities = ['swim', 'fish', 'canoe', 'snork', 'sail', 'pboard', 'kayak'] as const;

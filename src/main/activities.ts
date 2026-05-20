@@ -63,6 +63,27 @@ export const Activities: CampActivities = Object.freeze({
     arch: [8, 16, 2],
   },
 
+  landRanges9am: {
+    art: [4, 10, 2],
+    hike: [4, 6, 2],
+    bball: [6, 12, 0],
+    cheer: [6, 12, 0],
+    soc: [6, 12, 0],
+    vball: [6, 12, 0],
+    arch: [8, 16, 2],
+  },
+
+  landRanges10am: {
+    fris: [3, 8, 1],
+    art: [4, 10, 2],
+    hike: [4, 6, 2],
+    pball: [4, 12, 1],
+    fball: [6, 12, 1],
+    lax: [6, 12, 1],
+    yoga: [6, 10, 1],
+    arch: [8, 16, 2],
+  },
+
   /*
   Water activities people ranges and time slots offered.
   // array[0] min of num of people per water activity
