@@ -1699,6 +1699,8 @@ export class Schedule {
   schedulingLog(func_name: string, when: string): void {
     console.log(`\n${when} ${func_name}`)
     const notScheduledAllNames =  this.notScheduledAllNamesWater
+    console.log("NOT SCHEDULED WATER:")
+    console.log("-------------------")
     console.log("NOT SCHEDULED COUNT ALL NAMES WATER: ", notScheduledAllNames.length)
     console.log("NOT SCHEDULED 9AM WATER NAMES: ", this.notScheduled9amWater.names.length)
     console.log("NOT SCHEDULED 9AM WATER ACTIVITIS: ", this.notScheduled9amWater.waterActivities)
@@ -1706,6 +1708,8 @@ export class Schedule {
     console.log("NOT SCHEDULED 10AM WATER ACTIVITIS: ", this.notScheduled10amWater.waterActivities)
     console.log("\n")
 
+    console.log("NOT SCHEDULED LAND:")
+    console.log("-------------------")
     console.log("NOT SCHEDULED COUNT ALL NAMES LAND: ", this.notScheduledAllNamesLand.length)
     console.log("NOT SCHEDULED 9AM LAND NAMES: ", this.notScheduled9amLand.names.length)
     console.log("NOT SCHEDULED 9AM LAND ACTIVITIS: ", this.notScheduled9amLand.landActivities)
@@ -1714,12 +1718,37 @@ export class Schedule {
     console.log("\n")
   }
 
-  private testScheduling(activityType: AllowedActivityTypes, func_name: string): void {
+  private testScheduling(activityType: AllowedActivityTypes | 'final log', func_name: string): void {
+    console.log("\n")
+    console.log("______________________________________")
+    console.log(`\tENTERING LOGS -- ${activityType}`)
+    console.log("--------------------------------------")
+    console.log("\tAfter calling", func_name, '\n')
+
+    if (activityType === 'water' || activityType === 'final log') {
+      console.log("NOT SCHEDULED WATER:")
+      console.log("-------------------")
+      console.log("NOT SCHEDULED COUNT ALL NAMES WATER: ", this.notScheduledAllNamesWater.length)
+      console.log("NOT SCHEDULED 9AM WATER NAMES: ", this.notScheduled9amWater.names.length)
+      console.log("NOT SCHEDULED 9AM WATER ACTIVITIS: ", this.notScheduled9amWater.waterActivities)
+      console.log("NOT SCHEDULED 10AM WATER: ", this.notScheduled10amWater.names.length)
+      console.log("NOT SCHEDULED 10AM WATER ACTIVITIS: ", this.notScheduled10amWater.waterActivities)
+      console.log("\n")
+    }
+
+    if (activityType === 'land' || activityType === 'final log') {
+      console.log("NOT SCHEDULED LAND:")
+      console.log("-------------------")
+      console.log("NOT SCHEDULED COUNT ALL NAMES LAND: ", this.notScheduledAllNamesLand.length)
+      console.log("NOT SCHEDULED 9AM LAND NAMES: ", this.notScheduled9amLand.names.length)
+      console.log("NOT SCHEDULED 9AM LAND ACTIVITIS: ", this.notScheduled9amLand.landActivities)
+      console.log("NOT SCHEDULED 10AM LAND: ", this.notScheduled10amLand.names.length)
+      console.log("NOT SCHEDULED 10AM LAND ACTIVITIS: ", this.notScheduled10amLand.landActivities)
+      console.log("\n")
+    }
     const notScheduledAllNames = activityType === 'water' ? this.notScheduledAllNamesWater : this.notScheduledAllNamesLand;
     const totalKidsCount = this.kids.count - notScheduledAllNames.length
 
-    console.log("TEST SCHEDULING: ", func_name)
-    console.log("\n\nWATER TIMESLOTS")
     let waterTotalCount = 0;
     let water9amTotalCount = 0;
     let water10amTotalCount = 0;
@@ -1747,10 +1776,7 @@ export class Schedule {
       }
     }
 
-    // console.log("WATER 9am and 10am CHECKS")
     waterTotalCount = water9amTotalCount + water10amTotalCount;
-    // console.log("WATER 9am this.kids.names(get) count:", water9amActivityCount)
-    // console.log("WATER 10am this.kids.names(get) count:", water10amActivityCount)
 
     const water9amActivityCountAlt = { 'fish': 0, 'pboard': 0, 'snork': 0, 'canoe': 0, 'kayak': 0, 'sail': 0, 'swim': 0 };
     const water10amActivityCountAlt = { 'fish': 0, 'pboard': 0, 'snork': 0, 'canoe': 0, 'kayak': 0, 'sail': 0, 'swim': 0 };
@@ -1760,21 +1786,18 @@ export class Schedule {
     for (const activity in this.water9am) {
       water10amActivityCountAlt[activity] = this.water10am[activity].length;
     }
-    // console.log("9am this.water9am count ALT:", water9amActivityCountAlt)
-    // console.log("10am this.water10am count ALT:", water10amActivityCountAlt)
 
-    // Check if water9amActivityCountAlt and water9amActivityCount are equal
     const keys1 = Object.keys(water9amActivityCountAlt).sort();
     const keys2 = Object.keys(water9amActivityCount).sort();
     const equalObjects9am =  keys1.every((key, index) =>
         key === keys2[index] && water9amActivityCountAlt[key] === water9amActivityCount[key]
       );
-
-    console.log("\nWATER: ARE OBJECTS EQUAL?")
-    if (equalObjects9am) {
-      console.log("WATER 9AM objects THEY ARE EQUAL yaaay")
-    } else {
-      console.log("WATER 9AM objects THEY ARE not EQUAL!!!")
+    if (activityType === 'water' || activityType === 'final log') {
+      if (equalObjects9am) {
+        console.log("WATER 9AM objects ARE EQUAL")
+      } else {
+        console.log("WATER 9AM objects ARE not EQUAL!")
+      }
     }
 
     const keys1a = Object.keys(water10amActivityCountAlt).sort();
@@ -1782,15 +1805,14 @@ export class Schedule {
     const equalObjects10am =  keys1a.every((key, index) =>
         key === keys2a[index] && water10amActivityCountAlt[key] === water10amActivityCount[key]
       );
-
-    if (equalObjects10am) {
-      console.log("WATER 10AM objects THEY ARE EQUAL yaaay")
-    } else {
-      console.log("WATER 10AM objects THEY ARE not EQAUL!!!")
+    if (activityType === 'water' || activityType === 'final log') {
+      if (equalObjects10am) {
+        console.log("WATER 10AM objects ARE EQUAL")
+      } else {
+        console.log("WATER 10AM objects ARE not EQUAL!")
+      }
     }
-    console.log("\n")
 
-    console.log("LAND TIMESLOTS")
     let landTotalCount = 0;
     let land9amTotalCount = 0;
     let land10amTotalCount = 0;
@@ -1820,8 +1842,6 @@ export class Schedule {
     }
 
     landTotalCount = land9amTotalCount + land10amTotalCount;
-    // console.log("LAND 9am this.kids.names(get) count:", land9amActivityCount)
-    // console.log("LAND 10am this.kids.names(get) count:", land10amActivityCount)
 
     const land9amActivityCountAlt = { 'art': 0, 'hike': 0, 'bball': 0, 'cheer': 0, 'soc': 0, 'vball': 0, 'arch': 0 };
     const land10amActivityCountAlt = { 'fris': 0, 'art': 0, 'hike': 0, 'pball': 0, 'fball': 0, 'lax': 0, 'yoga': 0, 'arch': 0 };
@@ -1831,21 +1851,18 @@ export class Schedule {
     for (const activity in this.land10am) {
       land10amActivityCountAlt[activity] = this.land10am[activity].length;
     }
-    // console.log("9am this.land9am count ALT:", land9amActivityCountAlt)
-    // console.log("10am this.land10am count ALT:", land10amActivityCountAlt)
 
-    // Check if land9amActivityCountAlt and land9amActivityCount are equal
     const keys1Land = Object.keys(land9amActivityCountAlt).sort();
     const keys2Land = Object.keys(land9amActivityCount).sort();
     const equalObjects9amLand =  keys1Land.every((key, index) =>
         key === keys2Land[index] && land9amActivityCountAlt[key] === land9amActivityCount[key]
       );
-
-    console.log("\nLAND: ARE OBJECTS EQUAL?")
-    if (equalObjects9amLand) {
-      console.log("LAND 9AM objects THEY ARE EQUAL yaaay")
-    } else {
-      console.log("LAND 9AM objects THEY ARE not EQUAL!!!")
+    if (activityType === 'land' || activityType === 'final log') {
+      if (equalObjects9amLand) {
+        console.log("LAND 9AM objects ARE EQUAL")
+      } else {
+        console.log("LAND 9AM objects ARE not EQUAL!")
+      }
     }
 
     const keys1aLand = Object.keys(land10amActivityCountAlt).sort();
@@ -1853,53 +1870,66 @@ export class Schedule {
     const equalObjects10amLand =  keys1aLand.every((key, index) =>
         key === keys2aLand[index] && land10amActivityCountAlt[key] === land10amActivityCount[key]
       );
-
-    if (equalObjects10amLand) {
-      console.log("LAND 10AM objects THEY ARE EQUAL yaaay")
-    } else {
-      console.log("LAND 10AM objects THEY ARE not EQAUL!!!")
-    }
-    console.log("LAND 9am and 10am CHECKS")
-
-    console.log("\nLAND LENGTHS TOTALS")
-    console.log('Kids total count / 2 = ', this.kids.count / 2)
-    const land9amTotalLength = this.notScheduled9amLand.names.length + this.scheduled9amLand.names.length === this.scheduled10amWater.names.length;
-    const land10amTotalLength = this.notScheduled10amLand.names.length + this.scheduled10amLand.names.length === this.scheduled9amWater.names.length;
-    console.log("land9amTotalLength:", land9amTotalLength, "\nland10amTotalLength:", land10amTotalLength)
-    console.log("land 9am Unscheduled Names Length=", this.notScheduled9amLand.names.length, "\nland 9am SCHEDULED Names Length=", this.scheduled9amLand.names.length)
-    console.log("Land 9am unscheduled plus scheduled = ", land9amTotalLength)
-    console.log("land 10am Unscheduled Names Length=", this.notScheduled10amLand.names.length, "\nland 10am SCHEDULED Names Length=", this.scheduled10amLand.names.length)
-    console.log("Land 10am unscheduled plus scheduled = ", land10amTotalLength)
-    const totalLandScheduleCount = this.notScheduled9amLand.names.length + this.scheduled9amLand.names.length + this.notScheduled10amLand.names.length + this.scheduled10amLand.names.length;
-    console.log(`totalLandScheduleCount should be ${this.kids.count}; actual count = `, totalLandScheduleCount)
-
-    if (land9amTotalLength && land10amTotalLength) {
-      console.log("\n\nLENGTHS TOTALS MATCH YAY")
-    } else {
-      console.log("\n\nLENGTHS TOTALS DO NOT MATCH!!!")
-    }
-    console.log("\n")
-
-    console.log("Water totals:")
-    if (waterTotalCount !== totalKidsCount) {
-      console.log("\n\nLand Scheduled # mismatch. this.Kids.timeSlots != this.kids.totalKidsCount: ")
-      console.log(waterTotalCount, "!==", totalKidsCount, "\n")
-    } else {
-      console.log("Land Scheduled # MATCHES YAY. this.Kids.timeSlots == this.kids.totalKidsCount: ")
-      console.log(waterTotalCount, "==", totalKidsCount, "\n\n")
+    if (activityType === 'land' || activityType === 'final log') {
+      if (equalObjects10amLand) {
+        console.log("LAND 10AM objects ARE EQUAL")
+      } else {
+        console.log("LAND 10AM objects ARE not EQUAL!")
+      }
     }
 
-    console.log("Land totals:")
-    if (landTotalCount !== totalKidsCount) {
-      console.log("\n\nLand Scheduled # mismatch. this.Kids.timeSlots != this.kids.totalKidsCount: ")
-      console.log(landTotalCount, "!==", totalKidsCount, "\n")
-    } else {
-      console.log("Land Scheduled # MATCHES YAY. this.Kids.timeSlots == this.kids.totalKidsCount: ")
-      console.log(landTotalCount, "==", totalKidsCount, "\n\n")
+    if (activityType === 'water' || activityType === 'final log') {
+      console.log("\nWATER LENGTHS TOTALS")
+      console.log('Kids total count / 2 = ', this.kids.count / 2)
+      const water9amTotalLength = this.notScheduled9amWater.names.length + this.scheduled9amWater.names.length === this.kids.count;
+      const water10amTotalLength = this.notScheduled10amWater.names.length + this.scheduled10amWater.names.length === this.kids.count;
+      console.log("Water9amTotalLength:", water9amTotalLength, "\nwater10amTotalLength:", water10amTotalLength)
+      console.log("Water 9am Unscheduled Names Length=", this.notScheduled9amWater.names.length, "\nwater 9am SCHEDULED Names Length=", this.scheduled9amWater.names.length)
+      console.log("Water 9am unscheduled plus scheduled = ", water9amTotalLength)
+      console.log("Water 10am Unscheduled Names Length=", this.notScheduled10amWater.names.length, "\nwater 10am SCHEDULED Names Length=", this.scheduled10amWater.names.length)
+      console.log("Water 10am unscheduled plus scheduled = ", water10amTotalLength)
+      const totalWaterScheduleCount = (this.notScheduled9amWater.names.length + this.scheduled9amWater.names.length + this.notScheduled10amWater.names.length + this.scheduled10amWater.names.length) / 2;
+      console.log(`totalWater should be ${this.kids.count}; actual count = `, totalWaterScheduleCount)
+    }
+
+    if (activityType === 'land' || activityType === 'final log') {
+      console.log("\nLAND LENGTHS TOTALS")
+      console.log('Kids total count / 2 = ', this.kids.count / 2)
+      const land9amTotalLength = this.notScheduled9amLand.names.length + this.scheduled9amLand.names.length === this.scheduled10amWater.names.length;
+      const land10amTotalLength = this.notScheduled10amLand.names.length + this.scheduled10amLand.names.length === this.scheduled9amWater.names.length;
+      console.log("land9amTotalLength:", land9amTotalLength, "\nland10amTotalLength:", land10amTotalLength)
+      console.log("land 9am Unscheduled Names Length=", this.notScheduled9amLand.names.length, "\nland 9am SCHEDULED Names Length=", this.scheduled9amLand.names.length)
+      console.log("Land 9am unscheduled plus scheduled = ", land9amTotalLength)
+      console.log("land 10am Unscheduled Names Length=", this.notScheduled10amLand.names.length, "\nland 10am SCHEDULED Names Length=", this.scheduled10amLand.names.length)
+      console.log("Land 10am unscheduled plus scheduled = ", land10amTotalLength)
+      const totalLandScheduleCount = this.notScheduled9amLand.names.length + this.scheduled9amLand.names.length + this.notScheduled10amLand.names.length + this.scheduled10amLand.names.length;
+      console.log(`totalLandScheduleCount should be ${this.kids.count}; actual count = `, totalLandScheduleCount)
+    }
+
+    if (activityType === 'water' || activityType === 'final log') {
+      console.log("\nWater totals:")
+      if (waterTotalCount !== totalKidsCount) {
+        console.log("Land Scheduled # mismatch. this.Kids.timeSlots != this.kids.totalKidsCount: ")
+        console.log(waterTotalCount, "!==", totalKidsCount)
+      } else {
+        console.log("Land Scheduled # MATCHES: this.Kids.timeSlots == this.kids.totalKidsCount: ")
+        console.log(waterTotalCount, "==", totalKidsCount)
+      }
+    }
+
+    if (activityType === 'land' || activityType === 'final log') {
+      console.log("\nLand totals:")
+      if (landTotalCount !== totalKidsCount) {
+        console.log("\n\nLand Scheduled # mismatch. this.Kids.timeSlots != this.kids.totalKidsCount: ")
+        console.log(landTotalCount, "!==", totalKidsCount)
+      } else {
+        console.log("Land Scheduled # MATCHES:  this.Kids.timeSlots == this.kids.totalKidsCount: ")
+        console.log(landTotalCount, "==", totalKidsCount)
+      }
     }
 
     if (func_name == 'end log') {
-      console.log('TOTAL KIDS NOT SCHEDULED:', this.kids.count - totalKidsCount)
+      console.log('\nTOTAL KIDS NOT SCHEDULED:', this.kids.count - totalKidsCount)
       for (const kid of unscheduleKids) {
         console.log(kid)
       }
@@ -1910,15 +1940,17 @@ export class Schedule {
       console.log("this.notScheduledAllNamesWater.length === 0:", allNamesEmpty);
     }
 
-    console.log("SCHEDULED LISTS")
-    const oppositesEqualWaterString = JSON.stringify(this.notScheduled9amWater.names.sort()) === JSON.stringify(this.scheduled10amWater.names.sort())
-    const oppositesEqualWaterString2 = JSON.stringify(this.notScheduled9amWater.names.sort()) === JSON.stringify(this.scheduled10amWater.names.sort())
-    console.log("STRINGIFY COMPARE WATER notScheduled9amWater.names == scheduled10amWater.names:", oppositesEqualWaterString);
-    console.log("STRINGIFY COMPARE WATER notScheduled10amWater.names == scheduled9amWater.names:", oppositesEqualWaterString2);
-    const oppositesEqualLandString = JSON.stringify(this.notScheduled9amLand.names.sort()) === JSON.stringify(this.scheduled10amLand.names.sort())
-    const oppositesEqualLandString2 = JSON.stringify(this.notScheduled9amLand.names.sort()) === JSON.stringify(this.scheduled10amLand.names.sort())
-    console.log("STRINGIFY COMPARE LAND notScheduled9amLand.names == scheduled10amLand.names:", oppositesEqualLandString);
-    console.log("STRINGIFY COMPARE LAND notScheduled10amLand.names == scheduled9amLand.names:", oppositesEqualLandString2);
+    if (func_name == 'end log') {
+      console.log("\n\nSCHEDULED LISTS -- FINAL REPORT")
+      const oppositesEqualWaterString = JSON.stringify(this.notScheduled9amWater.names.sort()) === JSON.stringify(this.scheduled10amWater.names.sort())
+      const oppositesEqualWaterString2 = JSON.stringify(this.notScheduled9amWater.names.sort()) === JSON.stringify(this.scheduled10amWater.names.sort())
+      console.log("STRINGIFY COMPARE WATER notScheduled9amWater.names == scheduled10amWater.names:", oppositesEqualWaterString);
+      console.log("STRINGIFY COMPARE WATER notScheduled10amWater.names == scheduled9amWater.names:", oppositesEqualWaterString2);
+      const oppositesEqualLandString = JSON.stringify(this.notScheduled9amLand.names.sort()) === JSON.stringify(this.scheduled10amLand.names.sort())
+      const oppositesEqualLandString2 = JSON.stringify(this.notScheduled9amLand.names.sort()) === JSON.stringify(this.scheduled10amLand.names.sort())
+      console.log("STRINGIFY COMPARE LAND notScheduled9amLand.names == scheduled10amLand.names:", oppositesEqualLandString);
+      console.log("STRINGIFY COMPARE LAND notScheduled10amLand.names == scheduled9amLand.names:", oppositesEqualLandString2);
+    }
   }
 
   runAlgo(): string {
@@ -1957,7 +1989,6 @@ export class Schedule {
     for (let i = 0; i < waterMethods.length; i++) {
       console.log("ENTERING: " + waterMethods[i].name + "()")
       waterMethods[i](...waterMethodArgs[i])
-      this.schedulingLog(waterMethods[i].name + "()", 'after')
       this.testScheduling('water', waterMethods[i].name + "()")
     }
 
@@ -1973,7 +2004,7 @@ export class Schedule {
       this.scheduleLeastFullLand.bind(this),
       this.scheduleLeastFullLand.bind(this),
       this.scheduleNoChoicesMatch.bind(this),
-      // this.scheduleSorryNoChoices.bind(this)
+      this.scheduleSorryNoChoices.bind(this)
     ];
 
     const landMethodArgs = [
@@ -1984,16 +2015,16 @@ export class Schedule {
       ['land', '9am'],
       ['land', '10am'],
       ['land'],
+      ['land'],
     ];
 
     for (let i = 0; i < landMethods.length; i++) {
       console.log("ENTERING: " + landMethods[i].name + "()")
       landMethods[i](...landMethodArgs[i])
-      this.schedulingLog(landMethods[i].name + "()", 'after')
       this.testScheduling('land', landMethods[i].name + "()")
     }
 
-    this.testScheduling('water', 'end log')
+    this.testScheduling('final log', 'end log')
     return 'Algo complete';
   }
 }
