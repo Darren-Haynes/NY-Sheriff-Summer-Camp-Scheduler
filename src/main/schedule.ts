@@ -1632,7 +1632,7 @@ export class Schedule {
     for (const name of notScheduledAllNames) {
       const choices = this.getAllKidsChoicesByActivityType(name, activityType)
       let scheduledActivitiesFull = null;
-      let timeSlot = '9am';
+      let timeSlot: AllowedTimes = '9am';
       if (notScheduled9am.length > notScheduled10am.length) {
         scheduledActivitiesFull = this.getScheduledActivitiesFull(activityType, '9am');
         } else {
@@ -1642,7 +1642,8 @@ export class Schedule {
       mainChoiceLoop:
       for (const choice of choices) {
         if (scheduledActivitiesFull.has(choice)) {
-          const fullNames = timeSlot === '9am' ? this.water9am[choice] : this.water10am[choice]
+          const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot)
+          const fullNames = activityTypeTimeSlot[choice]
           for (const choiceNum of [1, 2, 3]) {
             const fullNamesChoices = this.getRescheduleMatches(fullNames, choice, activityType, timeSlot, choiceNum)
             if (fullNamesChoices.hasOwnProperty('reScheduleKid')) {
@@ -1925,6 +1926,13 @@ export class Schedule {
     console.log(`${this.algo} algorithm initiated`);
     this.schedulingLog('any scheduling', 'before')
 
+    this.scheduleDoubles.bind(this), // only water activities can be scheduled as doubles
+    this.scheduleSingles.bind(this),
+    this.scheduleBelowMin.bind(this),
+    this.scheduleUniques.bind(this),
+    this.scheduleLeastFull.bind(this),
+    this.scheduleNoChoicesMatch.bind(this),
+    this.scheduleSorryNoChoices.bind(this)
     // SCHEDULE WATER ACTIVITIES
     const waterMethods = [
       this.scheduleDoubles.bind(this), // only water activities can be scheduled as doubles
@@ -1964,7 +1972,7 @@ export class Schedule {
       this.scheduleUniques.bind(this),
       this.scheduleLeastFullLand.bind(this),
       this.scheduleLeastFullLand.bind(this),
-      // this.scheduleNoChoicesMatch.bind(this),
+      this.scheduleNoChoicesMatch.bind(this),
       // this.scheduleSorryNoChoices.bind(this)
     ];
 
@@ -1975,6 +1983,7 @@ export class Schedule {
       ['land'],
       ['land', '9am'],
       ['land', '10am'],
+      ['land'],
     ];
 
     for (let i = 0; i < landMethods.length; i++) {
