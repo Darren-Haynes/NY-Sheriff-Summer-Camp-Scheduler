@@ -261,6 +261,19 @@ export class Schedule {
     return Activities.waterRanges
   }
 
+  private getInsufficientlyScheduledActivites(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): AllActivities[] {
+    const activities = this.getActivityTypeTimeSlot(activityType, timeSlot);
+    const activityRange = this.getRange(activityType, timeSlot);
+    let activity: AllActivities = 'arch' // to appease the types compiler
+    let matchingActivities: AllActivities[] = []
+    for (let [activity, names] of Object.entries(activities)) {
+      const ranges = activityRange[activity]
+      if (names.length < activityRange[activity][0] && names.length > 1) {
+        matchingActivities.push(activity)
+      };
+    };
+    return matchingActivities
+  }
   /**
     * First return activity that has kids but below the minimum required, else return a random activity that has no kids scheduled.
     * @param {string} activityType - only 2 options: 'land' or 'water'.
@@ -269,7 +282,6 @@ export class Schedule {
     */
   private getActivitiesBelowMin(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): AllActivities {
     const activities = this.getActivityTypeTimeSlot(activityType, timeSlot);
-    // const notFullActivities = new Map<string, number>();
     const activityRange = this.getRange(activityType, timeSlot);
     let activity: AllActivities = 'arch' // to appease the types compiler
     let matchingActivities: AllActivities[] = []
@@ -1316,7 +1328,6 @@ export class Schedule {
         activityKids[activity].push(...this.getKidsbyActivityChoice(activity, activityType, i, timeSlot))
       }
     }
-
     // if (!this.isLandFirst && activityType === 'land') {
     //   for (activity in activityKids) {
     //     if (timeSlot === '9am') {
@@ -1377,8 +1388,10 @@ export class Schedule {
         if (notScheduledActivities[0].timeSlot === '9am') {
           notScheduledActivities = this.scheduleBelowMinTimeSlot(activityType, '9am', notScheduledActivities)
         }
-        if (notScheduledActivities[0].timeSlot === '10am') {
-          notScheduledActivities = this.scheduleBelowMinTimeSlot(activityType, '10am', notScheduledActivities)
+        if (notScheduledActivities.length > 0) {
+          if (notScheduledActivities[0].timeSlot === '10am') {
+            notScheduledActivities = this.scheduleBelowMinTimeSlot(activityType, '10am', notScheduledActivities)
+          }
         }
       }
     }
@@ -1729,6 +1742,21 @@ export class Schedule {
     }
   }
 
+  /**
+   * Reschedule kids who have been scheduled to an activity but is not enough people to meet
+   * the minumim required kids for that activity
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {string} timeSlot - only 2 options -'9am' or '10am'
+   * @returns {void}
+   */
+  private scheduleInsufficientlyScheduled(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): void {
+    const insufficientActivities = this.getInsufficientlyScheduledActivites(activityType, timeSlot)
+    if (insufficientActivities.length > 0) {
+      // TODO: if this presents itself during testing - well fix it :)
+      throw new Error(`Insufficiently scheduled activities: ${insufficientActivities}`)
+    }
+  }
+
   private scheduleSorryNoChoicesTimeSlot(name: string, activityType: AllowedActivityTypes, timeSlot: AllowedTimes): boolean {
     const scheduledActivitiesNotFull = this.getScheduledActivitiesNotFull(activityType, timeSlot)
     if (scheduledActivitiesNotFull.size === 0) {return false}
@@ -1743,12 +1771,12 @@ export class Schedule {
   private scheduleSorryNoChoicesLand(activityType: 'land', timeSlot: Allowed9and10Only): void {
     const noChoicesForYou = timeSlot === '9am' ? [...this.notScheduled9amLand.names] : [...this.notScheduled10amLand.names]
     for (const name of noChoicesForYou) {
-      const didSchedule = this.scheduleSorryNoChoicesTimeSlot(name, activityType, timeSlot)
-      if (!didSchedule) {
+      if (!this.scheduleSorryNoChoicesTimeSlot(name, activityType, timeSlot)) {
         const activity = this.getActivitiesBelowMin(activityType, timeSlot)
         this.scheduleKid(name, activity, activityType, timeSlot)
       }
     }
+    this.scheduleInsufficientlyScheduled(activityType, timeSlot)
   }
 
   private scheduleSorryNoChoices(activityType: AllowedActivityTypes): void {
@@ -1758,11 +1786,17 @@ export class Schedule {
       const notScheduled10am = activityType === 'land' ? this.notScheduled10amLand : this.notScheduled10amWater
       if (notScheduled9am.names.length > notScheduled10am.names.length) {
         if (!this.scheduleSorryNoChoicesTimeSlot(name, activityType, '9am')) {
-          this.scheduleSorryNoChoicesTimeSlot(name, activityType, '10am')
+          if (!this.scheduleSorryNoChoicesTimeSlot(name, activityType, '10am')) {
+            const activity = this.getActivitiesBelowMin(activityType, '10am')
+            this.scheduleKid(name, activity, activityType, '10am')
+          }
         }
       } else {
         if (!this.scheduleSorryNoChoicesTimeSlot(name, activityType, '10am')) {
-          this.scheduleSorryNoChoicesTimeSlot(name, activityType, '9am')
+          if (!this.scheduleSorryNoChoicesTimeSlot(name, activityType, '9am')) {
+            const activity = this.getActivitiesBelowMin(activityType, '9am')
+            this.scheduleKid(name, activity, activityType, '9am')
+          }
         }
       }
     }
