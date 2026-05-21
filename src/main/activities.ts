@@ -63,6 +63,9 @@ export const Activities: CampActivities = Object.freeze({
     arch: [8, 16, 2],
   },
 
+  // 80 max kids can be scheduled
+  // 40 min can be scheduled if all activities are scheduled
+  // 4 min can be scheduled if just one activity is scheduled
   landRanges9am: {
     art: [4, 10, 2],
     hike: [4, 6, 2],
@@ -73,6 +76,9 @@ export const Activities: CampActivities = Object.freeze({
     arch: [8, 16, 2],
   },
 
+  // 86 max kids can be scheduled
+  // 41 min can be scheduled if all activities are scheduled
+  // 3 min can be scheduled if just one activity is scheduled
   landRanges10am: {
     fris: [3, 8, 1],
     art: [4, 10, 2],
@@ -93,6 +99,10 @@ export const Activities: CampActivities = Object.freeze({
   // array[4] Double the maximum num of people per activity
 */
   waterRanges: {
+    // 146 max kids can be scheduled (max 73 per 9am and 73 per 10am)
+    // 72 min kids can be scheduled. (min 36 per 9am and 36 per 10am)
+    // 4 minumum kids can be scheduled if just one activity scheduled for one time slot
+    // 8 minumum kids can be scheduled if just one activity scheduled for one both time slots
     fish: [4, 7, 2, 8, 14],
     pboard: [4, 8, 2, 8, 16],
     snork: [4, 8, 2, 8, 16],
