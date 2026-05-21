@@ -445,19 +445,42 @@ export class Schedule {
    * @param {string} timeSlot - only 2 options: '9am' or '10am'.
    * @returns {Map} - e.g {'swim': 39, 'fish': 9, ...} how many unscheduled kids chose each activity
    */
-  private getNotScheduledKidsList(activityType: AllowedActivityTypes, timeSlot: Allowed9and10Only): string[] {
-    if (!this.isLandFirst) {
-      if (activityType === 'land') {
-        return timeSlot === '9am' ? this.notScheduled9amLand.names : this.notScheduled10amLand.names;
+  private getNotScheduledKidsList(activityType: AllowedActivityTypes, timeSlot: Allowed9and10Only, algoFirst: boolean = true): string[] {
+    if (algoFirst) {
+      if (!this.isLandFirst) {
+        if (activityType === 'land') {
+          return timeSlot === '9am' ? this.notScheduled9amLand.names : this.notScheduled10amLand.names;
+        } else {
+          return this.notScheduledAllNamesWater
+        }
       } else {
-        return this.notScheduledAllNamesWater
+        if (activityType === 'water') {
+          return timeSlot === '9am' ? this.notScheduled9amWater.names : this.notScheduled10amWater.names;
+        } else {
+          return this.notScheduledAllNamesLand
+        }
       }
+    }
+    if (activityType === 'land') {
+      return timeSlot === '9am' ? this.notScheduled9amLand.names : this.notScheduled10amLand.names;
     } else {
-      if (activityType === 'water') {
-        return timeSlot === '9am' ? this.notScheduled9amWater.names : this.notScheduled10amWater.names;
-      } else {
-        return this.notScheduledAllNamesLand
-      }
+      return timeSlot === '9am' ? this.notScheduled9amWater.names : this.notScheduled10amWater.names;
+    }
+  }
+
+  private getNotScheduledActivitiesList(activityType: AllowedActivityTypes, timeSlot: Allowed9and10Only): string[]{
+    if (activityType === 'land') {
+      return timeSlot === '9am' ? this.notScheduled9amLand.landActivities : this.notScheduled10amLand.landActivities;
+    } else {
+      return timeSlot === '9am' ? this.notScheduled9amWater.waterActivities : this.notScheduled10amWater.waterActivities;
+    }
+  }
+
+  private getScheduledActivitiesList(activityType: AllowedActivityTypes, timeSlot: Allowed9and10Only): string[]{
+    if (activityType === 'land') {
+      return timeSlot === '9am' ? this.scheduled9amLand.landActivities : this.scheduled10amLand.landActivities;
+    } else {
+      return timeSlot === '9am' ? this.scheduled9amWater.waterActivities : this.scheduled10amWater.waterActivities;
     }
   }
 
@@ -905,11 +928,11 @@ export class Schedule {
       let kidsByActivityChoice: string[] = [];
       if (choiceNum.length > 1) {
         for (let i = 0; i < choiceNum.length; i++) {
-          const activityChoices = this.getKidsbyActivityChoice(activity, activityType, choiceNum[i]);
+          const activityChoices = this.getKidsbyActivityChoice(activity, activityType, choiceNum[i], timeSlot);
           kidsByActivityChoice = kidsByActivityChoice.concat(activityChoices);
         }
       } else {
-        kidsByActivityChoice = this.getKidsbyActivityChoice(activity, activityType, choiceNum[0]);
+        kidsByActivityChoice = this.getKidsbyActivityChoice(activity, activityType, choiceNum[0], timeSlot);
       }
       const activityValue = maxOrMin ? 1 : 0;
       // TODO: fix type error
@@ -1167,10 +1190,12 @@ export class Schedule {
           console.log(`this.scheduleDoubleMin($${activityType}, ${choices.slice(0, i)}, 'min' ran successfully`)
         }
         case 'bothMinAndMax':
+        console.log("Entering scheduleDoubleMax")
         result = this.scheduleDoubleMax(activityType, choices.slice(0, i), 'max', timeSlot)
         if (result) {
           console.log(`this.scheduleDoubleMax(${activityType}, ${choices.slice(0, i)}, 'max') ran successfully`)
         }
+        console.log("Entering scheduleDoubleMin")
         result = this.scheduleDoubleMin(activityType, choices.slice(0, i), 'min' timeSlot)
         if (result) {
           console.log(`this.scheduleDoubleMin($${activityType}, ${choices.slice(0, i)}, 'min' ran successfully`)
@@ -1976,18 +2001,42 @@ export class Schedule {
     }
   }
 
+  private testUnscheduledToScheduled(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): boolean {
+    const allNames = activityType ==='land' ? this.notScheduledAllNamesLand : this.notScheduledAllNamesWater;
+    const scheduledTimeNames = this.getScheduledKidsList(activityType, timeSlot);
+    const scheduledActivities = this.getScheduledActivitiesList(activityType, timeSlot);
+    const notScheduledTimeNames = this.getNotScheduledKidsList(activityType, timeSlot, false);
+    const notScheduledActivities = this.getNotScheduledActivitiesList(activityType, timeSlot);
+    if (activityType === 'water') {
+      // Unscheduled kids list length and scheduled kids list length should add up to total amount of kids that need to be scheduled
+      const scheduledAndNotScheduledCompareToAllNames = scheduledTimeNames.length + notScheduledTimeNames.length === this.kids.count
+      if (!scheduledAndNotScheduledCompareToAllNames) {
+        console.log(`Water scheduled names (${scheduledTimeNames.length}) + not scheduled names (${notScheduledTimeNames.length}) does not equal total kids count (${this.kids.count})`);
+        return false
+      }
+    }
+
+    // The kids names in the unscheduled list should never be found in the scheduled list
+    const scheduledKidsInUnscheduleKidsList = scheduledTimeNames.every(name => notScheduledTimeNames.includes(name))
+    if (scheduledKidsInUnscheduleKidsList) {
+      console.log(`At least one Scheduled kid (${scheduledTimeNames.length}) is in the unscheduled kids list (${notScheduledTimeNames.length})`);
+      return false
+    }
+
+    // The kids names in the unscheduled list should never be found in the scheduled list
+    const scheduledActivitiesNotInUnscheduleActivitiesList = scheduledActivities.some(name => notScheduledActivities.includes(name))
+    if (scheduledActivitiesNotInUnscheduleActivitiesList) {
+      console.log(`At least one Scheduled activity (${scheduledActivities.length}) is in the unscheduled activities list (${notScheduledActivities.length})`);
+      return false
+    }
+    return true;
+  }
+
   runAlgo(): string {
     this.isLandFirst = false;
     console.log(`${this.algo} algorithm initiated`);
     this.schedulingLog('any scheduling', 'before')
 
-    this.scheduleDoubles.bind(this), // only water activities can be scheduled as doubles
-    this.scheduleSingles.bind(this),
-    this.scheduleBelowMin.bind(this),
-    this.scheduleUniques.bind(this),
-    this.scheduleLeastFull.bind(this),
-    this.scheduleNoChoicesMatch.bind(this),
-    this.scheduleSorryNoChoices.bind(this)
     // SCHEDULE WATER ACTIVITIES
     const waterMethods = [
       this.scheduleDoubles.bind(this), // only water activities can be scheduled as doubles
