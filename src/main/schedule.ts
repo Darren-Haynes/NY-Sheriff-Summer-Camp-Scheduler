@@ -262,6 +262,30 @@ export class Schedule {
   }
 
   /**
+    * First return activity that has kids but below the minimum required, else return a random activity that has no kids scheduled.
+    * @param {string} activityType - only 2 options: 'land' or 'water'.
+    * @param {string} timeSlot - only 2 options: '9am' or '10am'.
+    * @returns {AllActivities} - return an activity
+    */
+  private getActivitiesBelowMin(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): AllActivities {
+    const activities = this.getActivityTypeTimeSlot(activityType, timeSlot);
+    // const notFullActivities = new Map<string, number>();
+    const activityRange = this.getRange(activityType, timeSlot);
+    let activity: AllActivities = 'arch' // to appease the types compiler
+    let matchingActivities: AllActivities[] = []
+    for (let [activity, names] of Object.entries(activities)) {
+      const ranges = activityRange[activity]
+      if (names.length < activityRange[activity][0] && names.length > 1) {
+        return activity
+      } else {
+        matchingActivities.push(activity)
+      };
+    };
+    const randomActivity = matchingActivities[Math.floor(Math.random() * matchingActivities.length)];
+    return randomActivity
+  }
+
+  /**
     * Get list of all scheduled activities that have available slots for a given activity type and time slot.
     * @param {string} activityType - only 2 options: 'land' or 'water'.
     * @param {string} timeSlot - only 2 options: '9am' or '10am'.
@@ -1247,13 +1271,13 @@ export class Schedule {
   }
 
   /**
-   * Get object containing activities that have not yet been scheduled and how many kids have chosen each activity.
+   * Get object containing activities that have not yet been scheduled because not enough kids have chosen them.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {string} timeSlot - only 2 options -'9am' or '10am'
    * @param {boolean} includeZero - if true, activities that kids haven't chosen will be included in the result.
    * @returns {Object<activity, shortfall from min kids required for activity} - Array of kids names who chose the activity
    */
-  private getActivitiesBelowMin(activityType: AllowedActivityTypes, timeSlot: Allowed9and10Only, includeZero=false): Map<LandActivities | WaterActivities, number> {
+  private getActivitiesNotEnoughChoices(activityType: AllowedActivityTypes, timeSlot: Allowed9and10Only, includeZero=false): Map<LandActivities | WaterActivities, number> {
     const notScheduledActivitiesCount
       = this.countActivityChoices(activityType, [1, 2, 3], timeSlot)
 
@@ -1330,8 +1354,8 @@ export class Schedule {
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    */
   private scheduleBelowMin(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): void {
-    const notScheduledActivitiesCount9am = this.getActivitiesBelowMin(activityType, '9am');
-    const notScheduledActivitiesCount10am = this.getActivitiesBelowMin(activityType, '10am');
+    const notScheduledActivitiesCount9am = this.getActivitiesNotEnoughChoices(activityType, '9am');
+    const notScheduledActivitiesCount10am = this.getActivitiesNotEnoughChoices(activityType, '10am');
     let notScheduledActivities: Array<NotScheduledActivities> = [];
     for (const [activity, count] of notScheduledActivitiesCount9am) {
       const activityObj: NotScheduledActivities = { activity: activity, shortFall: count, timeSlot: '9am'}
@@ -1449,7 +1473,7 @@ export class Schedule {
     * @param {string} timeSlot - time slot to schedule the kid to (9am or 10am).
     * @returns {void}
     */
-  private scheduleKid(name: string, activity: WaterActivities | LandActivities, activityType: AllowedActivityTypes, timeSlot: AllowedTimes): void {
+  private scheduleKid(name: string, activity: AllActivities, activityType: AllowedActivityTypes, timeSlot: AllowedTimes): void {
     this.removeFromNotScheduled([name], activityType, activity, timeSlot);
     this.AddToScheduled([name], activityType, activity, timeSlot)
     this.setKidsTimeSlot([name], activity, activityType + timeSlot)
@@ -1708,10 +1732,10 @@ export class Schedule {
   private scheduleSorryNoChoicesTimeSlot(name: string, activityType: AllowedActivityTypes, timeSlot: AllowedTimes): boolean {
     const scheduledActivitiesNotFull = this.getScheduledActivitiesNotFull(activityType, timeSlot)
     if (scheduledActivitiesNotFull.size === 0) {return false}
-    innerloop:
-    for (const activity of scheduledActivitiesNotFull.keys()) {
+    let activity: AllActivities = 'arch'
+    for (let activity of scheduledActivitiesNotFull.keys()) {
       this.scheduleKid(name, activity, activityType, timeSlot);
-      break innerloop
+      break
     }
     return true
   }
@@ -1719,7 +1743,11 @@ export class Schedule {
   private scheduleSorryNoChoicesLand(activityType: 'land', timeSlot: Allowed9and10Only): void {
     const noChoicesForYou = timeSlot === '9am' ? [...this.notScheduled9amLand.names] : [...this.notScheduled10amLand.names]
     for (const name of noChoicesForYou) {
-      this.scheduleSorryNoChoicesTimeSlot(name, activityType, timeSlot)
+      const didSchedule = this.scheduleSorryNoChoicesTimeSlot(name, activityType, timeSlot)
+      if (!didSchedule) {
+        const activity = this.getActivitiesBelowMin(activityType, timeSlot)
+        this.scheduleKid(name, activity, activityType, timeSlot)
+      }
     }
   }
 
