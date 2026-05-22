@@ -1792,7 +1792,7 @@ export class Schedule {
         this.scheduleKid(name, activity, activityType, timeSlot)
       }
     }
-    this.scheduleInsufficientlyScheduled(activityType, timeSlot)
+    this.scheduleInsufficientlyScheduled(activityType, timeSlot, true)
   }
 
   private scheduleSorryNoChoices(activityType: AllowedActivityTypes): void {
@@ -1914,9 +1914,9 @@ export class Schedule {
 
     const keys1 = Object.keys(water9amActivityCountAlt).sort();
     const keys2 = Object.keys(water9amActivityCount).sort();
-    const equalObjects9am =  keys1.every((key, index) =>
-        key === keys2[index] && water9amActivityCountAlt[key] === water9amActivityCount[key]
-      );
+    const equalObjects9am = keys1.every((key, index) =>
+      key === keys2[index] && water9amActivityCountAlt[key] === water9amActivityCount[key]
+    );
     if (activityType === 'water' || activityType === 'final log') {
       if (equalObjects9am) {
         console.log("WATER 9AM objects ARE EQUAL")
@@ -1927,9 +1927,9 @@ export class Schedule {
 
     const keys1a = Object.keys(water10amActivityCountAlt).sort();
     const keys2a = Object.keys(water10amActivityCount).sort();
-    const equalObjects10am =  keys1a.every((key, index) =>
-        key === keys2a[index] && water10amActivityCountAlt[key] === water10amActivityCount[key]
-      );
+    const equalObjects10am = keys1a.every((key, index) =>
+      key === keys2a[index] && water10amActivityCountAlt[key] === water10amActivityCount[key]
+    );
     if (activityType === 'water' || activityType === 'final log') {
       if (equalObjects10am) {
         console.log("WATER 10AM objects ARE EQUAL")
@@ -1979,9 +1979,9 @@ export class Schedule {
 
     const keys1Land = Object.keys(land9amActivityCountAlt).sort();
     const keys2Land = Object.keys(land9amActivityCount).sort();
-    const equalObjects9amLand =  keys1Land.every((key, index) =>
-        key === keys2Land[index] && land9amActivityCountAlt[key] === land9amActivityCount[key]
-      );
+    const equalObjects9amLand = keys1Land.every((key, index) =>
+      key === keys2Land[index] && land9amActivityCountAlt[key] === land9amActivityCount[key]
+    );
     if (activityType === 'land' || activityType === 'final log') {
       if (equalObjects9amLand) {
         console.log("LAND 9AM objects ARE EQUAL")
@@ -1992,9 +1992,9 @@ export class Schedule {
 
     const keys1aLand = Object.keys(land10amActivityCountAlt).sort();
     const keys2aLand = Object.keys(land10amActivityCount).sort();
-    const equalObjects10amLand =  keys1aLand.every((key, index) =>
-        key === keys2aLand[index] && land10amActivityCountAlt[key] === land10amActivityCount[key]
-      );
+    const equalObjects10amLand = keys1aLand.every((key, index) =>
+      key === keys2aLand[index] && land10amActivityCountAlt[key] === land10amActivityCount[key]
+    );
     if (activityType === 'land' || activityType === 'final log') {
       if (equalObjects10amLand) {
         console.log("LAND 10AM objects ARE EQUAL")
@@ -2029,6 +2029,117 @@ export class Schedule {
       console.log("Land 10am unscheduled plus scheduled = ", land10amTotalLength)
       const totalLandScheduleCount = this.notScheduled9amLand.names.length + this.scheduled9amLand.names.length + this.notScheduled10amLand.names.length + this.scheduled10amLand.names.length;
       console.log(`totalLandScheduleCount should be ${this.kids.count}; actual count = `, totalLandScheduleCount)
+    }
+
+    if (activityType === 'water' || activityType === 'final log') {
+      console.log("\nCORRECT WATER 9AM ACTIVITIES")
+      const incorrectActivities9am: WaterActivities[] = []
+      for (const waterActivity9am of Object.keys(this.water9am)) {
+        if (!Object.keys(Activities.waterRanges).includes(waterActivity9am))
+          incorrectActivities9am.push(waterActivity9am as WaterActivities)
+      }
+      if (incorrectActivities9am.length > 0)
+        console.log(`Incorrect water activities: ${incorrectActivities9am}`)
+      else
+        console.log("All correct")
+
+      console.log("\nCORRECT WATER 10AM ACTIVITIES")
+      const incorrectActivities10am: WaterActivities[] = []
+      for (const waterActivity10am of Object.keys(this.water10am)) {
+        if (!Object.keys(Activities.waterRanges).includes(waterActivity10am))
+          incorrectActivities10am.push(waterActivity10am as WaterActivities)
+      }
+      if (incorrectActivities10am.length > 0) {
+        console.log(`Incorrect water activities: ${incorrectActivities10am}`)
+      } else {
+        console.log("All correct")
+      }
+    }
+
+    if (activityType === 'land' || activityType === 'final log') {
+      console.log("\nCORRECT LAND 9AM ACTIVITIES")
+      const incorrectActivities9am: LandActivities[] = []
+      for (const landActivity9am of Object.keys(this.land9am)) {
+        if (!Object.keys(Activities.landRanges9am).includes(landActivity9am))
+          incorrectActivities9am.push(landActivity9am as LandActivities)
+      }
+      if (incorrectActivities9am.length > 0) {
+        console.log(`Incorrect land activities: ${incorrectActivities9am}`)
+      } else {
+        console.log("All correct")
+      }
+
+      console.log("\nCORRECT LAND 10AM ACTIVITIES")
+      const incorrectActivities10am: LandActivities[] = []
+      for (const landActivity10am of Object.keys(this.land10am)) {
+        if (!Object.keys(Activities.landRanges10am).includes(landActivity10am))
+          incorrectActivities10am.push(landActivity10am as LandActivities)
+      }
+      if (incorrectActivities10am.length > 0) {
+        console.log(`Incorrect land activities: ${incorrectActivities10am}`)
+      } else {
+        console.log("All correct")
+      }
+    }
+
+    if (activityType === 'water' || activityType === 'final log') {
+      console.log("\nWATER 9AM OVERSCHEDULED")
+      let overScheduled9am = false;
+      for (const waterActivity9am of Object.keys(this.water9am)) {
+        const activityCount = this.water9am[waterActivity9am as WaterActivities].length
+        const maxRange = Activities.waterRanges[waterActivity9am as WaterActivities][1]
+        if (activityCount > maxRange) {
+          overScheduled9am = true
+          console.log(waterActivity9am, "has", activityCount, "kids scheduled, max is", maxRange)
+        }
+      }
+      if (!overScheduled9am) {
+        console.log("No activities over scheduled")
+      }
+
+      console.log("\nWATER 10AM OVERSCHEDULED")
+      let overScheduled10am = false;
+      for (const waterActivity10am of Object.keys(this.water10am)) {
+        const activityCount = this.water10am[waterActivity10am as WaterActivities].length
+        const maxRange = Activities.waterRanges[waterActivity10am as WaterActivities][1]
+        if (activityCount > maxRange) {
+          overScheduled10am = true
+          console.log(waterActivity10am, "has", activityCount, "kids scheduled, max is", maxRange)
+        }
+      }
+      if (!overScheduled10am) {
+        console.log("No activities over scheduled")
+      }
+    }
+
+    if (activityType === 'land' || activityType === 'final log') {
+      console.log("\nLAND 9AM OVERSCHEDULED")
+      let overScheduled9am = false;
+      for (const landActivity9am of Object.keys(this.land9am)) {
+        const activityCount = this.land9am[landActivity9am as LandActivities].length
+        const maxRange = Activities.landRanges[landActivity9am as LandActivities][1]
+        if (activityCount > maxRange) {
+          overScheduled9am = true
+          console.log(landActivity9am, "has", activityCount, "kids scheduled, max is", maxRange)
+        }
+      }
+      if (!overScheduled9am) {
+        console.log("No activities over scheduled")
+      }
+
+      console.log("\nLAND 10AM OVERSCHEDULED")
+      let overScheduled10am = false;
+      for (const landActivity10am of Object.keys(this.land10am)) {
+        const activityCount = this.land10am[landActivity10am as LandActivities].length
+        const maxRange = Activities.landRanges[landActivity10am as LandActivities][1]
+        if (activityCount > maxRange) {
+          overScheduled10am = true
+          console.log(landActivity10am, "has", activityCount, "kids scheduled, max is", maxRange)
+        }
+      }
+      if (!overScheduled10am) {
+        console.log("No activities over scheduled")
+      }
     }
 
     if (activityType === 'water' || activityType === 'final log') {
