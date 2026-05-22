@@ -1820,6 +1820,36 @@ export class Schedule {
     this.scheduleInsufficientlyScheduled(activityType, '10am')
   }
 
+  /**
+   * Print activities that have more kids scheduled than the max allowed for that activity, if any.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {string} timeSlot - only 2 options -'9am' or '10am'
+   * @returns {void}
+   */
+  private printOverScheduled(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): void {
+    const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot)
+    const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges
+    console.log(`\n${activityType.toUpperCase()} ${timeSlot.toUpperCase()} OVERSCHEDULED`)
+    let overScheduled = false;
+    for (const activity of Object.keys(activityTypeTimeSlot)) {
+      const activityCount = activityTypeTimeSlot[activity as AllActivities].length
+      const maxRange = ranges[activity as AllActivities][1]
+      if (activityCount > maxRange) {
+        overScheduled = true
+        console.log(activity, "has", activityCount, "kids scheduled, max is", maxRange)
+      }
+    }
+    if (!overScheduled) {
+      console.log("No activities over scheduled")
+    }
+  }
+
+  /**
+   * Print activities that have been scheduled to the wrong activity and time slot, if any.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {string} timeSlot - only 2 options -'9am' or '10am'
+   * @returns {void}
+   */
   private printCorrectActivities(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): void {
     const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot)
     const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges
@@ -2057,63 +2087,10 @@ export class Schedule {
     }
 
     if (activityType === 'water' || activityType === 'final log') {
-      console.log("\nWATER 9AM OVERSCHEDULED")
-      let overScheduled9am = false;
-      for (const waterActivity9am of Object.keys(this.water9am)) {
-        const activityCount = this.water9am[waterActivity9am as WaterActivities].length
-        const maxRange = Activities.waterRanges[waterActivity9am as WaterActivities][1]
-        if (activityCount > maxRange) {
-          overScheduled9am = true
-          console.log(waterActivity9am, "has", activityCount, "kids scheduled, max is", maxRange)
-        }
-      }
-      if (!overScheduled9am) {
-        console.log("No activities over scheduled")
-      }
-
-      console.log("\nWATER 10AM OVERSCHEDULED")
-      let overScheduled10am = false;
-      for (const waterActivity10am of Object.keys(this.water10am)) {
-        const activityCount = this.water10am[waterActivity10am as WaterActivities].length
-        const maxRange = Activities.waterRanges[waterActivity10am as WaterActivities][1]
-        if (activityCount > maxRange) {
-          overScheduled10am = true
-          console.log(waterActivity10am, "has", activityCount, "kids scheduled, max is", maxRange)
-        }
-      }
-      if (!overScheduled10am) {
-        console.log("No activities over scheduled")
-      }
-    }
-
-    if (activityType === 'land' || activityType === 'final log') {
-      console.log("\nLAND 9AM OVERSCHEDULED")
-      let overScheduled9am = false;
-      for (const landActivity9am of Object.keys(this.land9am)) {
-        const activityCount = this.land9am[landActivity9am as LandActivities].length
-        const maxRange = Activities.landRanges[landActivity9am as LandActivities][1]
-        if (activityCount > maxRange) {
-          overScheduled9am = true
-          console.log(landActivity9am, "has", activityCount, "kids scheduled, max is", maxRange)
-        }
-      }
-      if (!overScheduled9am) {
-        console.log("No activities over scheduled")
-      }
-
-      console.log("\nLAND 10AM OVERSCHEDULED")
-      let overScheduled10am = false;
-      for (const landActivity10am of Object.keys(this.land10am)) {
-        const activityCount = this.land10am[landActivity10am as LandActivities].length
-        const maxRange = Activities.landRanges[landActivity10am as LandActivities][1]
-        if (activityCount > maxRange) {
-          overScheduled10am = true
-          console.log(landActivity10am, "has", activityCount, "kids scheduled, max is", maxRange)
-        }
-      }
-      if (!overScheduled10am) {
-        console.log("No activities over scheduled")
-      }
+      this.printOverScheduled('water', '9am')
+      this.printOverScheduled('water', '10am')
+      this.printOverScheduled('land', '9am')
+      this.printOverScheduled('land', '10am')
     }
 
     if (activityType === 'water' || activityType === 'final log') {
