@@ -1034,13 +1034,16 @@ export class Schedule {
     activityKids: string[],
     activityType: AllowedActivityTypes,
     activityTime: AllowedTimes,
-    activity: LandActivities | WaterActivities
+    activity: LandActivities | WaterActivities,
+    fromInsufficient: boolean = false
   ): void {
     const randomKids = this.randomChoices(kidsWhoCanReschedule, notScheduledCount)
     const allKidsToSchedule = activityKids.concat(randomKids)
     const activityTimeSlot = activityType + activityTime
     this.removeFromNotScheduled(activityKids, activityType, activity, activityTime)
-    this.AddToScheduled(activityKids, activityType, activity, activityTime)
+    if (!fromInsufficient) {
+      this.AddToScheduled(activityKids, activityType, activity, activityTime)
+    }
     this.updateKidsScheduledActivity(randomKids, activity, activityTimeSlot)
     this.setKidsTimeSlot(activityKids, activity, activityTimeSlot)
     if (activityType === 'water') {
@@ -1339,6 +1342,13 @@ export class Schedule {
     //   }
     // }
     return activityKids
+  }
+
+  private getShortfallCount(activityType: AllowedActivityTypes, timeSlot: AllowedTimes, activity: AllActivities): number {
+    const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot)
+    const range = this.getRange(activityType, timeSlot)
+    const shortfall = range[activity][0] - activityTypeTimeSlot[activity].length
+    return shortfall
   }
 
   private scheduleBelowMinTimeSlot(activityType: AllowedActivityTypes, timeSlot: AllowedTimes, notScheduledActivities: Array<NotScheduledActivities>): Array<NotScheduledActivities> {
@@ -1752,19 +1762,25 @@ export class Schedule {
   private scheduleInsufficientlyScheduled(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): void {
     const insufficientActivities = this.getInsufficientlyScheduledActivites(activityType, timeSlot)
     if (insufficientActivities.length > 0) {
-      // TODO: if this presents itself during testing - well fix it :)
-      throw new Error(`Insufficiently scheduled activities: ${insufficientActivities}`)
+      for (const activity of insufficientActivities) {
+        let kidsWhoCanReschedule = this.getKidsWhoCanReschedule(activityType, activity, timeSlot, [1, 2, 3]);
+        if (kidsWhoCanReschedule.length === 0) { throw new Error(`No kids can reschedule for activity: ${activity}`) }
+        const shortfallCount = this.getShortfallCount(activityType, timeSlot, activity)
+        if (kidsWhoCanReschedule.length > shortfallCount) {
+          kidsWhoCanReschedule = this.randomChoices(kidsWhoCanReschedule, shortfallCount)
+        }
+        const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot)
+        this.scheduleBelowMinActivities(kidsWhoCanReschedule, shortfallCount, activityTypeTimeSlot[activity], activityType, timeSlot, activity, true)
+      }
     }
   }
 
   private scheduleSorryNoChoicesTimeSlot(name: string, activityType: AllowedActivityTypes, timeSlot: AllowedTimes): boolean {
     const scheduledActivitiesNotFull = this.getScheduledActivitiesNotFull(activityType, timeSlot)
     if (scheduledActivitiesNotFull.size === 0) {return false}
-    let activity: AllActivities = 'arch'
-    for (let activity of scheduledActivitiesNotFull.keys()) {
-      this.scheduleKid(name, activity, activityType, timeSlot);
-      break
-    }
+    const activityList =  [...scheduledActivitiesNotFull.keys()]
+    const randomActivity = this.randomChoices(activityList, 1)[0]
+    this.scheduleKid(name, randomActivity, activityType, timeSlot);
     return true
   }
 
@@ -1800,6 +1816,8 @@ export class Schedule {
         }
       }
     }
+    this.scheduleInsufficientlyScheduled(activityType, '9am')
+    this.scheduleInsufficientlyScheduled(activityType, '10am')
   }
 
   schedulingLog(func_name: string, when: string): void {
@@ -2049,6 +2067,16 @@ export class Schedule {
     }
 
     if (func_name == 'end log') {
+
+      const notFullyScheduledWater9am = this.getInsufficientlyScheduledActivites('water', '9am')
+      const notFullyScheduledWater10am = this.getInsufficientlyScheduledActivites('water', '10am')
+      const notFullyScheduledLand9am = this.getInsufficientlyScheduledActivites('land', '9am')
+      const notFullyScheduledLand10am = this.getInsufficientlyScheduledActivites('land', '10am')
+      console.log('NOT FULLY SCHEDULED ACTIVITIES')
+      console.log('Water 9am:', notFullyScheduledWater9am)
+      console.log('Water 10am:', notFullyScheduledWater10am)
+      console.log('Land 9am:', notFullyScheduledLand9am)
+      console.log('Land 10am:', notFullyScheduledLand10am)
       console.log("\n\nSCHEDULED LISTS -- FINAL REPORT")
       const oppositesEqualWaterString = JSON.stringify(this.notScheduled9amWater.names.sort()) === JSON.stringify(this.scheduled10amWater.names.sort())
       const oppositesEqualWaterString2 = JSON.stringify(this.notScheduled9amWater.names.sort()) === JSON.stringify(this.scheduled10amWater.names.sort())
