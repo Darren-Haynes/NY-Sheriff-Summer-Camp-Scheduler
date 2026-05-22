@@ -1820,6 +1820,22 @@ export class Schedule {
     this.scheduleInsufficientlyScheduled(activityType, '10am')
   }
 
+  private printOverScheduled(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): void {
+    const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot)
+    const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges
+    console.log(`\nCORRECT ${activityType}.toUpperCase() ${timeSlot}.toUpperCase() ACTIVITIES`)
+    const incorrectActivities: AllActivities[] = []
+    for (const activity of Object.keys(activityTypeTimeSlot)) {
+      if (!Object.keys(ranges).includes(activity))
+        incorrectActivities.push(activity as AllActivities)
+    }
+    if (incorrectActivities.length > 0)
+      console.log(`Incorrect ${activityType} activities: ${incorrectActivities}`)
+    else {
+      console.log("All correct")
+    }
+  }
+
   schedulingLog(func_name: string, when: string): void {
     console.log(`\n${when} ${func_name}`)
     const notScheduledAllNames =  this.notScheduledAllNamesWater
@@ -2032,54 +2048,12 @@ export class Schedule {
     }
 
     if (activityType === 'water' || activityType === 'final log') {
-      console.log("\nCORRECT WATER 9AM ACTIVITIES")
-      const incorrectActivities9am: WaterActivities[] = []
-      for (const waterActivity9am of Object.keys(this.water9am)) {
-        if (!Object.keys(Activities.waterRanges).includes(waterActivity9am))
-          incorrectActivities9am.push(waterActivity9am as WaterActivities)
-      }
-      if (incorrectActivities9am.length > 0)
-        console.log(`Incorrect water activities: ${incorrectActivities9am}`)
-      else
-        console.log("All correct")
-
-      console.log("\nCORRECT WATER 10AM ACTIVITIES")
-      const incorrectActivities10am: WaterActivities[] = []
-      for (const waterActivity10am of Object.keys(this.water10am)) {
-        if (!Object.keys(Activities.waterRanges).includes(waterActivity10am))
-          incorrectActivities10am.push(waterActivity10am as WaterActivities)
-      }
-      if (incorrectActivities10am.length > 0) {
-        console.log(`Incorrect water activities: ${incorrectActivities10am}`)
-      } else {
-        console.log("All correct")
-      }
+      this.printOverScheduled('water', '9am')
+      this.printOverScheduled('water', '10am')
     }
-
     if (activityType === 'land' || activityType === 'final log') {
-      console.log("\nCORRECT LAND 9AM ACTIVITIES")
-      const incorrectActivities9am: LandActivities[] = []
-      for (const landActivity9am of Object.keys(this.land9am)) {
-        if (!Object.keys(Activities.landRanges9am).includes(landActivity9am))
-          incorrectActivities9am.push(landActivity9am as LandActivities)
-      }
-      if (incorrectActivities9am.length > 0) {
-        console.log(`Incorrect land activities: ${incorrectActivities9am}`)
-      } else {
-        console.log("All correct")
-      }
-
-      console.log("\nCORRECT LAND 10AM ACTIVITIES")
-      const incorrectActivities10am: LandActivities[] = []
-      for (const landActivity10am of Object.keys(this.land10am)) {
-        if (!Object.keys(Activities.landRanges10am).includes(landActivity10am))
-          incorrectActivities10am.push(landActivity10am as LandActivities)
-      }
-      if (incorrectActivities10am.length > 0) {
-        console.log(`Incorrect land activities: ${incorrectActivities10am}`)
-      } else {
-        console.log("All correct")
-      }
+      this.printOverScheduled('land', '9am')
+      this.printOverScheduled('land', '10am')
     }
 
     if (activityType === 'water' || activityType === 'final log') {
