@@ -1820,10 +1820,10 @@ export class Schedule {
     this.scheduleInsufficientlyScheduled(activityType, '10am')
   }
 
-  private printOverScheduled(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): void {
+  private printCorrectActivities(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): void {
     const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot)
     const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges
-    console.log(`\nCORRECT ${activityType}.toUpperCase() ${timeSlot}.toUpperCase() ACTIVITIES`)
+    console.log(`\nCORRECT ${activityType.toUpperCase()} ${timeSlot.toUpperCase()} ACTIVITIES`)
     const incorrectActivities: AllActivities[] = []
     for (const activity of Object.keys(activityTypeTimeSlot)) {
       if (!Object.keys(ranges).includes(activity))
@@ -2048,12 +2048,12 @@ export class Schedule {
     }
 
     if (activityType === 'water' || activityType === 'final log') {
-      this.printOverScheduled('water', '9am')
-      this.printOverScheduled('water', '10am')
+      this.printCorrectActivities('water', '9am')
+      this.printCorrectActivities('water', '10am')
     }
     if (activityType === 'land' || activityType === 'final log') {
-      this.printOverScheduled('land', '9am')
-      this.printOverScheduled('land', '10am')
+      this.printCorrectActivities('land', '9am')
+      this.printCorrectActivities('land', '10am')
     }
 
     if (activityType === 'water' || activityType === 'final log') {
