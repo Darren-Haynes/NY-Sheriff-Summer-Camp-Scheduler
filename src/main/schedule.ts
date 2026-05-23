@@ -1821,6 +1821,31 @@ export class Schedule {
   }
 
   /**
+   * Print the count of scheduled and not scheduled kids for a given activity type.
+   * This reveals if there was correct scheduling for list of names. For e.g the number of
+   * kids scheduled for 9am water activities should match those scheduled for 10am land activities.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @returns {void}
+   */
+  private printNameCounts(activityType: AllowedActivityTypes): void {
+    console.log(`\n${activityType.toUpperCase()} LENGTHS TOTALS`)
+    console.log('Kids total count / 2 = ', this.kids.count / 2)
+    const notScheduledNames9am = this.getNotScheduledKidsList(activityType, '9am', false)
+    const scheduledNames9am = this.getScheduledKidsList(activityType, '9am')
+    const notScheduledNames10am = this.getNotScheduledKidsList(activityType, '10am', false)
+    const scheduledNames10am = this.getScheduledKidsList(activityType, '10am')
+    const totalNamesLength9am = notScheduledNames9am.length + scheduledNames9am.length == this.kids.count;
+    const totalNamesLength10am = notScheduledNames10am.length + scheduledNames10am.length == this.kids.count;
+    console.log("Water9amTotalLength:", totalNamesLength9am, "\nwater10amTotalLength:", totalNamesLength10am)
+    console.log("Water 9am Unscheduled Names Length=", notScheduledNames9am.length, "\nwater 9am SCHEDULED Names Length=", scheduledNames9am.length)
+    console.log("Water 9am unscheduled plus scheduled = ", totalNamesLength9am)
+    console.log("Water 10am Unscheduled Names Length=", notScheduledNames10am.length, "\nwater 10am SCHEDULED Names Length=", scheduledNames10am.length)
+    console.log("Water 10am unscheduled plus scheduled = ", totalNamesLength10am)
+    const totalWaterScheduleCount = (notScheduledNames9am.length + scheduledNames9am.length + notScheduledNames10am.length + scheduledNames10am.length) / 2;
+    console.log(`totalWater should be ${this.kids.count}; actual count = `, totalWaterScheduleCount)
+  }
+
+  /**
    * Print activities that have more kids scheduled than the max allowed for that activity, if any.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {string} timeSlot - only 2 options -'9am' or '10am'
@@ -2050,31 +2075,11 @@ export class Schedule {
     }
 
     if (activityType === 'water' || activityType === 'final log') {
-      console.log("\nWATER LENGTHS TOTALS")
-      console.log('Kids total count / 2 = ', this.kids.count / 2)
-      const water9amTotalLength = this.notScheduled9amWater.names.length + this.scheduled9amWater.names.length === this.kids.count;
-      const water10amTotalLength = this.notScheduled10amWater.names.length + this.scheduled10amWater.names.length === this.kids.count;
-      console.log("Water9amTotalLength:", water9amTotalLength, "\nwater10amTotalLength:", water10amTotalLength)
-      console.log("Water 9am Unscheduled Names Length=", this.notScheduled9amWater.names.length, "\nwater 9am SCHEDULED Names Length=", this.scheduled9amWater.names.length)
-      console.log("Water 9am unscheduled plus scheduled = ", water9amTotalLength)
-      console.log("Water 10am Unscheduled Names Length=", this.notScheduled10amWater.names.length, "\nwater 10am SCHEDULED Names Length=", this.scheduled10amWater.names.length)
-      console.log("Water 10am unscheduled plus scheduled = ", water10amTotalLength)
-      const totalWaterScheduleCount = (this.notScheduled9amWater.names.length + this.scheduled9amWater.names.length + this.notScheduled10amWater.names.length + this.scheduled10amWater.names.length) / 2;
-      console.log(`totalWater should be ${this.kids.count}; actual count = `, totalWaterScheduleCount)
+      this.printNameCounts('water')
     }
 
     if (activityType === 'land' || activityType === 'final log') {
-      console.log("\nLAND LENGTHS TOTALS")
-      console.log('Kids total count / 2 = ', this.kids.count / 2)
-      const land9amTotalLength = this.notScheduled9amLand.names.length + this.scheduled9amLand.names.length === this.scheduled10amWater.names.length;
-      const land10amTotalLength = this.notScheduled10amLand.names.length + this.scheduled10amLand.names.length === this.scheduled9amWater.names.length;
-      console.log("land9amTotalLength:", land9amTotalLength, "\nland10amTotalLength:", land10amTotalLength)
-      console.log("land 9am Unscheduled Names Length=", this.notScheduled9amLand.names.length, "\nland 9am SCHEDULED Names Length=", this.scheduled9amLand.names.length)
-      console.log("Land 9am unscheduled plus scheduled = ", land9amTotalLength)
-      console.log("land 10am Unscheduled Names Length=", this.notScheduled10amLand.names.length, "\nland 10am SCHEDULED Names Length=", this.scheduled10amLand.names.length)
-      console.log("Land 10am unscheduled plus scheduled = ", land10amTotalLength)
-      const totalLandScheduleCount = this.notScheduled9amLand.names.length + this.scheduled9amLand.names.length + this.notScheduled10amLand.names.length + this.scheduled10amLand.names.length;
-      console.log(`totalLandScheduleCount should be ${this.kids.count}; actual count = `, totalLandScheduleCount)
+      this.printNameCounts('land')
     }
 
     if (activityType === 'water' || activityType === 'final log') {
