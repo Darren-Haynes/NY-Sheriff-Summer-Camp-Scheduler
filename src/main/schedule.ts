@@ -1891,26 +1891,33 @@ export class Schedule {
     }
   }
 
-  schedulingLog(func_name: string, when: string): void {
-    console.log(`\n${when} ${func_name}`)
-    const notScheduledAllNames =  this.notScheduledAllNamesWater
-    console.log("NOT SCHEDULED WATER:")
+  /**
+   * Print unscheduled names and activities.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {string} timeSlot - only 2 options -'9am' or '10am'
+   * @returns {void}
+   */
+  private printUnscheduledData(activityType: AllowedActivityTypes): void {
+    const notScheduledAllNames = activityType === 'land' ? this.notScheduledAllNamesLand : this.notScheduledAllNamesWater
+    const notScheduledNames9am = this.getNotScheduledKidsList(activityType, '9am', false)
+    const notScheduledNames10am = this.getNotScheduledKidsList(activityType, '10am', false)
+    const notScheduledActivities9am = this.getNotScheduledActivities(activityType, '9am')
+    const notScheduledActivities10am = this.getNotScheduledActivities(activityType, '10am')
+    console.log(`NOT SCHEDULED ${activityType.toUpperCase()}:`)
     console.log("-------------------")
-    console.log("NOT SCHEDULED COUNT ALL NAMES WATER: ", notScheduledAllNames.length)
-    console.log("NOT SCHEDULED 9AM WATER NAMES: ", this.notScheduled9amWater.names.length)
-    console.log("NOT SCHEDULED 9AM WATER ACTIVITIS: ", this.notScheduled9amWater.waterActivities)
-    console.log("NOT SCHEDULED 10AM WATER: ", this.notScheduled10amWater.names.length)
-    console.log("NOT SCHEDULED 10AM WATER ACTIVITIS: ", this.notScheduled10amWater.waterActivities)
+    console.log(`NOT SCHEDULED COUNT ALL NAMES ${activityType.toUpperCase()}: `, notScheduledAllNames.length)
+    console.log(`NOT SCHEDULED 9AM ${activityType.toUpperCase()} NAMES: `, notScheduledNames9am.length)
+    console.log(`NOT SCHEDULED 9AM ${activityType.toUpperCase()} ACTIVITIES: `, [...notScheduledActivities9am.keys()])
+    console.log(`NOT SCHEDULED 10AM ${activityType.toUpperCase()} NAMES: `, notScheduledNames10am.length)
+    console.log(`NOT SCHEDULED 10AM ${activityType.toUpperCase()} ACTIVITIES: `, [...notScheduledActivities10am.keys()])
     console.log("\n")
 
-    console.log("NOT SCHEDULED LAND:")
-    console.log("-------------------")
-    console.log("NOT SCHEDULED COUNT ALL NAMES LAND: ", this.notScheduledAllNamesLand.length)
-    console.log("NOT SCHEDULED 9AM LAND NAMES: ", this.notScheduled9amLand.names.length)
-    console.log("NOT SCHEDULED 9AM LAND ACTIVITIS: ", this.notScheduled9amLand.landActivities)
-    console.log("NOT SCHEDULED 10AM LAND: ", this.notScheduled10amLand.names.length)
-    console.log("NOT SCHEDULED 10AM LAND ACTIVITIS: ", this.notScheduled10amLand.landActivities)
-    console.log("\n")
+  }
+
+  schedulingLog(func_name: string, when: string): void {
+    console.log(`\n${when} ${func_name}`)
+    this.printUnscheduledData('water')
+    this.printUnscheduledData('land')
   }
 
   private testScheduling(activityType: AllowedActivityTypes | 'final log', func_name: string): void {
@@ -1921,25 +1928,11 @@ export class Schedule {
     console.log("\tAfter calling", func_name, '\n')
 
     if (activityType === 'water' || activityType === 'final log') {
-      console.log("NOT SCHEDULED WATER:")
-      console.log("-------------------")
-      console.log("NOT SCHEDULED COUNT ALL NAMES WATER: ", this.notScheduledAllNamesWater.length)
-      console.log("NOT SCHEDULED 9AM WATER NAMES: ", this.notScheduled9amWater.names.length)
-      console.log("NOT SCHEDULED 9AM WATER ACTIVITIS: ", this.notScheduled9amWater.waterActivities)
-      console.log("NOT SCHEDULED 10AM WATER: ", this.notScheduled10amWater.names.length)
-      console.log("NOT SCHEDULED 10AM WATER ACTIVITIS: ", this.notScheduled10amWater.waterActivities)
-      console.log("\n")
+      this.printUnscheduledData('water')
     }
 
     if (activityType === 'land' || activityType === 'final log') {
-      console.log("NOT SCHEDULED LAND:")
-      console.log("-------------------")
-      console.log("NOT SCHEDULED COUNT ALL NAMES LAND: ", this.notScheduledAllNamesLand.length)
-      console.log("NOT SCHEDULED 9AM LAND NAMES: ", this.notScheduled9amLand.names.length)
-      console.log("NOT SCHEDULED 9AM LAND ACTIVITIS: ", this.notScheduled9amLand.landActivities)
-      console.log("NOT SCHEDULED 10AM LAND: ", this.notScheduled10amLand.names.length)
-      console.log("NOT SCHEDULED 10AM LAND ACTIVITIS: ", this.notScheduled10amLand.landActivities)
-      console.log("\n")
+      this.printUnscheduledData('land')
     }
     // const notScheduledAllNames = activityType === 'water' ? this.notScheduledAllNamesWater : this.notScheduledAllNamesLand;
     const totalKidsCountWater = this.kids.count - this.notScheduledAllNamesWater.length
