@@ -1854,7 +1854,7 @@ export class Schedule {
   private printOverScheduled(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): void {
     const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot)
     const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges
-    console.log(`\n${activityType.toUpperCase()} ${timeSlot.toUpperCase()} OVERSCHEDULED`)
+    console.log(`${activityType.toUpperCase()} ${timeSlot.toUpperCase()} OVERSCHEDULED`)
     let overScheduled = false;
     for (const activity of Object.keys(activityTypeTimeSlot)) {
       const activityCount = activityTypeTimeSlot[activity as AllActivities].length
@@ -1866,6 +1866,30 @@ export class Schedule {
     }
     if (!overScheduled) {
       console.log("No activities over scheduled")
+    }
+  }
+
+  /**
+   * Print activities that have less kids scheduled than the min allowed for that activity, if any.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {string} timeSlot - only 2 options -'9am' or '10am'
+   * @returns {void}
+   */
+  private printUnderScheduled(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): void {
+    const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot)
+    const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges
+    console.log(`${activityType.toUpperCase()} ${timeSlot.toUpperCase()} UNDERSCHEDULED`)
+    let underScheduled = false;
+    for (const activity of Object.keys(activityTypeTimeSlot)) {
+      const activityCount = activityTypeTimeSlot[activity as AllActivities].length
+      const minRange = ranges[activity as AllActivities][0]
+      if (activityCount < minRange && activityCount > 0) {
+        underScheduled = true
+        console.log(activity, "has", activityCount, "kids scheduled, min is", minRange)
+      }
+    }
+    if (!underScheduled) {
+      console.log("No activities under scheduled")
     }
   }
 
@@ -2087,8 +2111,19 @@ export class Schedule {
     if (activityType === 'water' || activityType === 'final log') {
       this.printOverScheduled('water', '9am')
       this.printOverScheduled('water', '10am')
+    }
+      if (activityType === 'land' || activityType === 'final log') {
       this.printOverScheduled('land', '9am')
       this.printOverScheduled('land', '10am')
+    }
+
+    if (activityType === 'water' || activityType === 'final log') {
+      this.printUnderScheduled('water', '9am')
+      this.printUnderScheduled('water', '10am')
+    }
+    if (activityType === 'land' || activityType === 'final log') {
+      this.printUnderScheduled('land', '9am')
+      this.printUnderScheduled('land', '10am')
     }
 
     if (activityType === 'water' || activityType === 'final log') {
