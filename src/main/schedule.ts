@@ -649,7 +649,7 @@ export class Schedule {
    * @param {number[]} choices - num of choices to count in any combo of 1 thru 3: [[1], [2], [3], [1, 2], [1, 2], [1, 3], [1, 2, 3]]
    * @returns {string[]} - array of kids names who can be rescheduled
    */
-  private getKidsWhoCanReschedule(activityType: AllowedActivityTypes, activity: LandActivities | WaterActivities, timeSlot: AllowedTimes, choices: AllowedChoices): Array<string> {
+  private getKidsWhoCanReschedule(activityType: AllowedActivityTypes, activity: LandActivities | WaterActivities, timeSlot: AllowedTimes, choices: AllowedChoices, returnNoMatch: boolean = false ): Array<string> {
     let scheduledActivities = null;
     if (activityType === 'land') {
       scheduledActivities = timeSlot === '9am' ? this.land9am : this.land10am
@@ -658,6 +658,7 @@ export class Schedule {
     }
     const activitiesAboveMin = this.getActivitiesAboveMin(activityType, timeSlot)
     const kidsWhoCanReschedule = new Array;
+    const kidsWhoCanRescheduleNoMatch = new Array;
     for (const [activityAboveMin, count] of activitiesAboveMin) {
       const scheduledKids = scheduledActivities[activityAboveMin]
       for (const kid of scheduledKids) {
@@ -666,10 +667,13 @@ export class Schedule {
           const kidsChoice = activityType === 'land' ? Object.keys(kidsData)[choice - 1] : Object.keys(kidsData)[choice + 2]
           if (kidsData[kidsChoice] === activity) {
             kidsWhoCanReschedule.push(kid)
+          } else {
+            kidsWhoCanRescheduleNoMatch.push(kid)
           }
         }
       }
     }
+    if (returnNoMatch) return kidsWhoCanRescheduleNoMatch
     return kidsWhoCanReschedule;
   }
 
@@ -1760,8 +1764,8 @@ export class Schedule {
     const insufficientActivities = this.getInsufficientlyScheduledActivites(activityType, timeSlot)
     if (insufficientActivities.length > 0) {
       for (const activity of insufficientActivities) {
-        let kidsWhoCanReschedule = this.getKidsWhoCanReschedule(activityType, activity, timeSlot, [1, 2, 3]);
-        if (kidsWhoCanReschedule.length === 0) { throw new Error(`No kids can reschedule for activity: ${activity}`) }
+        let kidsWhoCanReschedule = this.getKidsWhoCanReschedule(activityType, activity, timeSlot, [1, 2, 3], true);
+        if (kidsWhoCanReschedule.length === 0) { throw new Error(`${this.kids.count} kids is not enough to run the camp`) }
         const shortfallCount = this.getShortfallCount(activityType, timeSlot, activity)
         if (kidsWhoCanReschedule.length > shortfallCount) {
           kidsWhoCanReschedule = this.randomChoices(kidsWhoCanReschedule, shortfallCount)
