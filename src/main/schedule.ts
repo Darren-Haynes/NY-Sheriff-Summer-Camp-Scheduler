@@ -280,21 +280,18 @@ export class Schedule {
     * @param {string} timeSlot - only 2 options: '9am' or '10am'.
     * @returns {AllActivities} - return an activity
     */
-  private getActivitiesBelowMin(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): AllActivities {
+  private getActivitiesBelowMin(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): AllActivities | false {
     const activities = this.getActivityTypeTimeSlot(activityType, timeSlot);
     const activityRange = this.getRange(activityType, timeSlot);
     let activity: AllActivities = 'arch' // to appease the types compiler
     let matchingActivities: AllActivities[] = []
     for (let [activity, names] of Object.entries(activities)) {
       const ranges = activityRange[activity]
-      if (names.length < activityRange[activity][0] && names.length > 1) {
+      if (names.length < activityRange[activity][0]) {
         return activity
-      } else {
-        matchingActivities.push(activity)
       };
     };
-    const randomActivity = matchingActivities[Math.floor(Math.random() * matchingActivities.length)];
-    return randomActivity
+    return false
   }
 
   /**
@@ -1802,17 +1799,13 @@ export class Schedule {
       const notScheduled10am = activityType === 'land' ? this.notScheduled10amLand : this.notScheduled10amWater
       if (notScheduled9am.names.length > notScheduled10am.names.length) {
         if (!this.scheduleSorryNoChoicesTimeSlot(name, activityType, '9am')) {
-          if (!this.scheduleSorryNoChoicesTimeSlot(name, activityType, '10am')) {
-            const activity = this.getActivitiesBelowMin(activityType, '10am')
-            this.scheduleKid(name, activity, activityType, '10am')
-          }
+          const activity = this.getActivitiesBelowMin(activityType, '9am')
+          this.scheduleKid(name, activity, activityType, '9am')
         }
       } else {
         if (!this.scheduleSorryNoChoicesTimeSlot(name, activityType, '10am')) {
-          if (!this.scheduleSorryNoChoicesTimeSlot(name, activityType, '9am')) {
-            const activity = this.getActivitiesBelowMin(activityType, '9am')
-            this.scheduleKid(name, activity, activityType, '9am')
-          }
+          const activity = this.getActivitiesBelowMin(activityType, '10am')
+          this.scheduleKid(name, activity, activityType, '10am')
         }
       }
     }
