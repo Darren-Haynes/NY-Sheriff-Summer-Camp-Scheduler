@@ -668,7 +668,10 @@ export class Schedule {
           if (kidsData[kidsChoice] === activity) {
             kidsWhoCanReschedule.push(kid)
           } else {
+            if (activitiesAboveMin.get(activityAboveMin) === 0) { continue }
             kidsWhoCanRescheduleNoMatch.push(kid)
+            let shortfallCount: number = activitiesAboveMin.get(activityAboveMin)
+            activitiesAboveMin.set(activityAboveMin, shortfallCount -= 1)
           }
         }
       }
@@ -1793,7 +1796,7 @@ export class Schedule {
         this.scheduleKid(name, activity, activityType, timeSlot)
       }
     }
-    this.scheduleInsufficientlyScheduled(activityType, timeSlot, true)
+    this.scheduleInsufficientlyScheduled(activityType, timeSlot)
   }
 
   private scheduleSorryNoChoices(activityType: AllowedActivityTypes): void {
