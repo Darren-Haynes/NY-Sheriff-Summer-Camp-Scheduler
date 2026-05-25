@@ -39,6 +39,8 @@ export class DataErrorHandler {
   activityErrorHeader: string;
   notEnoughKidsError: string[];
   notEnoughKidsHeader: string;
+  tooManyKidsError: string[];
+  tooManyKidsHeader: string;
   campData: string[][];
   headerRow: boolean;
 
@@ -50,7 +52,9 @@ export class DataErrorHandler {
     this.activityError = [];
     this.activityErrorHeader = `The Following Fields Contain Incorrect Activity Names`;
     this.notEnoughKidsError = [];
-    this.notEnoughKidsHeader = `There are not enough kids scheduled for camp`;
+    this.notEnoughKidsHeader = `There are not enough kids scheduled for the camp`;
+    this.tooManyKidsError = [];
+    this.tooManyKidsHeader = `There are too many kids scheduled for the camp`;
   }
 
   notEnoughKids(): boolean {
@@ -60,6 +64,15 @@ export class DataErrorHandler {
       );
     }
     return this.notEnoughKidsError.length !== 0;
+  }
+
+  tooManyKids(): boolean {
+    if (this.campData.length > 146) {
+      this.tooManyKidsError.push(
+        `The number of kids scheduled for camp is ${this.campData.length}, but 146 or less are required`
+      );
+    }
+    return this.tooManyKidsError.length !== 0;
   }
 
   numOfFields(): boolean {
@@ -132,6 +145,13 @@ export class DataErrorHandler {
         errorList: this.notEnoughKidsError,
       };
       errorList.push(notEnoughKidsObj);
+    }
+    if (this.tooManyKidsError.length !== 0) {
+      const tooManyKidsObj: ErrorData = {
+        header: this.tooManyKidsHeader.toUpperCase(),
+        errorList: this.tooManyKidsError,
+      };
+      errorList.push(tooManyKidsObj);
     }
     return errorList;
   }
