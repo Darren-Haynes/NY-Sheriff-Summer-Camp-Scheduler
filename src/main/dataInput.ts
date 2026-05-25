@@ -125,20 +125,6 @@ export class DataErrorHandler {
      * all errors found for that category of error.
      */
     const errorList: ErrorData[] = [];
-    if (this.numOfFieldsError.length !== 0) {
-      const fieldsObj: ErrorData = {
-        header: this.fieldsErrorHeader.toUpperCase(),
-        errorList: this.numOfFieldsError,
-      };
-      errorList.push(fieldsObj);
-    }
-    if (this.activityError.length !== 0) {
-      const activityObj: ErrorData = {
-        header: this.activityErrorHeader.toUpperCase(),
-        errorList: this.activityError,
-      };
-      errorList.push(activityObj);
-    }
     if (this.notEnoughKidsError.length !== 0) {
       const notEnoughKidsObj: ErrorData = {
         header: this.notEnoughKidsHeader.toUpperCase(),
@@ -152,6 +138,20 @@ export class DataErrorHandler {
         errorList: this.tooManyKidsError,
       };
       errorList.push(tooManyKidsObj);
+    }
+    if (this.numOfFieldsError.length !== 0) {
+      const fieldsObj: ErrorData = {
+        header: this.fieldsErrorHeader.toUpperCase(),
+        errorList: this.numOfFieldsError,
+      };
+      errorList.push(fieldsObj);
+    }
+    if (this.activityError.length !== 0) {
+      const activityObj: ErrorData = {
+        header: this.activityErrorHeader.toUpperCase(),
+        errorList: this.activityError,
+      };
+      errorList.push(activityObj);
     }
     return errorList;
   }
