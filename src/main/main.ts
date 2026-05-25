@@ -52,6 +52,7 @@ const createWindow = (): void => {
       dataErrors.numOfFields(),
       dataErrors.wrongActivity(),
       dataErrors.notEnoughKids(),
+      dataErrors.tooManyKids(),
     ];
     if (!allErrors.every(item => item === false)) {
       mainWindow.webContents.send('error-list', JSON.stringify(dataErrors.getErrorList()));
@@ -71,6 +72,7 @@ const createWindow = (): void => {
       dataErrors.numOfFields(),
       dataErrors.wrongActivity(),
       dataErrors.notEnoughKids(),
+      dataErrors.tooManyKids(),
     ];
     if (!allErrors.every(item => item === false)) {
       mainWindow.webContents.send('error-list', JSON.stringify(dataErrors.getErrorList()));
