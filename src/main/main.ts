@@ -50,7 +50,8 @@ const createWindow = (): void => {
     if (!allErrors.every(item => item === false)) {
       mainWindow.webContents.send('error-list', JSON.stringify(dataErrors.getErrorList()));
     } else {
-      scheduleKids(data);
+      const result = scheduleKids(data);
+      mainWindow.webContents.send('result-list', JSON.stringify(result));
     }
   });
 
@@ -60,7 +61,8 @@ const createWindow = (): void => {
     if (!allErrors.every(item => item === false)) {
       mainWindow.webContents.send('error-list', JSON.stringify(dataErrors.getErrorList()));
     } else {
-      scheduleKids(data);
+      const result = scheduleKids(data);
+      mainWindow.webContents.send('result-list', JSON.stringify(result));
     }
   });
 
@@ -71,7 +73,8 @@ const createWindow = (): void => {
 const scheduleKids = (data: string) => {
   const kids = new Kids(data);
   const camp = new Camp(kids);
-  const result = camp.waterFirst.runAlgo();
+  camp.waterFirst.runAlgo();
+  return camp.waterFirst;
 };
 
 const handleErrors = (data: string) => {

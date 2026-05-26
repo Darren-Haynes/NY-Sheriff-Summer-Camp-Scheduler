@@ -101,7 +101,8 @@ Input Sections
 }
 
 #input-box,
-#error-box {
+#error-box,
+#result-box {
   background: linear-gradient(
     338deg,
     rgba(101, 165, 204, 0.8) 0%,
@@ -121,6 +122,12 @@ Input Sections
 #error-box {
   background: rgba(255, 255, 255, 0.85);
   border-color: #bf272d;
+  flex-direction: column;
+}
+
+#result-box {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(0, 108, 120, 0.8);
   flex-direction: column;
 }
 
