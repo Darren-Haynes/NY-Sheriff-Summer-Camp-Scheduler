@@ -37,6 +37,8 @@ export class DataErrorHandler {
   fieldsErrorHeader: string;
   activityError: string[];
   activityErrorHeader: string;
+  duplicateChoiceError: string[];
+  duplicateChoiceErrorHeader: string;
   notEnoughKidsError: string[];
   notEnoughKidsHeader: string;
   tooManyKidsError: string[];
@@ -51,6 +53,8 @@ export class DataErrorHandler {
     this.fieldsErrorHeader = `The Following rows have too few or too many columns`;
     this.activityError = [];
     this.activityErrorHeader = `The Following Fields Contain Incorrect Activity Names`;
+    this.duplicateChoiceError = [];
+    this.duplicateChoiceErrorHeader = `The Following kids have chosen the same activity twice`;
     this.notEnoughKidsError = [];
     this.notEnoughKidsHeader = `There are not enough kids scheduled for the camp`;
     this.tooManyKidsError = [];
@@ -119,6 +123,21 @@ export class DataErrorHandler {
   }
 
   // Let's see if we can get merge right this time.
+  duplicateChoice(): boolean {
+    /**
+     * Check that no activity is chosen more than once.
+     */
+    this.campData.forEach((row, rowNum) => {
+      const choices = row.slice(3, 9);
+      const uniqueChoices = new Set(choices);
+      if (choices.length !== uniqueChoices.size) {
+        const errorMsg = `Row ${rowNum + 2}; duplicate choice`;
+        this.duplicateChoiceError.push(errorMsg);
+      }
+    });
+    return this.duplicateChoiceError.length !== 0;
+  }
+
   getErrorList(): ErrorData[] {
     /**
      * Return list of all errors found. Each list item is an object that contains
@@ -153,6 +172,13 @@ export class DataErrorHandler {
         errorList: this.activityError,
       };
       errorList.push(activityObj);
+    }
+    if (this.duplicateChoiceError.length !== 0) {
+      const duplicateChoiceObj: errorData = {
+        header: this.duplicateChoiceErrorHeader.toUpperCase(),
+        errorList: this.duplicateChoiceError,
+      };
+      errorList.push(duplicateChoiceObj);
     }
     return errorList;
   }
