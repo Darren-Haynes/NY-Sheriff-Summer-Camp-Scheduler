@@ -46,17 +46,7 @@ const createWindow = (): void => {
       s = s.replace(/","|",|,"/g, '\t');
       data += s + '\n';
     });
-<<<<<<< HEAD
-    const { campData, headerRow } = dataParser(data);
-    const dataErrors = new DataErrorHandler(campData, headerRow);
-    const allErrors: boolean[] = [
-      dataErrors.numOfFields(),
-      dataErrors.wrongActivity(),
-      dataErrors.duplicateChoice(),
-    ];
-=======
     const { allErrors, dataErrors } = handleErrors(data);
->>>>>>> data-testing
     if (!allErrors.every(item => item === false)) {
       mainWindow.webContents.send('error-list', JSON.stringify(dataErrors.getErrorList()));
     } else {
