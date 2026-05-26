@@ -122,6 +122,7 @@ export class DataErrorHandler {
     return this.activityError.length !== 0;
   }
 
+  // Let's see if we can get merge right this time.
   duplicateChoice(): boolean {
     /**
      * Check that no activity is chosen more than once.
