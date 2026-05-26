@@ -39,6 +39,10 @@ export class DataErrorHandler {
   activityErrorHeader: string;
   duplicateChoiceError: string[];
   duplicateChoiceErrorHeader: string;
+  notEnoughKidsError: string[];
+  notEnoughKidsHeader: string;
+  tooManyKidsError: string[];
+  tooManyKidsHeader: string;
   campData: string[][];
   headerRow: boolean;
 
@@ -51,6 +55,28 @@ export class DataErrorHandler {
     this.activityErrorHeader = `The Following Fields Contain Incorrect Activity Names`;
     this.duplicateChoiceError = [];
     this.duplicateChoiceErrorHeader = `The Following kids have chosen the same activity twice`;
+    this.notEnoughKidsError = [];
+    this.notEnoughKidsHeader = `There are not enough kids scheduled for the camp`;
+    this.tooManyKidsError = [];
+    this.tooManyKidsHeader = `There are too many kids scheduled for the camp`;
+  }
+
+  notEnoughKids(): boolean {
+    if (this.campData.length < 50) {
+      this.notEnoughKidsError.push(
+        `The number of kids scheduled for camp is ${this.campData.length}, but 50 or more are required`
+      );
+    }
+    return this.notEnoughKidsError.length !== 0;
+  }
+
+  tooManyKids(): boolean {
+    if (this.campData.length > 146) {
+      this.tooManyKidsError.push(
+        `The number of kids scheduled for camp is ${this.campData.length}, but 146 or less are required`
+      );
+    }
+    return this.tooManyKidsError.length !== 0;
   }
 
   numOfFields(): boolean {
@@ -111,13 +137,27 @@ export class DataErrorHandler {
     return this.duplicateChoiceError.length !== 0;
   }
 
-  getErrorList(): errorData[] {
+  getErrorList(): ErrorData[] {
     /**
      * Return list of all errors found. Each list item is an object that contains
      * a header that describes the type of error and then an enumerated list of
      * all errors found for that category of error.
      */
     const errorList: ErrorData[] = [];
+    if (this.notEnoughKidsError.length !== 0) {
+      const notEnoughKidsObj: ErrorData = {
+        header: this.notEnoughKidsHeader.toUpperCase(),
+        errorList: this.notEnoughKidsError,
+      };
+      errorList.push(notEnoughKidsObj);
+    }
+    if (this.tooManyKidsError.length !== 0) {
+      const tooManyKidsObj: ErrorData = {
+        header: this.tooManyKidsHeader.toUpperCase(),
+        errorList: this.tooManyKidsError,
+      };
+      errorList.push(tooManyKidsObj);
+    }
     if (this.numOfFieldsError.length !== 0) {
       const fieldsObj: ErrorData = {
         header: this.fieldsErrorHeader.toUpperCase(),
