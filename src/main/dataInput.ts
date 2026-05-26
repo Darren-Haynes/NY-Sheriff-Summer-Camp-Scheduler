@@ -118,6 +118,7 @@ export class DataErrorHandler {
     return this.activityError.length !== 0;
   }
 
+  // Let's see if we can get merge right this time.
   getErrorList(): ErrorData[] {
     /**
      * Return list of all errors found. Each list item is an object that contains
