@@ -46,6 +46,7 @@ const createWindow = (): void => {
       s = s.replace(/","|",|,"/g, '\t');
       data += s + '\n';
     });
+<<<<<<< HEAD
     const { campData, headerRow } = dataParser(data);
     const dataErrors = new DataErrorHandler(campData, headerRow);
     const allErrors: boolean[] = [
@@ -53,27 +54,46 @@ const createWindow = (): void => {
       dataErrors.wrongActivity(),
       dataErrors.duplicateChoice(),
     ];
+=======
+    const { allErrors, dataErrors } = handleErrors(data);
+>>>>>>> data-testing
     if (!allErrors.every(item => item === false)) {
       mainWindow.webContents.send('error-list', JSON.stringify(dataErrors.getErrorList()));
     } else {
-      const kids = new Kids(data);
-      const camp = new Camp(kids);
-      const result = camp.waterFirst.runAlgo();
-      console.log(result);
+      scheduleKids(data);
     }
   });
 
   // Handle input via the pastebox
   ipcMain.handle('submit-text', async (event, data) => {
-    const { campData, headerRow } = dataParser(data);
-    const dataErrors = new DataErrorHandler(campData, headerRow);
-    const allErrors: boolean[] = [dataErrors.numOfFields(), dataErrors.wrongActivity()];
+    const { allErrors, dataErrors } = handleErrors(data);
     if (!allErrors.every(item => item === false)) {
       mainWindow.webContents.send('error-list', JSON.stringify(dataErrors.getErrorList()));
+    } else {
+      scheduleKids(data);
     }
   });
+
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
+};
+
+const scheduleKids = (data: string) => {
+  const kids = new Kids(data);
+  const camp = new Camp(kids);
+  const result = camp.waterFirst.runAlgo();
+};
+
+const handleErrors = (data: string) => {
+  const { campData, headerRow } = dataParser(data);
+  const dataErrors = new DataErrorHandler(campData, headerRow);
+  const allErrors: boolean[] = [
+    dataErrors.numOfFields(),
+    dataErrors.wrongActivity(),
+    dataErrors.notEnoughKids(),
+    dataErrors.tooManyKids(),
+  ];
+  return { allErrors, dataErrors };
 };
 
 // This method will be called when Electron has finished
