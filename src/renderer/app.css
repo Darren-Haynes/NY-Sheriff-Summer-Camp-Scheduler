@@ -133,11 +133,8 @@ Input Sections
   width: 85%;
   max-width: 1200px;
   background: rgba(255, 255, 255, 0.85);
-  border-color: #125e68;
-  border-width: 8px;
-  flex-direction: column;
-  overflow-y: scroll;
-  scrollbar-width: none;
+  border-color: white;
+  border-width: 10px;
 }
 
 #error-heading,
@@ -154,8 +151,8 @@ Input Sections
 }
 
 #result-heading {
-  margin-top: 10px;
-  margin-left: 0;
+  margin-top: -10px;
+  width: 20px;
   text-align: center;
 }
 
@@ -186,12 +183,23 @@ button:hover {
 
 #text-box {
   box-sizing: border-box;
-  width: 75%;
+  width: 85%;
+  overflow-y: scroll;
 }
 
-#text-box-btns {
+#text-box-btns,
+#result-box-btns-container {
   flex-direction: column;
   width: 200px;
+}
+
+#result-box-btns {
+  /*align-items: center;*/
+  margin-left: 9px;
+}
+
+#result-box-btns-container {
+  margin-top: 20px;
 }
 
 #error-box-btn {
@@ -234,6 +242,13 @@ button:hover {
   box-sizing: border-box;
   border: 15px solid #fff;
   border-radius: 8px;
+}
+
+#result-textarea {
+  width: 95%;
+  height: 0vh;
+  resize: none;
+  box-sizing: border-box;
 }
 
 #error-textarea {
