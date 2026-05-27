@@ -1,4 +1,4 @@
-import React from 'react';
+import { copySchedule } from './ipcFunctions';
 import TimeSlot from './timeSlots';
 
 interface ToggleProps {
@@ -74,7 +74,7 @@ const ResultBox: React.FC<ToggleProps> = ({ isVisible, onToggle, result }) => {
             Export 📤
           </button>
           <button
-            // onClick={submitTextboxContent}
+            onClick={() => copySchedule(result, waterActs, land9amActs, land10amActs)}
             type="button"
             id="submit-btn"
             className="paste-box-btns fade-in-5s"

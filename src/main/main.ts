@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, clipboard } from 'electron';
 import Excel from 'exceljs';
 import { dataParser, DataErrorHandler } from './dataInput';
 import { Camp } from './camp';
@@ -66,6 +66,10 @@ const createWindow = (): void => {
     }
   });
 
+  ipcMain.handle('copy-schedule', async (event, data) => {
+    clipboard.writeText(data);
+    return true;
+  });
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
 };
