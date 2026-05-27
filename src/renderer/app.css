@@ -133,6 +133,8 @@ Input Sections
   background: rgba(255, 255, 255, 0.85);
   border-color: rgba(0, 108, 120, 0.8);
   flex-direction: column;
+  overflow-y: scroll;
+  scrollbar-width: none;
 }
 
 #error-heading,
