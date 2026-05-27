@@ -60,9 +60,13 @@ const resultBox: React.FC<ToggleProps> = ({ isVisible, onToggle, result }) => {
   const allText = waterText + landText9am + landText10am;
   return (
     <div id="result-box">
-      <h3 id="result-heading">Camp Schedule:</h3>
-      <div id="error-content">
-        <textarea id="error-textarea" value={allText}></textarea>
+      <h2 id="result-heading">Camp Schedule:</h2>
+      <h3 className="result-heading-sub">Water 9am</h3>
+      <h3 className="result-heading-sub">Water 10am</h3>
+      <h3 className="result-heading-sub">Land 9am</h3>
+      <h3 className="result-heading-sub">Land 10am</h3>
+      <div id="result-content">
+        <div>{allText}</div>
       </div>
     </div>
   );
