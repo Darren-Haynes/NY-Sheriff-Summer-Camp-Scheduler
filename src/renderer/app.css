@@ -37,6 +37,10 @@ h1 {
   margin-top: 22px;
 }
 
+h4 {
+  font-size: 20px;
+}
+
 #logo {
   position: fixed;
   left: calc(50vw - 99.5px);
@@ -126,9 +130,11 @@ Input Sections
 }
 
 #result-box {
+  width: 85%;
+  max-width: 1200px;
   background: rgba(255, 255, 255, 0.85);
-  border-color: rgba(0, 108, 120, 0.8);
-  flex-direction: column;
+  border-color: white;
+  border-width: 10px;
 }
 
 #error-heading,
@@ -139,7 +145,19 @@ Input Sections
   margin-top: 28px;
 }
 
-#error-content {
+.result-heading-sub {
+  font-size: 1.2rem;
+  padding-left: 20px;
+}
+
+#result-heading {
+  margin-top: -10px;
+  width: 20px;
+  text-align: center;
+}
+
+#error-content,
+result-content {
   margin-left: 35px;
   height: 95%;
 }
@@ -165,12 +183,23 @@ button:hover {
 
 #text-box {
   box-sizing: border-box;
-  width: 75%;
+  width: 85%;
+  overflow-y: scroll;
 }
 
-#text-box-btns {
+#text-box-btns,
+#result-box-btns-container {
   flex-direction: column;
   width: 200px;
+}
+
+#result-box-btns {
+  /*align-items: center;*/
+  margin-left: 9px;
+}
+
+#result-box-btns-container {
+  margin-top: 20px;
 }
 
 #error-box-btn {
@@ -213,6 +242,13 @@ button:hover {
   box-sizing: border-box;
   border: 15px solid #fff;
   border-radius: 8px;
+}
+
+#result-textarea {
+  width: 95%;
+  height: 0vh;
+  resize: none;
+  box-sizing: border-box;
 }
 
 #error-textarea {
