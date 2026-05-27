@@ -18,7 +18,7 @@ const PasteBox: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
 
       <div id="text-box-btns">
         <button
-          onClick={() => onToggle('input-options')}
+          onClick={() => onToggle('input-box')}
           type="button"
           id="close-btn"
           className="paste-box-btns fade-in-1s"
