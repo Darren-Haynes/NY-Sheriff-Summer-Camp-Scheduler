@@ -12,7 +12,16 @@ const TimeSlot = ({
   result: typeof Schedule;
 }) => {
   const joinNames = (names: string[]): string => {
-    return names.length === 0 ? 'No kids scheduled' : names.join(', ');
+    if (names.length === 0) {
+      return 'No kids scheduled';
+    }
+    let nameOrder = '';
+    names.forEach(name => {
+      const [last, first] = name.split(/\s+/);
+      const inOrder = `${first} ${last}, `;
+      nameOrder += inOrder;
+    });
+    return nameOrder.slice(0, -2);
   };
 
   return (
@@ -21,7 +30,7 @@ const TimeSlot = ({
       <ul>
         {activities.map((item, index) => (
           <li key={index}>
-            {item}
+            {item} {result[timeSlot][item].length}
             <p>{joinNames(result[timeSlot][item])}</p>
           </li>
         ))}

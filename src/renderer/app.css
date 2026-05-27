@@ -130,8 +130,11 @@ Input Sections
 }
 
 #result-box {
+  width: 85%;
+  max-width: 1200px;
   background: rgba(255, 255, 255, 0.85);
-  border-color: rgba(0, 108, 120, 0.8);
+  border-color: #125e68;
+  border-width: 8px;
   flex-direction: column;
   overflow-y: scroll;
   scrollbar-width: none;
