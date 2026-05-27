@@ -131,7 +131,8 @@ Input Sections
   flex-direction: column;
 }
 
-#error-heading {
+#error-heading,
+#result-heading {
   flex-grow: 3;
   height: 10px;
   margin-left: 35px;
