@@ -1,4 +1,5 @@
 import { app, BrowserWindow, dialog, ipcMain, clipboard } from 'electron';
+import fs from 'fs';
 import Excel from 'exceljs';
 import { dataParser, DataErrorHandler } from './dataInput';
 import { Camp } from './camp';
@@ -69,6 +70,37 @@ const createWindow = (): void => {
   ipcMain.handle('copy-schedule', async (event, data) => {
     clipboard.writeText(data);
     mainWindow.webContents.send('clipboard-content', 'notification-box');
+  });
+
+  ipcMain.handle('export-excel', async (event, data) => {
+    // 1. Create a new workbook
+    const workbook = new Excel.Workbook();
+
+    // 2. Add a worksheet
+    const worksheet = workbook.addWorksheet('My Sheet');
+
+    // 3. Define columns (optional but recommended for object-based row addition)
+    worksheet.columns = [
+      { header: 'Id', key: 'id', width: 10 },
+      { header: 'Name', key: 'name', width: 32 },
+      { header: 'Date', key: 'date', width: 15 },
+    ];
+
+    // 4. Add data rows
+    worksheet.addRow({ id: 1, name: 'John Doe', date: new Date() });
+    worksheet.addRow({ id: 2, name: 'Jane Smith', date: new Date() });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    // 5. Save the workbook to the file system
+    // await workbook.xlsx.writeFile('output.xlsx');
+    const { filePath, canceled } = await dialog.showSaveDialog({
+      title: 'Save Workbook',
+      filters: [{ name: 'Excel Files', extensions: ['xlsx'] }],
+    });
+    if (!canceled && filePath) {
+      fs.writeFileSync(filePath, buffer);
+      console.log('File saved successfully');
+    }
   });
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
