@@ -68,7 +68,7 @@ const createWindow = (): void => {
 
   ipcMain.handle('copy-schedule', async (event, data) => {
     clipboard.writeText(data);
-    return true;
+    mainWindow.webContents.send('clipboard-content', 'notification-box');
   });
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
