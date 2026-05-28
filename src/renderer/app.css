@@ -123,6 +123,18 @@ Input Sections
   margin-bottom: 5px;
 }
 
+#notification-box {
+  background: rgba(255, 255, 255, 0.85);
+  border: 2px solid green;
+  box-sizing: border-box;
+  padding: 5px;
+  position: fixed;
+  top: 20px;
+  right: 10px;
+  color: green;
+  line-height: 0;
+}
+
 #error-box {
   background: rgba(255, 255, 255, 0.85);
   border-color: #bf272d;
@@ -294,6 +306,10 @@ Input Box Transitions
   animation-duration: 5s;
 }
 
+.fade-out-5s-stay {
+  animation: fade-out 5s ease forwards;
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -304,6 +320,15 @@ Input Box Transitions
   }
 }
 
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
 /*
 FOOTER
 */
