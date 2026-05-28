@@ -72,36 +72,73 @@ const createWindow = (): void => {
     mainWindow.webContents.send('clipboard-content', 'notification-box');
   });
 
-  ipcMain.handle('export-excel', async (event, data) => {
-    // 1. Create a new workbook
-    const workbook = new Excel.Workbook();
+  ipcMain.handle(
+    'export-excel',
+    async (event, result, waterActs: string[], land9amActs: string[], land10amActs: string[]) => {
+      const workbook = new Excel.Workbook();
+      const activityWS = workbook.addWorksheet('By Activity');
 
-    // 2. Add a worksheet
-    const worksheet = workbook.addWorksheet('My Sheet');
+      // Define columns (optional but recommended for object-based row addition)
+      activityWS.columns = [
+        { header: 'Activity Time', key: 'time', width: 15 },
+        { header: 'Activity', key: 'activity', width: 12 },
+        { header: 'Kid Count', key: 'count', width: 10 },
+        { header: 'Names', key: 'names', width: 200 },
+      ];
 
-    // 3. Define columns (optional but recommended for object-based row addition)
-    worksheet.columns = [
-      { header: 'Id', key: 'id', width: 10 },
-      { header: 'Name', key: 'name', width: 32 },
-      { header: 'Date', key: 'date', width: 15 },
-    ];
+      // Add data rows
+      for (const activity of waterActs) {
+        const kids = result['water9am'][activity];
+        const kidsCount = kids.length;
+        activityWS.addRow({
+          time: 'Water 9AM',
+          activity: activity,
+          count: kidsCount,
+          names: kids.join(', '),
+        });
+      }
+      for (const activity of waterActs) {
+        const kids = result['water9am'][activity];
+        const kidsCount = kids.length;
+        activityWS.addRow({
+          time: 'Water 10AM',
+          activity: activity,
+          count: kidsCount,
+          names: kids.join(', '),
+        });
+      }
+      for (const activity of land9amActs) {
+        const kids = result['land9am'][activity];
+        const kidsCount = kids.length;
+        activityWS.addRow({
+          time: 'Land 9AM',
+          activity: activity,
+          count: kidsCount,
+          names: kids.join(', '),
+        });
+      }
+      for (const activity of land10amActs) {
+        const kids = result['land10am'][activity];
+        const kidsCount = kids.length;
+        activityWS.addRow({
+          time: 'Land 10AM',
+          activity: activity,
+          count: kidsCount,
+          names: kids.join(', '),
+        });
+      }
 
-    // 4. Add data rows
-    worksheet.addRow({ id: 1, name: 'John Doe', date: new Date() });
-    worksheet.addRow({ id: 2, name: 'Jane Smith', date: new Date() });
-
-    const buffer = await workbook.xlsx.writeBuffer();
-    // 5. Save the workbook to the file system
-    // await workbook.xlsx.writeFile('output.xlsx');
-    const { filePath, canceled } = await dialog.showSaveDialog({
-      title: 'Save Workbook',
-      filters: [{ name: 'Excel Files', extensions: ['xlsx'] }],
-    });
-    if (!canceled && filePath) {
-      fs.writeFileSync(filePath, buffer);
-      console.log('File saved successfully');
+      const buffer = await workbook.xlsx.writeBuffer();
+      const { filePath, canceled } = await dialog.showSaveDialog({
+        title: 'Save NY Kids Camp Workbook',
+        filters: [{ name: 'Excel Files', extensions: ['xlsx'] }],
+      });
+      if (!canceled && filePath) {
+        fs.writeFileSync(filePath, buffer);
+        console.log('File saved successfully');
+      }
     }
-  });
+  );
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
 };
