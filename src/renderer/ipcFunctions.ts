@@ -83,7 +83,7 @@ export const exportToExcel = (
   // const water10amText = timeSlotData(result, waterActs, 'WATER 10AM', 'water10am');
   // const land9amText = timeSlotData(result, land9amActs, 'LAND 9AM', 'land9am');
   // const land10amText = timeSlotData(result, land10amActs, 'LAND 10AM', 'land10am');
-  const reply = window.textAPI.export_excel('some message');
+  const reply = window.textAPI.export_excel(result, waterActs, land9amActs, land10amActs);
   reply
     .then((value): string[] => {
       console.log(value);
