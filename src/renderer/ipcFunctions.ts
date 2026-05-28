@@ -72,3 +72,25 @@ export const copySchedule = (
     });
   // return water9amText;
 };
+
+export const exportToExcel = (
+  result,
+  waterActs: string[],
+  land9amActs: string[],
+  land10amActs: string[]
+) => {
+  // const water9amText = timeSlotData(result, waterActs, 'WATER 9AM', 'water9am');
+  // const water10amText = timeSlotData(result, waterActs, 'WATER 10AM', 'water10am');
+  // const land9amText = timeSlotData(result, land9amActs, 'LAND 9AM', 'land9am');
+  // const land10amText = timeSlotData(result, land10amActs, 'LAND 10AM', 'land10am');
+  const reply = window.textAPI.export_excel('some message');
+  reply
+    .then((value): string[] => {
+      console.log(value);
+      return value;
+    })
+    .catch(error => {
+      console.error('Promise rejected with:', error);
+    });
+  // return water9amText;
+};
