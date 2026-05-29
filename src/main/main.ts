@@ -52,6 +52,7 @@ const createWindow = (): void => {
       mainWindow.webContents.send('error-list', JSON.stringify(dataErrors.getErrorList()));
     } else {
       const result = scheduleKids(data);
+      result.schedule = Object.fromEntries(result.schedule);
       mainWindow.webContents.send('result-list', JSON.stringify(result));
     }
   });
@@ -86,45 +87,59 @@ const createWindow = (): void => {
         { header: 'Names', key: 'names', width: 200 },
       ];
 
+      const allActivities = waterActs.concat(waterActs, land9amActs, land10amActs);
+      const activityTimes = Array(waterActs.length)
+        .fill('Water 9AM')
+        .concat(
+          Array(waterActs.length).fill('Water 10AM'),
+          Array(land9amActs.length).fill('Land 9AM'),
+          Array(land10amActs.length).fill('Land 10AM')
+        );
+
       // Add data rows
-      for (const activity of waterActs) {
-        const kids = result['water9am'][activity];
+      for (let i = 0; i < allActivities.length; i++) {
+        const timeSlot = activityTimes[i].toLowerCase().replaceAll(' ', '');
+        const kids = result[timeSlot][allActivities[i]];
         const kidsCount = kids.length;
         activityWS.addRow({
-          time: 'Water 9AM',
-          activity: activity,
+          time: activityTimes[i],
+          activity: allActivities[i],
           count: kidsCount,
-          names: kids.join(', '),
+          names: joinNames(kids),
         });
       }
-      for (const activity of waterActs) {
-        const kids = result['water9am'][activity];
-        const kidsCount = kids.length;
-        activityWS.addRow({
-          time: 'Water 10AM',
-          activity: activity,
-          count: kidsCount,
-          names: kids.join(', '),
-        });
-      }
-      for (const activity of land9amActs) {
-        const kids = result['land9am'][activity];
-        const kidsCount = kids.length;
-        activityWS.addRow({
-          time: 'Land 9AM',
-          activity: activity,
-          count: kidsCount,
-          names: kids.join(', '),
-        });
-      }
-      for (const activity of land10amActs) {
-        const kids = result['land10am'][activity];
-        const kidsCount = kids.length;
-        activityWS.addRow({
-          time: 'Land 10AM',
-          activity: activity,
-          count: kidsCount,
-          names: kids.join(', '),
+
+      const nameWS = workbook.addWorksheet('By Name');
+
+      // Define columns (optional but recommended for object-based row addition)
+      nameWS.columns = [
+        { header: 'Name', key: 'name', width: 25 },
+        { header: 'Water Time', key: 'waterTime', width: 15 },
+        { header: 'Water Activity', key: 'waterActivity', width: 12 },
+        { header: 'Land Time', key: 'landTime', width: 15 },
+        { header: 'Land Activity', key: 'landActivity', width: 12 },
+      ];
+
+      for (const name of result.kids.names.sort()) {
+        let waterTime = '10am';
+        let waterActivity = result['schedule'][name]['timeSlots']['water10am'];
+        if (result['schedule'][name]['timeSlots']['water9am'] !== null) {
+          waterTime = '9am';
+          waterActivity = result['schedule'][name]['timeSlots']['water9am'];
+        }
+        let landTime = '10am';
+        let landActivity = result['schedule'][name]['timeSlots']['land10am'];
+        if (result['schedule'][name]['timeSlots']['land9am'] !== null) {
+          landTime = '9am';
+          landActivity = result['schedule'][name]['timeSlots']['land9am'];
+        }
+
+        nameWS.addRow({
+          name: name,
+          waterTime: waterTime,
+          waterActivity: waterActivity,
+          landTime: landTime,
+          landActivity: landActivity,
         });
       }
 
@@ -135,12 +150,24 @@ const createWindow = (): void => {
       });
       if (!canceled && filePath) {
         fs.writeFileSync(filePath, buffer);
-        console.log('File saved successfully');
       }
     }
   );
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
+};
+
+const joinNames = (names: string[]): string => {
+  if (names.length === 0) {
+    return 'No kids scheduled';
+  }
+  let nameOrder = '';
+  names.forEach(name => {
+    const [last, first] = name.split(/\s+/);
+    const inOrder = `${first} ${last}, `;
+    nameOrder += inOrder;
+  });
+  return nameOrder.slice(0, -2);
 };
 
 const scheduleKids = (data: string) => {
