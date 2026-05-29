@@ -1,4 +1,4 @@
-import { copySchedule } from './ipcFunctions';
+import { copySchedule, exportToExcel } from './ipcFunctions';
 import TimeSlot from './timeSlots';
 
 interface ToggleProps {
@@ -66,7 +66,7 @@ const ResultBox: React.FC<ToggleProps> = ({ isVisible, onToggle, result }) => {
             Close ❌
           </button>
           <button
-            // onClick={fileUpload}
+            onClick={() => exportToExcel(result, waterActs, land9amActs, land10amActs)}
             type="button"
             id="upload-btn-2"
             className="paste-box-btns fade-in-3s"
