@@ -47,6 +47,8 @@ export class Schedule {
   scheduled9amLand: ScheduledLand9am;
   scheduled10amWater: ScheduledWater;
   scheduled10amLand: ScheduledLand10am;
+  landChoicesPercentages: number[];
+  waterChoicesPercentages: number[];
   algo: string;
   water9am: WaterKids;
   water10am: WaterKids;
@@ -220,8 +222,8 @@ export class Schedule {
     const namesChoice: string[] = [];
     for (const [activity, names] of Object.entries(activityTypeTimeSlot)) {
       names.forEach((name) => {
-        const kidData = this.kids[name]
-        if (kidData.choices[choice] === activity) {
+        const kidData = this.kids.choices[name]
+        if (kidData[choice] === activity) {
           namesChoice.push(name);
         }
       })
@@ -2220,6 +2222,91 @@ export class Schedule {
     return true;
   }
 
+  /**
+    * Get the percentage of kids who got the activity they wanted for their 1st, 2nd, 3rd or no choices.
+    * @param {string} activityType - only 2 options: 'land' or 'water'.
+    * @returns {void}
+    */
+  private calculateChoicesPercentages(activityType: AllowedActivityTypes): void {
+    const firstChoices9am: string[] = this.getScheduledChoicesNames(activityType, '9am', 1)
+    const firstChoices10am: string[] = this.getScheduledChoicesNames(activityType, '10am', 1)
+    const secondChoices9am: string[] = this.getScheduledChoicesNames(activityType, '9am', 2)
+    const secondChoices10am: string[] = this.getScheduledChoicesNames(activityType, '10am', 2)
+    const thirdChoices9am: string[] = this.getScheduledChoicesNames(activityType, '9am', 3)
+    const thirdChoices10am: string[] = this.getScheduledChoicesNames(activityType, '10am', 3)
+    const noChoices: string[]  = this.kids.names.filter(item => ![...firstChoices9am, ...firstChoices10am, ...secondChoices9am, ...secondChoices10am, ...thirdChoices9am, ...thirdChoices10am].includes(item));
+
+    const firstChoicesPercentDecimal = ((firstChoices9am.length + firstChoices10am.length) / this.kids.count) * 100
+    const secondChoicesPercentDecimal = ((secondChoices9am.length + secondChoices10am.length) / this.kids.count) * 100
+    const thirdChoicesPercentDecimal = ((thirdChoices9am.length + thirdChoices10am.length) / this.kids.count) * 100
+    const noChoicesPercentDecimal = (noChoices.length / this.kids.count) * 100
+
+    const AllPercentages: number[] = []
+    const firstChoicesPercent: number = Math.round(firstChoicesPercentDecimal)
+    AllPercentages.push(firstChoicesPercent)
+    const firstChoicesRemainder: number = Math.abs(firstChoicesPercentDecimal % 1)
+    const secondChoicesPercent: number = Math.round(secondChoicesPercentDecimal)
+    AllPercentages.push(secondChoicesPercent)
+    const secondChoicesRemainder: number = Math.abs(secondChoicesPercentDecimal % 1)
+    const thirdChoicesPercent: number = Math.round(thirdChoicesPercentDecimal)
+    AllPercentages.push(thirdChoicesPercent)
+    const thirdChoicesRemainder: number = Math.abs(thirdChoicesPercentDecimal % 1)
+    const noChoicesPercent: number = Math.round(noChoicesPercentDecimal)
+    AllPercentages.push(noChoicesPercent)
+    const noChoicesRemainder: number = Math.abs(noChoicesPercentDecimal % 1)
+
+    const totalPercent: number = firstChoicesPercent + secondChoicesPercent + thirdChoicesPercent + noChoicesPercent
+
+    if (totalPercent === 99) {
+      let greatestRemainder = firstChoicesRemainder;
+      let greatestRemainderIndex = 0;
+      let index = 0
+      const AllRemainders: number[] = [firstChoicesRemainder, secondChoicesRemainder, thirdChoicesRemainder, noChoicesRemainder];
+      for (const remainder of AllRemainders) {
+        if (remainder > greatestRemainder) {
+          greatestRemainder = remainder;
+          greatestRemainderIndex = index;
+        }
+        ++index;
+      }
+      AllPercentages[index] += 1
+    }
+
+    if (totalPercent === 101) {
+      let greatestRemainder = firstChoicesRemainder;
+      let greatestRemainderIndex = 0;
+      let index = 0
+      const AllRemainders: number[] = [firstChoicesRemainder, secondChoicesRemainder, thirdChoicesRemainder, noChoicesRemainder];
+      for (const remainder of AllRemainders) {
+        if (remainder < greatestRemainder) {
+          greatestRemainder = remainder;
+          greatestRemainderIndex = index;
+        }
+        ++index
+      }
+      AllPercentages[greatestRemainderIndex] -= 1
+    }
+
+    if (AllPercentages.reduce((accumulator, currentValue) => accumulator + currentValue, 0) !== 100) {
+      throw new Error('Percentages do not add up to 100')
+    }
+    if (activityType === 'land') {
+      this.landChoicesPercentages = AllPercentages
+    } else {
+      this.waterChoicesPercentages = AllPercentages
+    }
+  }
+
+  /**
+    * Get the land and water percentages of scheduled kids.
+    * @returns {object}
+    */
+  private stats(): object {
+    const landPercentages = this.calculateChoicesPercentages('land')
+    const waterPercentages = this.calculateChoicesPercentages('water')
+    return { landPercentages: landPercentages, waterPercentages: waterPercentages }
+  }
+
   runAlgo(): string {
     this.isLandFirst = false;
     console.log(`${this.algo} algorithm initiated`);
@@ -2289,6 +2376,7 @@ export class Schedule {
     }
 
     this.testScheduling('final log', 'end log')
+    this.stats()
     return 'Algo complete';
   }
 }
