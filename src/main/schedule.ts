@@ -364,27 +364,28 @@ export class Schedule {
 
   private removeNotChosenActivitiesFromScheduledNotFull(activityType: AllowedActivityTypes, scheduledNotFull: Map<string, number>, notScheduledAllNames: string[]): Map<string, number>{
     const activities = activityType === 'land' ? Schedule.LANDTYPES : Schedule.WATERTYPES;
-    const chosenList: string[] = new Array
+    const chosenList = new Set<string>();
     for (const name of notScheduledAllNames) {
       for (const activity of activities) {
         if (scheduledNotFull.has(this.kids.choices[name][activity])) {
-          if (chosenList.includes(this.kids.choices[name][activity])) {
+          if (chosenList.has(this.kids.choices[name][activity])) {
             continue
           }
-          chosenList.push(this.kids.choices[name][activity])
-          if (chosenList.length === scheduledNotFull.size) {
+          chosenList.add(this.kids.choices[name][activity])
+          if (chosenList.size === scheduledNotFull.size) {
             return scheduledNotFull
           }
         }
       }
     }
     for (const activity of scheduledNotFull.keys()) {
-      if (!chosenList.includes(activity)) {
+      if (!chosenList.has(activity)) {
         scheduledNotFull.delete(activity)
       }
     }
     return scheduledNotFull;
   }
+
 
   private getAllKidsChoicesByActivityType(name: string,activityType: AllowedActivityTypes): string[] {
     const activities = activityType === 'land' ? Schedule.LANDTYPES : Schedule.WATERTYPES;
