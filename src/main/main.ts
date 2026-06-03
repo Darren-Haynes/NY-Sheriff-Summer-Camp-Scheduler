@@ -173,8 +173,8 @@ const joinNames = (names: string[]): string => {
 const scheduleKids = (data: string) => {
   const kids = new Kids(data);
   const camp = new Camp(kids);
-  camp.waterFirst.runAlgo();
-  return camp.waterFirst;
+  camp.scheduleTheKids(100);
+  return camp.bestSchedule;
 };
 
 const handleErrors = (data: string) => {
