@@ -558,12 +558,13 @@ export class Schedule {
     for (let i = 0; i < choices.length; i++) {
       UNSCHEDULED_NAMES.forEach(kid => {
         const kidsData = this.kids.choices[kid]
-        // TODO fix type error
-        const activity = kidsData[ACTIVITY_TYPES[choices[i] - 1].toLowerCase();
+        const activity = kidsData[ACTIVITY_TYPES[choices[i] - 1].toLowerCase()] as string;
         if (activitiesChoicesCount.has(activity)) {
           const currentActivityCount = activitiesChoicesCount.get(activity);
-          const newActivityCount = currentActivityCount + 1;
-          activitiesChoicesCount.set(activity, newActivityCount);
+          if (currentActivityCount !== undefined) {
+            const newActivityCount = currentActivityCount + 1;
+            activitiesChoicesCount.set(activity, newActivityCount);
+          }
         }
       });
     }
@@ -576,9 +577,6 @@ export class Schedule {
    * @param {number[]} ChoiceNum - land or water choice 1, 2 or 3
    * @returns {string} - returns specific activity choice such as 'land1' or 'water3' etc.
    */
-  // TODO: choiceNum argument may cause a bug. The original argument passed in is called
-  // numOfChoices which refers to the number of choices between 1 or 2 or 3 total choices.
-
   private getKidsChoice(activityType: AllowedActivityTypes, choiceNum: AllowedChoiceNums): string {
     const ACTIVITY_TYPES = activityType === 'water' ? Schedule.WATERTYPES : Schedule.LANDTYPES;
       return ACTIVITY_TYPES[choiceNum - 1];
@@ -617,26 +615,6 @@ export class Schedule {
       }
     });
     return matchedKids;
-  }
-
-
-  /**
-   * Filter scheduled activities that are below (but not equal to) max capacity,
-   * so we can see which activities we can add more kids to.
-   * @param {string} activityType - only 2 options: 'land' or 'water'.
-   * @param {string} timeSlot - only 2 options -'9am' or '10am'
-   * @returns {Map<string, number>} - Map of activity names and their number open slots
-   */
-  private getActivitiesBelowMax(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): Map<string, number> {
-    const openSlots = new Map<string, number>();
-    const scheduledCount = Schedule.scheduledActivityCount(activityType, timeSlot, false)
-    for (const [activity, count] of scheduledCount) {
-      const activityMax = Activities.waterRanges[activity][1]
-      if (count < activityMax) {
-        openSlots.set(activity, activityMax - count);
-      }
-    }
-    return openSlots;
   }
 
   /**
