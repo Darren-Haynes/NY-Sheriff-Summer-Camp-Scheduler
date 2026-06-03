@@ -18,6 +18,23 @@ export class Camp {
     this.bestSchedule = null;
   }
 
+  private bestPercentagesSchedule(): Schedule {
+    let currBestSchedule = this.allRuns[0];
+    for (let i = 0; i < this.allRuns.length; i++) {
+      if (this.allRuns[i].waterPercentages[3] < currBestSchedule.waterPercentages[3]) {
+        currBestSchedule = this.allRuns[i];
+        continue;
+      }
+      if (
+        this.allRuns[i].waterPercentages[3] === currBestSchedule.waterPercentages[3] &&
+        this.allRuns[i].landPercentages[3] < currBestSchedule.landPercentages[3]
+      ) {
+        currBestSchedule = this.allRuns[i];
+      }
+    }
+    return currBestSchedule;
+  }
+
   /**
    * The schedule can be ran 1 to 100 times. Since there is randomness in the scheduling algorithm,
    * multiple runs are necessary to find the best schedule. Best meaning the schedule that gives
@@ -34,10 +51,6 @@ export class Camp {
       this.run.runAlgo();
       this.allRuns.push(this.run);
     }
-    for (let i = 0; i < this.allRuns.length; i++) {
-      console.log('Water Percentage', this.allRuns[i].waterPercentages);
-      console.log('Land Percentage', this.allRuns[i].landPercentages);
-    }
-    this.bestSchedule = this.allRuns[0];
+    this.bestSchedule = this.bestPercentagesSchedule();
   }
 }
