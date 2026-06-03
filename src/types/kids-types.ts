@@ -14,18 +14,12 @@ export type KidsData = Map<
 
 export interface KidsChoices {
   [key: string]: string;
-  art: string;
-  hike: string;
-  bball: string;
-  cheer: string;
-  soc: string;
-  vball: string;
-  arch: string;
-  pball: string;
-  lax: string;
-  fball: string;
-  yoga: string;
-  fris: string;
+  land1: string;
+  land2: string;
+  land3: string;
+  water1: string;
+  water2: string;
+  water3: string;
 }
 
 interface ActivityCounts {
@@ -36,6 +30,7 @@ interface ActivityCounts {
 }
 
 export interface WaterActivityCounts {
+  [key: string]: ActivityCounts;
   swim: ActivityCounts;
   fish: ActivityCounts;
   canoe: ActivityCounts;
@@ -46,6 +41,7 @@ export interface WaterActivityCounts {
 }
 
 export interface LandActivityCounts {
+  [key: string]: ActivityCounts;
   bball: ActivityCounts;
   vball: ActivityCounts;
   soc: ActivityCounts;
