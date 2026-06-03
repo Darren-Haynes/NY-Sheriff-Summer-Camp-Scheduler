@@ -12,14 +12,21 @@ export type KidsData = Map<
   }
 >;
 
-type KidsChoices = {
-  land1: string;
-  land2: string;
-  land3: string;
-  water1: string;
-  water2: string;
-  water3: string;
-};
+export interface KidsChoices {
+  [key: string]: string;
+  art: string;
+  hike: string;
+  bball: string;
+  cheer: string;
+  soc: string;
+  vball: string;
+  arch: string;
+  pball: string;
+  lax: string;
+  fball: string;
+  yoga: string;
+  fris: string;
+}
 
 interface ActivityCounts {
   total: number;

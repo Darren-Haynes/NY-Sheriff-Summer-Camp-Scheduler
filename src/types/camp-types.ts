@@ -34,20 +34,6 @@ export interface LandRanges {
   yoga: LandRangeType;
   fris: LandRangeType;
 }
-// export type LandRanges = {
-//   bball: Array<number>;
-//   vball: Array<number>;
-//   soc: Array<number>;
-//   arch: Array<number>;
-//   art: Array<number>;
-//   hike: Array<number>;
-//   cheer: Array<number>;
-//   pball: Array<number>;
-//   lax: Array<number>;
-//   fball: Array<number>;
-//   yoga: Array<number>;
-//   fris: Array<number>;
-// };
 
 export interface LandRanges9am {
   [key: string]: LandRangeType;
