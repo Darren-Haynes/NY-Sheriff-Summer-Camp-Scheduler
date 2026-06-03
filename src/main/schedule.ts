@@ -2262,33 +2262,34 @@ export class Schedule {
 
     const AllPercentages: number[] = []
     const firstChoicesPercent: number = Math.round(firstChoicesPercentDecimal)
-    AllPercentages.push(firstChoicesPercent)
     const firstChoicesRemainder: number = Math.abs(firstChoicesPercentDecimal % 1)
+    AllPercentages.push(firstChoicesPercent)
     const secondChoicesPercent: number = Math.round(secondChoicesPercentDecimal)
-    AllPercentages.push(secondChoicesPercent)
     const secondChoicesRemainder: number = Math.abs(secondChoicesPercentDecimal % 1)
+    AllPercentages.push(secondChoicesPercent)
     const thirdChoicesPercent: number = Math.round(thirdChoicesPercentDecimal)
-    AllPercentages.push(thirdChoicesPercent)
     const thirdChoicesRemainder: number = Math.abs(thirdChoicesPercentDecimal % 1)
+    AllPercentages.push(thirdChoicesPercent)
     const noChoicesPercent: number = Math.round(noChoicesPercentDecimal)
-    AllPercentages.push(noChoicesPercent)
     const noChoicesRemainder: number = Math.abs(noChoicesPercentDecimal % 1)
+    AllPercentages.push(noChoicesPercent)
 
     const totalPercent: number = firstChoicesPercent + secondChoicesPercent + thirdChoicesPercent + noChoicesPercent
 
     if (totalPercent === 99) {
       let greatestRemainder = firstChoicesRemainder;
       let greatestRemainderIndex = 0;
-      let index = 0
+      let index = 0;
       const AllRemainders: number[] = [firstChoicesRemainder, secondChoicesRemainder, thirdChoicesRemainder, noChoicesRemainder];
       for (const remainder of AllRemainders) {
-        if (remainder < greatestRemainder) {
+        // Find the largest remainder so we can add the missing percent to that bucket
+        if (remainder > greatestRemainder) {
           greatestRemainder = remainder;
           greatestRemainderIndex = index;
         }
         index++;
       }
-      AllPercentages[index] += 1
+      AllPercentages[greatestRemainderIndex] += 1;
     }
 
     if (totalPercent === 101) {
@@ -2305,10 +2306,12 @@ export class Schedule {
       }
       AllPercentages[greatestRemainderIndex] -= 1
       if (AllPercentages.reduce((accumulator, currentValue) => accumulator + currentValue, 0) !== 100) {
-        console.log('PERCENTAGES DO NOT ADD TO 100%')
-        console.log(`${activityType}: ${AllPercentages}`)
         throw new Error('Percentages do not add up to 100%')
       }
+    }
+
+    if (AllPercentages.length > 4) {
+      console.log("take a looksy")
     }
 
     if (activityType === 'land') {
