@@ -436,11 +436,11 @@ export class Schedule {
     const choicesCount = new Map<string, number>();
     const scheduledTimeActivity = activityType === "water" ? this.scheduled9amWater.waterActivities : timeSlot === "9am" ? this.scheduled9amLand.landActivities : this.scheduled10amLand.landActivities;
     const activitiesActs = activityType === 'water' ? Activities.waterActs : timeSlot === '9am' ? Activities.land9amActs : Activities.land10amActs;
-    activitiesActs.forEach(activity => {
-      if (!scheduledTimeActivity.includes(activity)) {
-        choicesCount.set(activity, 0);
-      }
-    });
+    for (const activity of activitiesActs) {
+        if (!(scheduledTimeActivity as readonly string[]).includes(activity)) {
+            choicesCount.set(activity, 0);
+        }
+    }
     return choicesCount;
   }
 
@@ -455,7 +455,7 @@ export class Schedule {
     let count = 0;
     kidsToSpare.forEach(kids => {
       kids[1].forEach(kid => {
-        const theKid = this.kids.data.get(kid)
+        const theKid = this.kids.choices[ kid ]
         for (const [kidActivityType, kidActivity] of Object.entries(theKid.choices)) {
           if (ACTIVITY_TYPES.includes(kidActivityType)) {
             if (kidActivity === activity) {
