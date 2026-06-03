@@ -65,18 +65,18 @@ export class Schedule {
     this.algo = algo;
     this.kids = kids
     this.schedule = this.scheduleConstructor();
-    this.notScheduled9amWater = this.notScheduledConstructor(true);
-    this.notScheduled10amWater = this.notScheduledConstructor(false);
-    this.notScheduledAllNamesWater = structuredClone(this.kids.names);
-    this.notScheduled9amLand = this.notScheduledConstructor(true);
-    this.notScheduled10amLand = this.notScheduledConstructor(false);
-    this.notScheduledAllNamesLand = structuredClone(this.kids.names);
+    this.notScheduled9amWater = this.notScheduledConstructorWater();
+    this.notScheduled10amWater = this.notScheduledConstructorWater();
+    this.notScheduledAllNamesWater = JSON.parse(JSON.stringify(this.kids.names));
+    this.notScheduled9amLand = this.notScheduledConstructorLand(true);
+    this.notScheduled10amLand = this.notScheduledConstructorLand(false);
+    this.notScheduledAllNamesLand = JSON.parse(JSON.stringify(this.kids.names));
     this.landPercentages = [];
     this.waterPercentages = [];
-    this.water9am = structuredClone(Activities.water9am);
-    this.water10am = structuredClone(Activities.water10am);
-    this.land9am = structuredClone(Activities.land9am);
-    this.land10am = structuredClone(Activities.land10am);
+    this.water9am = JSON.parse(JSON.stringify(Activities.water9am));
+    this.water10am = JSON.parse(JSON.stringify(Activities.water10am));
+    this.land9am = JSON.parse(JSON.stringify(Activities.land9am));
+    this.land10am = JSON.parse(JSON.stringify(Activities.land10am));
     this.scheduled9amWater = {names: [], waterActivities: []}
     this.scheduled9amLand = {names: [], landActivities: []}
     this.scheduled10amWater = {names: [], waterActivities: []}
@@ -111,18 +111,29 @@ export class Schedule {
 
   /**
    * Create object that contains the names of kids who are not yet scheduled for an activity,
-   * and also land or water activities that have not been scheduled.
-   * @param {boolean} nineAm - true if the time slot is 9am, false if it's 10am.
-   * @returns {NotScheduled} e.g {names: ['doe john', 'doe jane'...], landActivities: ['fball', 'arch'...], waterActivities: ['fish', 'canoe'...]}
+   * and also water activities that have not been scheduled.
+   * @returns {NotScheduledWater} e.g {names: ['doe john', 'doe jane'...], waterActivities: ['fish', 'canoe'...]}
    */
-  private notScheduledConstructor(nineAM = true): NotScheduled {
+  private notScheduledConstructorWater(): NotScheduledWater {
+    const notScheduled: NotScheduledWater = {
+      names:  JSON.parse(JSON.stringify(this.kids.names)),
+      waterActivities: JSON.parse(JSON.stringify(Activities.waterActs)),
+    };
+    return notScheduled;
+  }
+
+  /**
+   * Create object that contains the names of kids who are not yet scheduled for an activity,
+   * and also land activities that have not been scheduled.
+   * @returns {NotScheduledLand} e.g {names: ['doe john', 'doe jane'...], landActivities: ['bball', 'hike'...]}
+   */
+  private notScheduledConstructorLand(nineAM = true): NotScheduledLand {
     const nineOrTen = nineAM
-      ? structuredClone(Activities.land9amActs)
-      : structuredClone(Activities.land10amActs);
-    const notScheduled: NotScheduled = {
-      names: structuredClone(this.kids.names),
-      landActivities: structuredClone(nineOrTen),
-      waterActivities: structuredClone(Activities.waterActs),
+      ? JSON.parse(JSON.stringify(Activities.land9amActs))
+      : JSON.parse(JSON.stringify(Activities.land10amActs));
+    const notScheduled: NotScheduledLand = {
+      names: JSON.parse(JSON.stringify(this.kids.names)),
+      landActivities: JSON.parse(JSON.stringify(nineOrTen)),
     };
     return notScheduled;
   }
