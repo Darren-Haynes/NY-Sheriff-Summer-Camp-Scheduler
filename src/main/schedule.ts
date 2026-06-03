@@ -160,11 +160,11 @@ export class Schedule {
     }
 
     const activityCount = new Map<string, number>();
-    for (const activity in activityTimeSlot) {
-      if (!showZero && activityTimeSlot[activity].length === 0) {
+    for (const [activity, names] of Object.entries(activityTimeSlot)) {
+      if (!showZero && names.length === 0) {
           continue;
       } else {
-          activityCount.set(activity, activityTimeSlot[activity].length);
+          activityCount.set(activity, names.length);
       }
     }
     return activityCount;
@@ -253,7 +253,7 @@ export class Schedule {
     const scheduledAboveMin = new Map<string, [number, string[]]>();
     const activityRange = activityType === 'land' ? Activities.landRanges : Activities.waterRanges
     const activityTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
-    for (const [activity, names] of Object.entries(activityTimeSlot)) {
+    for (const [activity, names] of Object.entries(activityTimeSlot) as [keyof typeof activityTimeSlot, string[]][]) {
       if (names.length > activityRange[activity][0]) {
         const aboveMinCount = names.length - activityRange[activity][0];
         scheduledAboveMin.set(activity, [aboveMinCount, names])
@@ -280,7 +280,7 @@ export class Schedule {
     const activityRange = this.getRange(activityType, timeSlot);
     let activity: AllActivities = 'arch' // to appease the types compiler
     let matchingActivities: AllActivities[] = []
-    for (let [activity, names] of Object.entries(activities)) {
+    for (const [activity, names] of Object.entries(activities) as [keyof typeof activities, string[]][]) {
       const ranges = activityRange[activity]
       if (names.length < activityRange[activity][0] && names.length > 1) {
         matchingActivities.push(activity)
@@ -299,7 +299,7 @@ export class Schedule {
     const activityRange = this.getRange(activityType, timeSlot);
     let activity: AllActivities = 'arch' // to appease the types compiler
     let matchingActivities: AllActivities[] = []
-    for (let [activity, names] of Object.entries(activities)) {
+    for (const [activity, names] of Object.entries(activities) as [keyof typeof activities, string[]][]) {
       const ranges = activityRange[activity]
       if (names.length < activityRange[activity][0]) {
         return activity
@@ -318,7 +318,7 @@ export class Schedule {
     const scheduledActivities = this.getActivityTypeTimeSlot(activityType, timeSlot);
     const notFullActivities = new Map<string, number>();
     const activityRange = this.getRange(activityType, timeSlot);
-    for (const [activity, names] of Object.entries(scheduledActivities)) {
+      for (const [activity, names] of Object.entries(scheduledActivities) as [keyof typeof scheduledActivities, string[]][]) {
       if (names.length < activityRange[activity][1] && names.length > 0) {
         notFullActivities.set(activity, activityRange[activity][1] - names.length);
       };
@@ -336,7 +336,7 @@ export class Schedule {
     const scheduledActivities = this.getActivityTypeTimeSlot(activityType, timeSlot);
     const fullActivities = new Map<string, number>();
     const activityRange = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
-    for (const [activity, names] of Object.entries(scheduledActivities)) {
+    for (const [activity, names] of Object.entries(scheduledActivities) as [keyof typeof scheduledActivities, string[]][]) {
       if (names.length === activityRange[activity][1]) {
         fullActivities.set(activity, activityRange[activity][1]);
       };
@@ -354,7 +354,7 @@ export class Schedule {
     const scheduledActivities = this.getActivityTypeTimeSlot(activityType, timeSlot);
     const notScheduledActivities = new Map<string, number>();
     const activityRange = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
-    for (const [activity, names] of Object.entries(scheduledActivities)) {
+      for (const [activity, names] of Object.entries(scheduledActivities) as [keyof typeof scheduledActivities, string[]][]) {
       if (names.length === 0) {
         notScheduledActivities.set(activity, activityRange[activity][1]);
       };
@@ -476,12 +476,16 @@ export class Schedule {
   private sortActivitiesByShortfall(notScheduledActivities: Map<string, number>, activityType: AllowedActivityTypes): Map<string, number> {
     const activityRanges = activityType === 'water' ? Activities.waterRanges : Activities.landRanges;
     const shortfallFromMin: Map<string, number> = new Map();
-    notScheduledActivities.forEach((activityCount, activity) => {
-      const activityMin = activityRanges[activity][0];
-      if (activityMin - activityCount > 0) {
-        shortfallFromMin.set(activity, activityMin - activityCount);
-      }
-    });
+      for (const [activity, count] of notScheduledActivities.entries()) {
+        if (activity in activityRanges) {
+            const activityMin = activityRanges[activity][0];
+            const shortfall = activityMin - count;
+
+            if (shortfall > 0) {
+                shortfallFromMin.set(activity, shortfall);
+            }
+        }
+    }
     return new Map([...shortfallFromMin.entries()].sort((b, a) => a[1] - b[1]));
   }
 
