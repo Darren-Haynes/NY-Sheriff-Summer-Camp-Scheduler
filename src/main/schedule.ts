@@ -81,7 +81,6 @@ export class Schedule {
     this.scheduled9amLand = {names: [], landActivities: []}
     this.scheduled10amWater = {names: [], waterActivities: []}
     this.scheduled10amLand = {names: [], landActivities: []}
-
     this.isLandFirst = false;
   }
 
@@ -693,9 +692,6 @@ export class Schedule {
    * @returns {string[]} - the Array of random selected elements
    */
   private randomChoices(arr: string[], numOfItems: number): string[] {
-    if (numOfItems > arr.length) {
-      throw new Error('Random choice selection cannot be greater than list length.');
-    }
     const randomSort = arr.sort(() => Math.random() - 0.5);
     return randomSort.slice(0, numOfItems);
   }
@@ -905,11 +901,13 @@ export class Schedule {
       const activityValue = (maxOrMin === 'max') ? 1 : 0;
       // TODO: fix type error
       const activityMaxOrMin =
-        activityType === 'land'
-          ? Activities.landRanges[activity][activityValue]
-          : Activities.waterRanges[activity][activityValue];
+        activityType === 'water'
+          ? Activities.waterRanges[activity][activityValue]
+          : timeSlot === '9am'
+            ? Activities.landRanges9am[activity][activityValue]
+            : Activities.landRanges10am[activity][activityValue];
 
-      let kidsTimeSlot: string[];
+      let kidsTimeSlot: string[] = [];
       if (maxOrMin === 'max') {
         kidsTimeSlot = this.randomChoices(kidsByActivityChoice, activityMaxOrMin);
       }
@@ -2193,7 +2191,13 @@ export class Schedule {
     }
   }
 
-  private testUnscheduledToScheduled(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): boolean {
+  /**
+    * Tests that the number of unscheduled kids and activities matches the number of scheduled kids and activities for a given activity type and time slot.
+    * @param {AllowedActivityTypes} activityType - only 2 options: 'land' or 'water'.
+    * @param {AllowedTimes} timeSlot - only 2 options: '9am' or '10am'.
+    * @returns {boolean} - true if the number of unscheduled kids and activities matches the number of scheduled kids and activities, false otherwise.
+    */
+  private testUnscheduledToScheduledActivityTypeTime(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): boolean {
     const allNames = activityType ==='land' ? this.notScheduledAllNamesLand : this.notScheduledAllNamesWater;
     const scheduledTimeNames = this.getScheduledKidsList(activityType, timeSlot);
     const scheduledActivities = this.getScheduledActivitiesList(activityType, timeSlot);
@@ -2222,6 +2226,19 @@ export class Schedule {
       return false
     }
     return true;
+  }
+
+  private testUnscheduledToScheduled(): boolean {
+    const validScheduleWater9am: boolean = this.testUnscheduledToScheduledActivityTypeTime('water', '9am')
+    const validScheduleWater10am: boolean = this.testUnscheduledToScheduledActivityTypeTime('water', '10am')
+    const validScheduleLand9am: boolean = this.testUnscheduledToScheduledActivityTypeTime('land', '9am')
+    const validScheduleLand10am: boolean = this.testUnscheduledToScheduledActivityTypeTime('land', '10am')
+    const allScheduleTests: boolean[] = [validScheduleWater9am, validScheduleWater10am, validScheduleLand9am, validScheduleLand10am]
+    const result =  allScheduleTests.every(test => test === true);
+    if (!result) {
+      throw new Error('Unscheduled kids & activities count to scheduled kids & activities mismatch.')
+    }
+    return result;
   }
 
   /**
@@ -2382,13 +2399,8 @@ export class Schedule {
 
     this.testScheduling('final log', 'end log')
 
-
-    const validScheduleWater9am: boolean = this.testUnscheduledToScheduled('water', '9am')
-    const validScheduleWater10am: boolean = this.testUnscheduledToScheduled('water', '10am')
-    const validScheduleLand9am: boolean = this.testUnscheduledToScheduled('land', '9am')
-    const validScheduleLand10am: boolean = this.testUnscheduledToScheduled('land', '10am')
-    const allScheduleTests: boolean[] = [validScheduleWater9am, validScheduleWater10am, validScheduleLand9am, validScheduleLand10am]
+    // TODO: use the return results of this.stats() to add to the allScheduleTests checks.this.stats()
     this.stats()
-    return allScheduleTests.every(test => test === true);
+    return this.testUnscheduledToScheduled()
   }
 }
