@@ -47,8 +47,8 @@ export class Schedule {
   scheduled9amLand: ScheduledLand9am;
   scheduled10amWater: ScheduledWater;
   scheduled10amLand: ScheduledLand10am;
-  landChoicesPercentages: number[];
-  waterChoicesPercentages: number[];
+  landPercentages: number[];
+  waterPercentages: number[];
   algo: string;
   water9am: WaterKids;
   water10am: WaterKids;
@@ -71,6 +71,8 @@ export class Schedule {
     this.notScheduled9amLand = this.notScheduledConstructor(true);
     this.notScheduled10amLand = this.notScheduledConstructor(false);
     this.notScheduledAllNamesLand = structuredClone(this.kids.names);
+    this.landPercentages = [];
+    this.waterPercentages = [];
     this.water9am = structuredClone(Activities.water9am);
     this.water10am = structuredClone(Activities.water10am);
     this.land9am = structuredClone(Activities.land9am);
@@ -2227,7 +2229,7 @@ export class Schedule {
     * @param {string} activityType - only 2 options: 'land' or 'water'.
     * @returns {void}
     */
-  private calculateChoicesPercentages(activityType: AllowedActivityTypes): void {
+  private calculateChoicesPercentages(activityType: AllowedActivityTypes): boolean {
     const firstChoices9am: string[] = this.getScheduledChoicesNames(activityType, '9am', 1)
     const firstChoices10am: string[] = this.getScheduledChoicesNames(activityType, '10am', 1)
     const secondChoices9am: string[] = this.getScheduledChoicesNames(activityType, '9am', 2)
@@ -2263,11 +2265,11 @@ export class Schedule {
       let index = 0
       const AllRemainders: number[] = [firstChoicesRemainder, secondChoicesRemainder, thirdChoicesRemainder, noChoicesRemainder];
       for (const remainder of AllRemainders) {
-        if (remainder > greatestRemainder) {
+        if (remainder < greatestRemainder) {
           greatestRemainder = remainder;
           greatestRemainderIndex = index;
         }
-        ++index;
+        index++;
       }
       AllPercentages[index] += 1
     }
@@ -2278,36 +2280,39 @@ export class Schedule {
       let index = 0
       const AllRemainders: number[] = [firstChoicesRemainder, secondChoicesRemainder, thirdChoicesRemainder, noChoicesRemainder];
       for (const remainder of AllRemainders) {
-        if (remainder < greatestRemainder) {
+        if (remainder > greatestRemainder) {
           greatestRemainder = remainder;
           greatestRemainderIndex = index;
         }
-        ++index
+        index++;
       }
       AllPercentages[greatestRemainderIndex] -= 1
+      if (AllPercentages.reduce((accumulator, currentValue) => accumulator + currentValue, 0) !== 100) {
+        console.log('PERCENTAGES DO NOT ADD TO 100%')
+        console.log(`${activityType}: ${AllPercentages}`)
+        throw new Error('Percentages do not add up to 100%')
+      }
     }
 
-    if (AllPercentages.reduce((accumulator, currentValue) => accumulator + currentValue, 0) !== 100) {
-      throw new Error('Percentages do not add up to 100')
-    }
     if (activityType === 'land') {
-      this.landChoicesPercentages = AllPercentages
+      this.landPercentages = AllPercentages
     } else {
-      this.waterChoicesPercentages = AllPercentages
+      this.waterPercentages = AllPercentages
     }
+    return true;
   }
 
   /**
     * Get the land and water percentages of scheduled kids.
     * @returns {object}
     */
-  private stats(): object {
-    const landPercentages = this.calculateChoicesPercentages('land')
-    const waterPercentages = this.calculateChoicesPercentages('water')
-    return { landPercentages: landPercentages, waterPercentages: waterPercentages }
+  private stats(): boolean {
+    const landTrue = this.calculateChoicesPercentages('land')
+    const waterTrue = this.calculateChoicesPercentages('water')
+    return (landTrue && waterTrue)
   }
 
-  runAlgo(): string {
+  runAlgo(): boolean {
     this.isLandFirst = false;
     console.log(`${this.algo} algorithm initiated`);
     this.schedulingLog('any scheduling', 'before')
@@ -2376,7 +2381,14 @@ export class Schedule {
     }
 
     this.testScheduling('final log', 'end log')
+
+
+    const validScheduleWater9am: boolean = this.testUnscheduledToScheduled('water', '9am')
+    const validScheduleWater10am: boolean = this.testUnscheduledToScheduled('water', '10am')
+    const validScheduleLand9am: boolean = this.testUnscheduledToScheduled('land', '9am')
+    const validScheduleLand10am: boolean = this.testUnscheduledToScheduled('land', '10am')
+    const allScheduleTests: boolean[] = [validScheduleWater9am, validScheduleWater10am, validScheduleLand9am, validScheduleLand10am]
     this.stats()
-    return 'Algo complete';
+    return allScheduleTests.every(test => test === true);
   }
 }
