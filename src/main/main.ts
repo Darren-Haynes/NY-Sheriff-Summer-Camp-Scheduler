@@ -154,7 +154,7 @@ const createWindow = (): void => {
     }
   );
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 };
 
 const joinNames = (names: string[]): string => {

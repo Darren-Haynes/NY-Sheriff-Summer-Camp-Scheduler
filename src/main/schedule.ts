@@ -24,7 +24,7 @@ import {
   ScheduledWater,
   WaterOnly,
 } from '../types/schedule-types';
-import { Int } from '../types/basic-types';
+import { Int } from '../types/num-types';
 import { KidsData } from '@src/types/kids-types';
 import { AllLandWaterKids9am10am, LandKids9am, LandKids10am, LandRanges9am, LandRanges10am, WaterRanges, WaterKids } from '../types/camp-types';
 
@@ -52,8 +52,8 @@ export class Schedule {
   algo: string;
   water9am: WaterKids;
   water10am: WaterKids;
-  land9am: LandKidsAM;
-  land10am: LandKidsPM;
+  land9am: LandKids9am;
+  land10am: LandKids10am;
   isLandFirst: boolean;
 
 
