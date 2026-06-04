@@ -866,76 +866,69 @@ export class Schedule {
    * @param {number[]} ChoiceNum - kids land or water choice 1st, 2nd or 3rd
    * @returns {void}
    */
-  private scheduleSingleActivities(
-    singleMaxActivities: string[],
-    activityType: AllowedActivityTypes,
-    choiceNum: AllowedChoices,
-    maxOrMin: AllowedMaxMin,
-    timeSlot: AllowedTimes
-  ): void {
-    singleMaxActivities.forEach((activity: AllActivities, idx) => {
-      timeSlot = this.getTimeSlotConditional(activityType, timeSlot)
-      let kidsByActivityChoice: string[] = [];
-      if (choiceNum.length > 1) {
-        for (let i = 0; i < choiceNum.length; i++) {
-          const activityChoices = this.getKidsbyActivityChoice(activity, activityType, choiceNum[i], timeSlot);
-          kidsByActivityChoice = kidsByActivityChoice.concat(activityChoices);
-        }
-      } else {
-        kidsByActivityChoice = this.getKidsbyActivityChoice(activity, activityType, choiceNum[0], timeSlot);
-      }
-      const activityValue = (maxOrMin === 'max') ? 1 : 0;
-      // TODO: fix type error
-      const activityMaxOrMin =
-        activityType === 'water'
-          ? Activities.waterRanges[activity][activityValue]
-          : timeSlot === '9am'
-            ? Activities.landRanges9am[activity][activityValue]
-            : Activities.landRanges10am[activity][activityValue];
 
-      let kidsTimeSlot: string[] = [];
-      if (maxOrMin === 'max') {
-        kidsTimeSlot = this.randomChoices(kidsByActivityChoice, activityMaxOrMin);
-      }
-      if (maxOrMin === 'min') {
-        kidsTimeSlot = kidsByActivityChoice
-      }
+   private scheduleSingleActivities(
+       singleMaxActivities: string[],
+       activityType: AllowedActivityTypes,
+       choiceNum: AllowedChoices,
+       maxOrMin: AllowedMaxMin,
+       timeSlot: AllowedTimes
+   ): void {
+       singleMaxActivities.forEach((activity: AllActivities) => {
+           const resolvedTimeSlot = this.getTimeSlotConditional(activityType, timeSlot);
 
-      if (kidsTimeSlot.length < activityMaxOrMin) {
-        return
-      }
+           let kidsByActivityChoice: string[] = [];
+           if (choiceNum.length > 1) {
+               for (let i = 0; i < choiceNum.length; i++) {
+                   const activityChoices = this.getKidsbyActivityChoice(activity, activityType, choiceNum[i], resolvedTimeSlot);
+                   kidsByActivityChoice = kidsByActivityChoice.concat(activityChoices);
+               }
+           } else {
+               kidsByActivityChoice = this.getKidsbyActivityChoice(activity, activityType, choiceNum[0], resolvedTimeSlot);
+           }
 
-      if (activityType === 'water') {
-        if (timeSlot === '9am') {
-          this.water9am[activity] = kidsTimeSlot;
-          this.removeFromNotScheduled(kidsTimeSlot, activityType, activity, '9am');
-          this.AddToScheduled(kidsTimeSlot, activityType, activity, '9am')
-          this.setKidsTimeSlot(kidsTimeSlot, activity, 'water9am')
-        }
-        if (timeSlot === '10am') {
-          this.water10am[activity] = kidsTimeSlot;
-          this.removeFromNotScheduled(kidsTimeSlot, activityType, activity, '10am');
-          this.AddToScheduled(kidsTimeSlot, activityType, activity, '10am')
-          this.setKidsTimeSlot(kidsTimeSlot, activity, 'water10am')
-        }
-      }
+           const activityValue = (maxOrMin === 'max') ? 1 : 0;
+           let activityMaxOrMin: number;
 
-      if (activityType === 'land') {
-        if (timeSlot === '9am') {
-          this.land9am[activity] = kidsTimeSlot;
-          this.removeFromNotScheduled(kidsTimeSlot, activityType, activity, '9am');
-          this.AddToScheduled(kidsTimeSlot, activityType, activity, '9am')
-          this.setKidsTimeSlot(kidsTimeSlot, activity, 'land9am')
-        }
-        if (timeSlot === '10am') {
-          this.land10am[activity] = kidsTimeSlot;
-          this.removeFromNotScheduled(kidsTimeSlot, activityType, activity, '10am');
-          this.AddToScheduled(kidsTimeSlot, activityType, activity, '10am')
-          this.setKidsTimeSlot(kidsTimeSlot, activity, 'land10am')
-        }
-      }
-    });
-}
+           if (activityType === 'water') {
+               const waterActivity = activity as WaterActivities;
+               activityMaxOrMin = Activities.waterRanges[waterActivity][activityValue];
+           } else {
+               const landActivity = activity as LandActivities;
+               if (resolvedTimeSlot === '9am') {
+                   activityMaxOrMin = Activities.landRanges9am[landActivity][activityValue];
+               } else {
+                   activityMaxOrMin = Activities.landRanges10am[landActivity][activityValue];
+               }
+           }
+
+           let kidsTimeSlot: string[] = [];
+           if (maxOrMin === 'max') {
+               kidsTimeSlot = this.randomChoices(kidsByActivityChoice, activityMaxOrMin);
+           } else {
+               kidsTimeSlot = kidsByActivityChoice;
+           }
+
+           if (kidsTimeSlot.length < activityMaxOrMin) return;
+
+           const isWater = activityType === 'water';
+           const is9am = resolvedTimeSlot === '9am';
+
+           const timeSlotKey = `${activityType}${resolvedTimeSlot}` as 'water9am' | 'water10am' | 'land9am' | 'land10am';
+
+           if (isWater) {
+               if (is9am) this.water9am[activity as WaterActivities] = kidsTimeSlot;
+               else this.water10am[activity as WaterActivities] = kidsTimeSlot;
+           } else {
+               if (is9am) this.land9am[activity as LandActivities9am] = kidsTimeSlot;
+               else this.land10am[activity as LandActivities10am] = kidsTimeSlot;
+           }
+
+           this.removeFromNotScheduled(kidsTimeSlot, activityType, activity, resolvedTimeSlot);
+           this.AddToScheduled(kidsTimeSlot, activityType, activity, resolvedTimeSlot);
+           this.setKidsTimeSlot(kidsTimeSlot, activity, timeSlotKey);
+       });
+   }
 
   /**
    * Add Kids to the schedule for activities that more kids have chosen than there are openings for both 9am and 10am timeslots
