@@ -823,39 +823,41 @@ export class Schedule {
        }
    }
 
-  private AddToScheduled(
-    names: string[],
-    activityType: AllowedActivityTypes,
-    activity: LandActivities | WaterActivities,
-    timeSlot: AllowedTimes
-  ): void {
-    if (activityType === 'water') {
-      if (timeSlot === '9am') {
-        if (!this.scheduled9amWater.waterActivities.includes(activity)) {
-          this.scheduled9amWater.waterActivities.push(activity)
-        }
-        this.scheduled9amWater.names.push(...names)
-      } else {
-        if (!this.scheduled10amWater.waterActivities.includes(activity)) {
-          this.scheduled10amWater.waterActivities.push(activity)
-        }
-        this.scheduled10amWater.names.push(...names)
-      }
-    }
-    if (activityType === 'land') {
-      if (timeSlot === '9am') {
-        if (!this.scheduled9amLand.landActivities.includes(activity)) {
-          this.scheduled9amLand.landActivities.push(activity)
-        }
-        this.scheduled9amLand.names.push(...names)
-      } else {
-        if (!this.scheduled10amLand.landActivities.includes(activity)) {
-          this.scheduled10amLand.landActivities.push(activity)
-        }
-        this.scheduled10amLand.names.push(...names)
-      }
-    }
-  }
+   private AddToScheduled(
+       names: string[],
+       activityType: AllowedActivityTypes,
+       activity: LandActivities | WaterActivities,
+       timeSlot: AllowedTimes
+   ): void {
+       if (timeSlot === 'both') {
+           this.AddToScheduled(names, activityType, activity, '9am');
+           this.AddToScheduled(names, activityType, activity, '10am');
+           return;
+       }
+
+       const scheduledData = {
+           water: {
+               '9am': this.scheduled9amWater,
+               '10am': this.scheduled10amWater,
+           },
+           land: {
+               '9am': this.scheduled9amLand,
+               '10am': this.scheduled10amLand,
+           },
+       };
+
+       const target = scheduledData[activityType][timeSlot];
+
+       const activityList = activityType === 'water'
+           ? target.waterActivities
+           : target.landActivities;
+
+       if (!activityList.includes(activity as any)) {
+           activityList.push(activity as any);
+       }
+
+       target.names.push(...names);
+   }
 
   /**
    * Add Kids to the schedule for activities that more kids have chosen than there are openings for either a 9am or 10 timeslots.
