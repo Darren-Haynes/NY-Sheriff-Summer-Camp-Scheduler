@@ -787,55 +787,41 @@ export class Schedule {
    * @param {number} timeSlot - '9am' or '10am' or 'both'
    * @returns {void}
    */
-  private removeFromNotScheduled(
-    names: string[],
-    activityType: string,
-    activity: LandActivities | WaterActivities,
-    timeSlot: AllowedTimes
-  ): void {
-    // TODO: fix all type errors within this method
-    // TODO: refactor this method to remove excess if statements and less DRY
-    if (activityType === 'water') {
-      this.removeElementsFromArray(this.notScheduledAllNamesWater, names);
-    }
-    if (activityType === 'land') {
-      this.removeElementsFromArray(this.notScheduledAllNamesLand, names);
-    }
-      // Remove names and activities from 9am timeslots
-    if (timeSlot === '9am') {
-      if (activityType === 'water') {
-        this.removeElementsFromArray(this.notScheduled9amWater.names, names);
-        const activityIdx = this.notScheduled9amWater.waterActivities.indexOf(activity)
-        if (activityIdx !== -1) {
-          this.notScheduled9amWater.waterActivities.splice(activityIdx, 1)
-        }
-      }
-      if (activityType === 'land') {
-        this.removeElementsFromArray(this.notScheduled9amLand.names, names);
-        const activityIdx = this.notScheduled9amLand.landActivities.indexOf(activity)
-        if (activityIdx !== -1) {
-          this.notScheduled9amLand.landActivities.splice(activityIdx, 1)
-        }
-      }
-    }
-    // Remove names and activities from 10am timeslots
-    if (timeSlot === '10am') {
-      if (activityType === 'land') {
-        this.removeElementsFromArray(this.notScheduled10amLand.names, names);
-        const activityIdx = this.notScheduled10amLand.landActivities.indexOf(activity)
-          if (activityIdx !== -1) {
-            this.notScheduled10amLand.landActivities.splice(activityIdx, 1)
-          }
-        }
-      if (activityType === 'water') {
-        this.removeElementsFromArray(this.notScheduled10amWater.names, names);
-        const activityIdx = this.notScheduled10amWater.waterActivities.indexOf(activity)
-        if (activityIdx !== -1) {
-          this.notScheduled10amWater.waterActivities.splice(activityIdx, 1)
-        }
-      }
-    }
-  }
+   private removeFromNotScheduled(
+       names: string[],
+       activityType: AllowedActivityTypes,
+       activity: LandActivities | WaterActivities,
+       timeSlot: AllowedTimes
+   ): void {
+       if (activityType === 'water') {
+           this.removeElementsFromArray(this.notScheduledAllNamesWater, names);
+       } else {
+           this.removeElementsFromArray(this.notScheduledAllNamesLand, names);
+       }
+
+       const slotData = {
+           water: {
+               '9am': this.notScheduled9amWater,
+               '10am': this.notScheduled10amWater,
+           },
+           land: {
+               '9am': this.notScheduled9amLand,
+               '10am': this.notScheduled10amLand,
+           },
+       };
+
+       const targetData = slotData[activityType][timeSlot];
+       this.removeElementsFromArray(targetData.names, names);
+
+       const activityList = activityType === 'water'
+           ? (targetData as typeof this.notScheduled9amWater).waterActivities
+           : (targetData as typeof this.notScheduled9amLand).landActivities;
+
+       const activityIdx = activityList.indexOf(activity as any);
+       if (activityIdx !== -1) {
+           activityList.splice(activityIdx, 1);
+       }
+   }
 
   private AddToScheduled(
     names: string[],
