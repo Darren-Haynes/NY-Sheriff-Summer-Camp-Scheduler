@@ -1575,28 +1575,19 @@ export class Schedule {
     activityType: AllowedActivityTypes,
     notScheduledActivities: Array<AllActivities>,
     timeSlot: AllowedTimes
-  ): Object {
+  ): object {
     const activityKids: AllLandWaterKids9am10am = {};
     let activity: AllActivities;
     for (activity of notScheduledActivities) {
       activityKids[activity] = [];
       let i: AllowedChoiceNums = 1;
       for (; i <= 3; i++) {
-        activityKids[activity].push(
-          ...this.getKidsbyActivityChoice(activity, activityType, i, timeSlot)
-        );
+        const kidsActivity = activityKids[activity];
+        if (kidsActivity !== undefined) {
+          kidsActivity.push(...this.getKidsbyActivityChoice(activity, activityType, i, timeSlot));
+        }
       }
     }
-    // if (!this.isLandFirst && activityType === 'land') {
-    //   for (activity in activityKids) {
-    //     if (timeSlot === '9am') {
-    //       this.removeElementsFromArray(activityKids[activity], this.notScheduled10amLand.names.concat(this.scheduled10amLand.names))
-    //     }
-    //     if (timeSlot === '10am') {
-    //       this.removeElementsFromArray(activityKids[activity], this.notScheduled9amLand.names.concat(this.scheduled9amLand.names))
-    //     }
-    //   }
-    // }
     return activityKids;
   }
 
