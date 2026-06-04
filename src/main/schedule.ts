@@ -1541,7 +1541,7 @@ export class Schedule {
     activityType: AllowedActivityTypes,
     timeSlot: Allowed9and10Only,
     includeZero = false
-  ): Map<LandActivities | WaterActivities, number> {
+  ): Map<string, number> {
     const notScheduledActivitiesCount = this.countActivityChoices(
       activityType,
       [1, 2, 3],
@@ -1549,7 +1549,7 @@ export class Schedule {
     );
 
     if (!includeZero) {
-      let keysToDelete = [];
+      const keysToDelete = [];
       for (const [activity, count] of notScheduledActivitiesCount.entries()) {
         if (count === 0) {
           keysToDelete.push(activity);
