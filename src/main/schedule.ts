@@ -1095,7 +1095,8 @@ export class Schedule {
     const ranges = activityType === 'water' ? Activities.waterRanges : timeSlot === '9am' ? Activities.landRanges9am : Activities.landRanges10am;
     const minCountQualifier = this.getActivityCountQualifier(maxOrMin, doubleOrSingle);
     for (const [activity, range] of Object.entries(ranges)) {
-      if (countedChoices.get(activity) >= range[minCountQualifier]) {
+      const counteChoicesNumber = countedChoices.get(activity);
+      if (counteChoicesNumber !== undefined && counteChoicesNumber >= range[minCountQualifier]) {
         qualifiedActivities.push(activity);
       }
     }
@@ -1201,43 +1202,45 @@ export class Schedule {
    * @param {string}  maxOrMinSched - 3 options: 'maxOnly', 'minOnly', 'bothMinAndMax'
    * @returns {boolean} true if 1 or more activities were scheduled, false if not activity is schedule.
    */
-  private scheduleDoubles(
-    activityType: WaterOnly,
-    choices: AllowedChoices,
-    maxOrMinSched: AllowedMaxMinSched,
-    timeSlot: AllowedTimes
-  ): boolean {
-    // TODO - remove line below and the console.log logic below that relies on it.
-    let result = false;
-    for (let i = 1; i < choices.length + 1; i++) {
-      switch (maxOrMinSched) {
-        case 'maxOnly':
-        result = this.scheduleDoubleMax(activityType, choices.slice(0, i), 'max', timeSlot)
-        if (result) {
-          console.log(`this.scheduleDoubleMax(${activityType}, ${choices.slice(0, i)}, 'max') ran successfully`)
-        }
-        case 'minOnly':
-        result = this.scheduleDoubleMin(activityType, choices.slice(0, i), 'min', timeSlot)
-        if (result) {
-          console.log(`this.scheduleDoubleMin($${activityType}, ${choices.slice(0, i)}, 'min' ran successfully`)
-        }
-        case 'bothMinAndMax':
-        console.log("Entering scheduleDoubleMax")
-        result = this.scheduleDoubleMax(activityType, choices.slice(0, i), 'max', timeSlot)
-        if (result) {
-          console.log(`this.scheduleDoubleMax(${activityType}, ${choices.slice(0, i)}, 'max') ran successfully`)
-        }
-        console.log("Entering scheduleDoubleMin")
-        result = this.scheduleDoubleMin(activityType, choices.slice(0, i), 'min' timeSlot)
-        if (result) {
-          console.log(`this.scheduleDoubleMin($${activityType}, ${choices.slice(0, i)}, 'min' ran successfully`)
-        }
-      }
-    }
-    return result;
-  }
+   private scheduleDoubles(
+       activityType: WaterOnly,
+       choices: AllowedChoices,
+       maxOrMinSched: AllowedMaxMinSched,
+       timeSlot: AllowedTimes
+   ): boolean {
+       let overallSuccess = false;
 
-/**
+       for (let i = 1; i <= choices.length; i++) {
+           const currentChoices = choices.slice(0, i) as unknown as AllowedChoices;
+
+           let caseSuccess = false;
+           const typedActivityType = activityType as AllowedActivityTypes;
+
+           switch (maxOrMinSched) {
+               case 'maxOnly':
+                   caseSuccess = this.scheduleDoubleMax(typedActivityType, currentChoices, 'max', timeSlot);
+                   if (caseSuccess) console.log(`scheduleDoubleMax ran successfully`);
+                   break;
+
+               case 'minOnly':
+                   caseSuccess = this.scheduleDoubleMin(typedActivityType, currentChoices, 'min', timeSlot);
+                   if (caseSuccess) console.log(`scheduleDoubleMin ran successfully`);
+                   break;
+
+               case 'bothMinAndMax':
+                   const maxSuccess = this.scheduleDoubleMax(typedActivityType, currentChoices, 'max', timeSlot);
+                   const minSuccess = this.scheduleDoubleMin(typedActivityType, currentChoices, 'min', timeSlot);
+                   caseSuccess = maxSuccess && minSuccess;
+                   break;
+           }
+
+           if (caseSuccess) overallSuccess = true;
+       }
+
+       return overallSuccess;
+   }
+
+ /**
   * Precursor to scheduleSingleMax and scheduleSinlgeMin methods.
   * @param {string} activityType - only 2 options: 'land' or 'water'.
   * @param {number[]} choices - num of choices to count in any combo of 1 thru 3: [[1], [2], [3], [1, 2], [1, 2], [1, 3], [1, 2, 3]]
