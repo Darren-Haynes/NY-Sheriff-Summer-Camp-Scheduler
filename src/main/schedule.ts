@@ -647,11 +647,13 @@ export class Schedule {
    * @returns {string[]} - array of kids names who can be rescheduled
    */
   private getKidsWhoCanReschedule(activityType: AllowedActivityTypes, activity: LandActivities | WaterActivities, timeSlot: AllowedTimes, choices: AllowedChoices, returnNoMatch: boolean = false ): Array<string> {
-    let scheduledActivities = null;
+    let scheduledActivities: Record<string, string[]>;
     if (activityType === 'land') {
       scheduledActivities = timeSlot === '9am' ? this.land9am : this.land10am
     } else if (activityType === 'water') {
       scheduledActivities = timeSlot === '9am' ? this.water9am : this.water10am
+    } else {
+      scheduledActivities = {};
     }
     const activitiesAboveMin = this.getActivitiesAboveMin(activityType, timeSlot)
     const kidsWhoCanReschedule = new Array;
@@ -667,8 +669,10 @@ export class Schedule {
           } else {
             if (activitiesAboveMin.get(activityAboveMin) === 0) { continue }
             kidsWhoCanRescheduleNoMatch.push(kid)
-            let shortfallCount: number = activitiesAboveMin.get(activityAboveMin)
-            activitiesAboveMin.set(activityAboveMin, shortfallCount -= 1)
+            let shortfallCount: number | undefined = activitiesAboveMin.get(activityAboveMin)
+            if (shortfallCount !== undefined) {
+              activitiesAboveMin.set(activityAboveMin, shortfallCount -= 1)
+            }
           }
         }
       }
@@ -719,60 +723,60 @@ export class Schedule {
   ): void {
     names.forEach((name) => {
       const kid = this.schedule.get(name)
-      kid.timeSlots[activityTimeSlot] = activity;
+      if (kid !== undefined) {
+        kid.timeSlots[activityTimeSlot] = activity as any;
+      }
     });
   }
 
   /**
-   * Set activity for kids' time slot.
-   * @param {string} name - kids name in format "<last> <first>" e.g "Jones Tom"
-   * @returns {object} - Object with time slot as key and activity as value
-   */
-  const getAssignedActivities(name: string[]): object {
-    const kidsData = this.schedule.get(name)
-    const kidsAssignedActivities = {};
-    for (const timeSlot in kidsData.timeSlots) {
-      if (kidsData.timeSlots[timeSlot] !== null) {
-        kidsAssignedActivities[timeSlot] = kidsData.timeSlots[timeSlot];
-      }
-    }
-    return kidsAssignedActivities
-  }
-
-  /**
-   * Set activity for kids' time slot.
+   * Changes timeSlot and activitiy for kids.
    * @param {string[]} names - kids that are getting moved from one timeslot activity to another.
    * @param {string} newActivity - new activity to assign to kids
    * @param {string} activityTimeSlot - time slot to update (e.g. 'land9am', 'water10am')
    * @returns {void}
    */
+
   private updateKidsScheduledActivity(
-    names: string[],
-    newActivity: LandActivities | WaterActivities,
-    activityTimeSlot: AllowedActivityTimes
+      names: string[],
+      newActivity: LandActivities | WaterActivities,
+      activityTimeSlot: AllowedActivityTimes
   ): void {
-    for (const name of names) {
-      const kidsData = this.schedule.get(name)
-      const oldActivity = kidsData.timeSlots[activityTimeSlot]
-      kidsData.timeSlots[activityTimeSlot] = newActivity
-      let activityObj = null;
-      switch (activityTimeSlot) {
-        case 'land9am':
-          activityObj = this.land9am
-          break
-        case 'land10am':
-          activityObj = this.land10am
-          break
-        case 'water9am':
-          activityObj = this.water9am
-          break
-        case 'water10am':
-          activityObj = this.water10am
-          break
+      for (const name of names) {
+          const kidsData = this.schedule.get(name);
+          if (kidsData === undefined) continue;
+          const oldActivity = kidsData.timeSlots[activityTimeSlot];
+          if (oldActivity === null) continue;
+          kidsData.timeSlots[activityTimeSlot] = newActivity as any;
+          let activityObj: Record<string, string[]>;
+          let safeOldActivity: string;
+
+          switch (activityTimeSlot) {
+              case 'land9am':
+                  activityObj = this.land9am;
+                  safeOldActivity = oldActivity as LandActivities;
+                  break;
+              case 'land10am':
+                  activityObj = this.land10am;
+                  safeOldActivity = oldActivity as LandActivities;
+                  break;
+              case 'water9am':
+                  activityObj = this.water9am;
+                  safeOldActivity = oldActivity as WaterActivities;
+                  break;
+              case 'water10am':
+                  activityObj = this.water10am;
+                  safeOldActivity = oldActivity as WaterActivities;
+                  break;
+              default:
+                  continue;
+          }
+
+          const nameIndex = activityObj[safeOldActivity].indexOf(name);
+          if (nameIndex > -1) {
+              activityObj[safeOldActivity].splice(nameIndex, 1);
+          }
       }
-      const nameIndex = activityObj[oldActivity].indexOf(name)
-      activityObj[oldActivity].splice(nameIndex, 1)
-    }
   }
 
   /**
@@ -1039,7 +1043,7 @@ export class Schedule {
   ): void {
     const randomKids = this.randomChoices(kidsWhoCanReschedule, notScheduledCount)
     const allKidsToSchedule = activityKids.concat(randomKids)
-    const activityTimeSlot = activityType + activityTime
+    const activityTimeSlot = (activityType + activityTime) as AllowedActivityTimes
     this.removeFromNotScheduled(activityKids, activityType, activity, activityTime)
     if (!fromInsufficient) {
       this.AddToScheduled(activityKids, activityType, activity, activityTime)
@@ -1047,16 +1051,19 @@ export class Schedule {
     this.updateKidsScheduledActivity(randomKids, activity, activityTimeSlot)
     this.setKidsTimeSlot(activityKids, activity, activityTimeSlot)
     if (activityType === 'water') {
+      const waterActivity = activity as WaterActivities
       if (activityTime === '9am') {
-        this.water9am[activity] = allKidsToSchedule;
+        this.water9am[waterActivity] = allKidsToSchedule;
       } else {
-        this.water10am[activity] = allKidsToSchedule;
+        this.water10am[waterActivity] = allKidsToSchedule;
       }
     } else {
       if (activityTime === '9am') {
-        this.land9am[activity] = allKidsToSchedule;
+        const landActivity = activity as LandActivities9am
+        this.land9am[landActivity] = allKidsToSchedule;
       } else {
-        this.land10am[activity] = allKidsToSchedule;
+        const landActivity = activity as LandActivities10am
+        this.land10am[landActivity] = allKidsToSchedule;
       }
     }
   }

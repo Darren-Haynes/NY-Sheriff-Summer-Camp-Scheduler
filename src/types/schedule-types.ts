@@ -67,9 +67,9 @@ export type LandActivities10am =
 
 export type AllActivities = LandActivities | WaterActivities;
 
-export type LandKids9am = Record<LandActivities9am, string[]>;
-export type LandKids10am = Record<LandActivities10am, string[]>;
-export type WaterKids = Record<WaterActivities, string[]>;
+export type LandKids9am = Record<LandActivities9am, string[]> | null;
+export type LandKids10am = Record<LandActivities10am, string[]> | null;
+export type WaterKids = Record<WaterActivities, string[]> | null;
 
 export interface ScheduledActivities {
   water9am: WaterKids;
