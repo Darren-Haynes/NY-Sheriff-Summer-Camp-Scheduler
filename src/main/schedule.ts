@@ -1738,12 +1738,12 @@ export class Schedule {
    * @param {string[]} kidsNames - array of the kids to schedule for the given activity.
    * @returns {Int} - number of kids scheduled for the given activity.
    */
-  private scheduleKids(
+  private scheduleKids<K extends string>(
     activityType: AllowedActivityTypes,
     activity: WaterActivities | LandActivities,
     timeSlot: AllowedTimes,
     kidsNames: string[]
-  ): Int {
+  ): number {
     const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
     const activityRanges =
       activityType === 'water' ? Activities.waterRanges : Activities.landRanges;
@@ -1752,29 +1752,23 @@ export class Schedule {
       activityType === 'water' ? (activity as WaterActivities) : (activity as LandActivities);
     const range = activityRanges[typedActivity][1];
 
-    const typedTimeSlot = `${activityType}${timeSlot}` as
-      | 'land9am'
-      | 'land10am'
-      | 'water9am'
-      | 'water10am';
-    const timeSlotObj = activityTypeTimeSlot[typedTimeSlot];
+    const typedTimeSlot = `${activityType}${timeSlot}` as K &
+      ('land9am' | 'land10am' | 'water9am' | 'water10am');
+    const timeSlotObj = (activityTypeTimeSlot as Record<K, any>)[typedTimeSlot];
 
-    // Use the type guard before indexing
     if (timeSlotObj && this.hasKey(timeSlotObj, typedActivity)) {
       const currentLength = timeSlotObj[typedActivity].length;
       const numOfOpenSlots = range - currentLength;
       const kidsToSchedule = kidsNames.slice(0, numOfOpenSlots);
-
       timeSlotObj[typedActivity].push(...kidsToSchedule);
 
       this.removeFromNotScheduled(kidsToSchedule, activityType, typedActivity, timeSlot);
       this.AddToScheduled(kidsToSchedule, activityType, typedActivity, timeSlot);
       this.setKidsTimeSlot(kidsToSchedule, typedActivity, typedTimeSlot);
-
-      return kidsToSchedule.length as Int;
+      return kidsToSchedule.length;
     }
 
-    return 0 as Int;
+    return 0;
   }
 
   /**
