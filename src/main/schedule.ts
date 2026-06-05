@@ -332,13 +332,10 @@ export class Schedule {
   ): AllActivities | false {
     const activities = this.getActivityTypeTimeSlot(activityType, timeSlot);
     const activityRange = this.getRange(activityType, timeSlot);
-    let activity: AllActivities = 'arch'; // to appease the types compiler
-    let matchingActivities: AllActivities[] = [];
     for (const [activity, names] of Object.entries(activities) as [
       keyof typeof activities,
       string[],
     ][]) {
-      const ranges = activityRange[activity];
       if (names.length < activityRange[activity][0]) {
         return activity;
       }
