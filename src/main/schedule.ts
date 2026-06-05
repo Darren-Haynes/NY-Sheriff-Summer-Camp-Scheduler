@@ -1670,7 +1670,7 @@ export class Schedule {
    * Kids are taken from other activities to reach the minimum number required.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    */
-  private scheduleBelowMin(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): void {
+  private scheduleBelowMin(activityType: AllowedActivityTypes): void {
     const notScheduledActivitiesCount9am = this.getActivitiesNotEnoughChoices(activityType, '9am');
     const notScheduledActivitiesCount10am = this.getActivitiesNotEnoughChoices(
       activityType,
@@ -1679,7 +1679,7 @@ export class Schedule {
     let notScheduledActivities: Array<NotScheduledActivities> = [];
     for (const [activity, count] of notScheduledActivitiesCount9am) {
       const activityObj: NotScheduledActivities = {
-        activity: activity,
+        activity: activity as AllActivities,
         shortFall: count,
         timeSlot: '9am',
       };
@@ -1687,7 +1687,7 @@ export class Schedule {
     }
     for (const [activity, count] of notScheduledActivitiesCount10am) {
       const activityObj: NotScheduledActivities = {
-        activity: activity,
+        activity: activity as AllActivities,
         shortFall: count,
         timeSlot: '10am',
       };
