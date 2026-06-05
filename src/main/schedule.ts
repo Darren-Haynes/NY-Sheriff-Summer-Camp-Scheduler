@@ -4,6 +4,7 @@ import {
   NotScheduledLand,
   NotScheduledWater,
   NotScheduledActivities,
+  ActivityKidsMap,
   AllActivities,
   AllowedTimes,
   Allowed9and10Only,
@@ -1635,7 +1636,11 @@ export class Schedule {
       if (activityObj.timeSlot === timeSlot) {
         activity = activityObj.activity;
         shortfallCount = activityObj.shortFall;
-        const activityKids = this.getNotScheduledKidsBelowMin(activityType, [activity], timeSlot);
+        const activityKids = this.getNotScheduledKidsBelowMin(
+          activityType,
+          [activity],
+          timeSlot
+        ) as ActivityKidsMap;
         const kidsWhoCanReschedule = this.getKidsWhoCanReschedule(
           activityType,
           activity,

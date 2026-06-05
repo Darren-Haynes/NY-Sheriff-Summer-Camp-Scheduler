@@ -35,6 +35,10 @@ export interface NotScheduledActivities {
   timeSlot: AllowedTimes;
 }
 
+export type ActivityKidsMap = {
+  [key: string]: string[];
+};
+
 export type WaterActivities = 'swim' | 'fish' | 'canoe' | 'snork' | 'sail' | 'pboard' | 'kayak';
 // TODO: uncomment the 2 line below to try and increase type safety
 // type Land9amActivities = 'bball' | 'vball' | 'soc' | 'arch' | 'art' | 'hike' | 'cheer';
