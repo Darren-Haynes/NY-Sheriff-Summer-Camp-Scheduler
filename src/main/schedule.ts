@@ -5,6 +5,7 @@ import {
   NotScheduledWater,
   NotScheduledActivities,
   ActivityKidsMap,
+  ActivityTimeSlotMap,
   AllActivities,
   AllowedTimes,
   Allowed9and10Only,
@@ -1738,11 +1739,11 @@ export class Schedule {
    * @param {string[]} kidsNames - array of the kids to schedule for the given activity.
    * @returns {Int} - number of kids scheduled for the given activity.
    */
-  private scheduleKids<K extends string>(
+  private scheduleKids(
     activityType: AllowedActivityTypes,
     activity: WaterActivities | LandActivities,
     timeSlot: AllowedTimes,
-    kidsNames: string[]
+    kidsNames: readonly string[]
   ): number {
     const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
     const activityRanges =
@@ -1752,22 +1753,34 @@ export class Schedule {
       activityType === 'water' ? (activity as WaterActivities) : (activity as LandActivities);
     const range = activityRanges[typedActivity][1];
 
-    const typedTimeSlot = `${activityType}${timeSlot}` as K &
-      ('land9am' | 'land10am' | 'water9am' | 'water10am');
-    const timeSlotObj = (activityTypeTimeSlot as Record<K, any>)[typedTimeSlot];
+    const typedTimeSlot = `${activityType}${timeSlot}` as
+      | 'land9am'
+      | 'land10am'
+      | 'water9am'
+      | 'water10am';
 
-    if (timeSlotObj && this.hasKey(timeSlotObj, typedActivity)) {
-      const currentLength = timeSlotObj[typedActivity].length;
-      const numOfOpenSlots = range - currentLength;
-      const kidsToSchedule = kidsNames.slice(0, numOfOpenSlots);
-      timeSlotObj[typedActivity].push(...kidsToSchedule);
+    // Fix: Use the type guard directly on the union object
+    if (this.hasKey(activityTypeTimeSlot, typedTimeSlot)) {
+      const timeSlotObj = activityTypeTimeSlot[typedTimeSlot];
 
-      this.removeFromNotScheduled(kidsToSchedule, activityType, typedActivity, timeSlot);
-      this.AddToScheduled(kidsToSchedule, activityType, typedActivity, timeSlot);
-      this.setKidsTimeSlot(kidsToSchedule, typedActivity, typedTimeSlot);
-      return kidsToSchedule.length;
+      // Assert timeSlotObj to a type with an index signature
+      if (timeSlotObj && this.hasKey(timeSlotObj, typedActivity)) {
+        const typedObj = timeSlotObj as Record<
+          string,
+          { length: number; push: (item: string) => void }
+        >;
+        const currentLength = typedObj[typedActivity].length;
+        const numOfOpenSlots = range - currentLength;
+        const kidsToSchedule = kidsNames.slice(0, numOfOpenSlots);
+        for (const kid of kidsToSchedule) {
+          typedObj[typedActivity].push(kid);
+        }
+        this.removeFromNotScheduled(kidsToSchedule, activityType, typedActivity, timeSlot);
+        this.AddToScheduled(kidsToSchedule, activityType, typedActivity, timeSlot);
+        this.setKidsTimeSlot(kidsToSchedule, typedActivity, typedTimeSlot);
+        return kidsToSchedule.length;
+      }
     }
-
     return 0;
   }
 
