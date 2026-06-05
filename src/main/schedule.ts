@@ -1598,8 +1598,30 @@ export class Schedule {
   ): number {
     const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
     const range = this.getRange(activityType, timeSlot);
-    const shortfall = range[activity][0] - activityTypeTimeSlot[activity].length;
-    return shortfall;
+
+    let typedTimeSlot: string;
+    if (activityType === 'water') {
+      typedTimeSlot = timeSlot as WaterActivities;
+    } else if (activityType === 'land' && timeSlot === '9am') {
+      typedTimeSlot = timeSlot as LandActivities9am;
+    } else {
+      typedTimeSlot = timeSlot as LandActivities10am;
+    }
+
+    const targetObj = activityTypeTimeSlot[typedTimeSlot as keyof typeof activityTypeTimeSlot];
+
+    // Fix: Check if targetObj is defined before using 'in' operator
+    if (targetObj && this.hasKey(targetObj, activity)) {
+      const indexedObj = targetObj as Record<string, { length: number }>;
+      return range[activity][0] - indexedObj[activity].length;
+    }
+
+    return 0; // Fallback if targetObj is undefined or key doesn't exist
+  }
+
+  // Type guard to check if a key exists on an object
+  private hasKey<T extends object>(obj: T, key: string | number | symbol): key is keyof T {
+    return key in obj;
   }
 
   private scheduleBelowMinTimeSlot(
