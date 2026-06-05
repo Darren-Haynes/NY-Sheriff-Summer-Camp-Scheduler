@@ -5,7 +5,6 @@ import {
   NotScheduledWater,
   NotScheduledActivities,
   ActivityKidsMap,
-  ActivityTimeSlotMap,
   AllActivities,
   AllowedTimes,
   Allowed9and10Only,
@@ -20,7 +19,6 @@ import {
   WaterActivities,
   LandActivities9am,
   LandActivities10am,
-  ScheduledActivities,
   ScheduledLand9am,
   ScheduledLand10am,
   ScheduledWater,
@@ -230,7 +228,7 @@ export class Schedule {
   ): string[] {
     const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
 
-    let choice: string = 'water1';
+    let choice = 'water1';
     if (activityType === 'water') {
       if (choiceNum === 2) {
         choice = 'water2';
@@ -311,13 +309,11 @@ export class Schedule {
   ): AllActivities[] {
     const activities = this.getActivityTypeTimeSlot(activityType, timeSlot);
     const activityRange = this.getRange(activityType, timeSlot);
-    let activity: AllActivities = 'arch'; // to appease the types compiler
-    let matchingActivities: AllActivities[] = [];
+    const matchingActivities: AllActivities[] = [];
     for (const [activity, names] of Object.entries(activities) as [
       keyof typeof activities,
       string[],
     ][]) {
-      const ranges = activityRange[activity];
       if (names.length < activityRange[activity][0] && names.length > 1) {
         matchingActivities.push(activity);
       }
