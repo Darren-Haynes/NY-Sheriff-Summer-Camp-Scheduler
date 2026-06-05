@@ -1744,22 +1744,37 @@ export class Schedule {
     timeSlot: AllowedTimes,
     kidsNames: string[]
   ): Int {
-    const activityTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
+    const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
     const activityRanges =
       activityType === 'water' ? Activities.waterRanges : Activities.landRanges;
-    const numOfOpenSlots = activityRanges[activity][1] - activityTimeSlot[activity].length;
-    const kidsToSchedule = kidsNames.slice(0, numOfOpenSlots);
-    for (const name of kidsToSchedule) {
-      activityTimeSlot[activity].push(name);
+
+    const typedActivity =
+      activityType === 'water' ? (activity as WaterActivities) : (activity as LandActivities);
+    const range = activityRanges[typedActivity][1];
+
+    const typedTimeSlot = `${activityType}${timeSlot}` as
+      | 'land9am'
+      | 'land10am'
+      | 'water9am'
+      | 'water10am';
+    const timeSlotObj = activityTypeTimeSlot[typedTimeSlot];
+
+    // Use the type guard before indexing
+    if (timeSlotObj && this.hasKey(timeSlotObj, typedActivity)) {
+      const currentLength = timeSlotObj[typedActivity].length;
+      const numOfOpenSlots = range - currentLength;
+      const kidsToSchedule = kidsNames.slice(0, numOfOpenSlots);
+
+      timeSlotObj[typedActivity].push(...kidsToSchedule);
+
+      this.removeFromNotScheduled(kidsToSchedule, activityType, typedActivity, timeSlot);
+      this.AddToScheduled(kidsToSchedule, activityType, typedActivity, timeSlot);
+      this.setKidsTimeSlot(kidsToSchedule, typedActivity, typedTimeSlot);
+
+      return kidsToSchedule.length as Int;
     }
-    this.removeFromNotScheduled(kidsToSchedule, activityType, activity, timeSlot);
-    this.AddToScheduled(kidsToSchedule, activityType, activity, timeSlot);
-    this.setKidsTimeSlot(kidsToSchedule, activity, activityType + timeSlot);
-    // TODO: remove for loop below, it seems to do nothing
-    for (const name of kidsToSchedule) {
-      const kid = this.schedule.get(name);
-    }
-    return kidsToSchedule.length;
+
+    return 0 as Int;
   }
 
   /**
