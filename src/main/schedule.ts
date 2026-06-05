@@ -449,7 +449,7 @@ export class Schedule {
   ): string[] {
     const activities = activityType === 'land' ? Schedule.LANDTYPES : Schedule.WATERTYPES;
     const choices = this.kids.choices[name];
-    const kidsChoices: string[] = new Array();
+    const kidsChoices: string[] = [];
     for (const activity of activities) {
       kidsChoices.push(choices[activity]);
     }
@@ -586,7 +586,7 @@ export class Schedule {
   private getNotScheduledKidsList(
     activityType: AllowedActivityTypes,
     timeSlot: Allowed9and10Only,
-    algoFirst: boolean = true
+    algoFirst = true
   ): string[] {
     if (algoFirst) {
       if (!this.isLandFirst) {
@@ -779,7 +779,7 @@ export class Schedule {
     activity: LandActivities | WaterActivities,
     timeSlot: AllowedTimes,
     choices: AllowedChoices,
-    returnNoMatch: boolean = false
+    returnNoMatch = false
   ): Array<string> {
     let scheduledActivities: Record<string, string[]>;
     if (activityType === 'land') {
@@ -790,9 +790,9 @@ export class Schedule {
       scheduledActivities = {};
     }
     const activitiesAboveMin = this.getActivitiesAboveMin(activityType, timeSlot);
-    const kidsWhoCanReschedule = new Array();
-    const kidsWhoCanRescheduleNoMatch = new Array();
-    for (const [activityAboveMin, count] of activitiesAboveMin) {
+    const kidsWhoCanReschedule = [];
+    const kidsWhoCanRescheduleNoMatch = [];
+    for (const [activityAboveMin] of activitiesAboveMin) {
       const scheduledKids = scheduledActivities[activityAboveMin];
       for (const kid of scheduledKids) {
         for (const choice of choices) {
@@ -936,6 +936,13 @@ export class Schedule {
       this.removeElementsFromArray(this.notScheduledAllNamesWater, names);
     } else {
       this.removeElementsFromArray(this.notScheduledAllNamesLand, names);
+    }
+
+    // Handle 'both' by calling the function for each time slot
+    if (timeSlot === 'both') {
+      this.removeFromNotScheduled(names, activityType, activity, '9am');
+      this.removeFromNotScheduled(names, activityType, activity, '10am');
+      return;
     }
 
     const slotData = {
