@@ -1905,7 +1905,7 @@ export class Schedule {
    * @param {object} kidtoScheduleData - data for the scheduling (not resheduling) a kid.
    * @returns {void}
    */
-  private scheduleNoChoicesMatchesFound(reScheduleData: Object, kidtoScheduleData: Object): void {
+  private scheduleNoChoicesMatchesFound(reScheduleData: object, kidtoScheduleData: object): void {
     const { reScheduleKid, fromActivity, toActivity } = reScheduleData;
     const { name: mainName, activity, activityType, timeSlot } = kidtoScheduleData;
     this.unScheduleKid(reScheduleKid, fromActivity, activityType, timeSlot);
@@ -2126,13 +2126,13 @@ export class Schedule {
     activity: LandActivities | WaterActivities,
     activityType: AllowedActivityTypes,
     timeSlot: Allowed9and10Only,
-    choiceNum: 1 | 2 | 3
+    choiceNum: AllowedChoices
   ): object {
     const scheduledActivitiesNotFull = this.getScheduledActivitiesNotFull(activityType, timeSlot);
     let fromActivity: LandActivities | WaterActivities;
     let toActivity: LandActivities | WaterActivities;
     for (const name of names) {
-      const activityTypeChoice = this.getKidsChoice(activityType, choiceNum);
+      const activityTypeChoice = this.getKidsChoice(activityType, [choiceNum][0]);
       const nameChoice = this.kids.choices[name][activityTypeChoice];
       if (nameChoice !== activity && scheduledActivitiesNotFull.has(nameChoice)) {
         return { reScheduleKid: name, fromActivity: activity, toActivity: nameChoice };
@@ -2153,16 +2153,19 @@ export class Schedule {
       mainChoiceLoop: for (const choice of choices) {
         if (scheduledActivitiesFull.has(choice)) {
           const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
-          const fullNames = activityTypeTimeSlot[choice];
+          const typedActivityTypeTimeSlot = activityTypeTimeSlot as Record<string, string[]>;
+          const typedChoice = choice as LandActivities;
+          const fullNames = typedActivityTypeTimeSlot[typedChoice];
           for (const choiceNum of [1, 2, 3]) {
+            const typedChoiceNum = [choiceNum] as AllowedChoices;
             const fullNamesChoices = this.getRescheduleMatches(
               fullNames,
-              choice,
+              typedChoice,
               activityType,
               timeSlot,
-              choiceNum
+              typedChoiceNum
             );
-            if (fullNamesChoices.hasOwnProperty('reScheduleKid')) {
+            if (Object.prototype.hasOwnProperty.call(fullNamesChoices, 'reScheduleKid')) {
               const kidToScheduleData = {
                 name: name,
                 activity: choice,
@@ -2177,6 +2180,7 @@ export class Schedule {
       }
     }
   }
+
   /**
    * Scheduled kids who cannot be scheduled to their chosen activities because no open slots are available.
    * To scheduled them we need to reschedule someone else to make a slot available so that the unscheduled kid(s)
@@ -2195,7 +2199,7 @@ export class Schedule {
       const choices = this.getAllKidsChoicesByActivityType(name, activityType);
       let scheduledActivitiesFull = null;
       let timeSlot: AllowedTimes = '9am';
-      if (notScheduled9am.length > notScheduled10am.length) {
+      if (notScheduled9am.names.length > notScheduled10am.names.length) {
         scheduledActivitiesFull = this.getScheduledActivitiesFull(activityType, '9am');
       } else {
         scheduledActivitiesFull = this.getScheduledActivitiesFull(activityType, '10am');
@@ -2204,16 +2208,19 @@ export class Schedule {
       mainChoiceLoop: for (const choice of choices) {
         if (scheduledActivitiesFull.has(choice)) {
           const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
-          const fullNames = activityTypeTimeSlot[choice];
+          const typedActivityTypeTimeSlot = activityTypeTimeSlot as Record<string, string[]>;
+          const typedChoice = choice as LandActivities;
+          const fullNames = typedActivityTypeTimeSlot[typedChoice];
           for (const choiceNum of [1, 2, 3]) {
+            const typedChoiceNum = [choiceNum] as AllowedChoices;
             const fullNamesChoices = this.getRescheduleMatches(
               fullNames,
-              choice,
+              typedChoice,
               activityType,
               timeSlot,
-              choiceNum
+              typedChoiceNum
             );
-            if (fullNamesChoices.hasOwnProperty('reScheduleKid')) {
+            if (Object.prototype.hasOwnProperty.call(fullNamesChoices, 'reScheduleKid')) {
               const kidToScheduleData = {
                 name: name,
                 activity: choice,
@@ -2258,10 +2265,11 @@ export class Schedule {
           kidsWhoCanReschedule = this.randomChoices(kidsWhoCanReschedule, shortfallCount);
         }
         const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
+        const typedActivityTypeTimeSlot = activityTypeTimeSlot as Record<string, string[]>;
         this.scheduleBelowMinActivities(
           kidsWhoCanReschedule,
           shortfallCount,
-          activityTypeTimeSlot[activity],
+          typedActivityTypeTimeSlot[activity],
           activityType,
           timeSlot,
           activity,
