@@ -193,24 +193,15 @@ export class Schedule {
     timeSlot: AllowedTimes
   ): WaterKids | LandKids9am | LandKids10am {
     const activityTimeSlots = [this.water9am, this.water10am, this.land9am, this.land10am];
-    let activityTimeSlot = activityTimeSlots[0];
     if (activityType === 'water') {
-      if (timeSlot === '9am') {
-        activityTimeSlot = activityTimeSlots[0];
-      }
       if (timeSlot === '10am') {
-        activityTimeSlot = activityTimeSlots[1];
+        return activityTimeSlots[1];
       }
     }
     if (activityType === 'land') {
-      if (timeSlot === '9am') {
-        activityTimeSlot = activityTimeSlots[2];
-      }
-      if (timeSlot === '10am') {
-        activityTimeSlot = activityTimeSlots[3];
-      }
+      return timeSlot === '9am' ? activityTimeSlots[2] : activityTimeSlots[3];
     }
-    return activityTimeSlot;
+    return activityTimeSlots[0];
   }
 
   /**
@@ -1197,7 +1188,7 @@ export class Schedule {
     activityType: AllowedActivityTypes,
     activityTime: AllowedTimes,
     activity: LandActivities | WaterActivities,
-    fromInsufficient: boolean = false
+    fromInsufficient = false
   ): void {
     const randomKids = this.randomChoices(kidsWhoCanReschedule, notScheduledCount);
     const allKidsToSchedule = activityKids.concat(randomKids);
@@ -1830,9 +1821,10 @@ export class Schedule {
     timeSlot: Allowed9and10Only
   ): void {
     const activityTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
-    const index = activityTimeSlot[activity].indexOf(name);
+    const typedActivityTimeSlot = activityTimeSlot as Record<string, string[]>;
+    const index = typedActivityTimeSlot[activity]?.indexOf(name);
     if (index !== -1) {
-      activityTimeSlot[activity].splice(index, 1);
+      typedActivityTimeSlot[activity].splice(index, 1);
     }
   }
 
@@ -1851,7 +1843,8 @@ export class Schedule {
     timeSlot: Allowed9and10Only
   ): void {
     const activityTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
-    activityTimeSlot[activity].push(name);
+    const typedActivityTimeSlot = activityTimeSlot as Record<string, string[]>;
+    typedActivityTimeSlot[activity].push(name);
   }
 
   /**
@@ -1870,7 +1863,7 @@ export class Schedule {
   ): void {
     this.removeFromNotScheduled([name], activityType, activity, timeSlot);
     this.AddToScheduled([name], activityType, activity, timeSlot);
-    this.setKidsTimeSlot([name], activity, activityType + timeSlot);
+    this.setKidsTimeSlot([name], activity, (activityType + timeSlot) as AllowedActivityTimes);
     this.addKidToActivity(name, activity, activityType, timeSlot);
   }
 
