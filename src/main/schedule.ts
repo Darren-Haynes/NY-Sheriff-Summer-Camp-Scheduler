@@ -2290,7 +2290,7 @@ export class Schedule {
     }
     const activityList = [...scheduledActivitiesNotFull.keys()];
     const randomActivity = this.randomChoices(activityList, 1)[0];
-    this.scheduleKid(name, randomActivity, activityType, timeSlot);
+    this.scheduleKid(name, randomActivity as AllActivities, activityType, timeSlot);
     return true;
   }
 
@@ -2302,7 +2302,9 @@ export class Schedule {
     for (const name of noChoicesForYou) {
       if (!this.scheduleSorryNoChoicesTimeSlot(name, activityType, timeSlot)) {
         const activity = this.getActivitiesBelowMin(activityType, timeSlot);
-        this.scheduleKid(name, activity, activityType, timeSlot);
+        if (activity !== false) {
+          this.scheduleKid(name, activity, activityType, timeSlot);
+        }
       }
     }
     this.scheduleInsufficientlyScheduled(activityType, timeSlot);
@@ -2321,12 +2323,16 @@ export class Schedule {
       if (notScheduled9am.names.length > notScheduled10am.names.length) {
         if (!this.scheduleSorryNoChoicesTimeSlot(name, activityType, '9am')) {
           const activity = this.getActivitiesBelowMin(activityType, '9am');
-          this.scheduleKid(name, activity, activityType, '9am');
+          if (activity !== false) {
+            this.scheduleKid(name, activity, activityType, '9am');
+          }
         }
       } else {
         if (!this.scheduleSorryNoChoicesTimeSlot(name, activityType, '10am')) {
           const activity = this.getActivitiesBelowMin(activityType, '10am');
-          this.scheduleKid(name, activity, activityType, '10am');
+          if (activity !== false) {
+            this.scheduleKid(name, activity, activityType, '10am');
+          }
         }
       }
     }
@@ -2398,11 +2404,12 @@ export class Schedule {
    */
   private printOverScheduled(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): void {
     const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
+    const typedActivityTypeTimeSlot = activityTypeTimeSlot as Record<string, string[]>;
     const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
     console.log(`${activityType.toUpperCase()} ${timeSlot.toUpperCase()} OVERSCHEDULED`);
     let overScheduled = false;
-    for (const activity of Object.keys(activityTypeTimeSlot)) {
-      const activityCount = activityTypeTimeSlot[activity as AllActivities].length;
+    for (const activity of Object.keys(typedActivityTypeTimeSlot)) {
+      const activityCount = typedActivityTypeTimeSlot[activity].length;
       const maxRange = ranges[activity as AllActivities][1];
       if (activityCount > maxRange) {
         overScheduled = true;
@@ -2422,11 +2429,12 @@ export class Schedule {
    */
   private printUnderScheduled(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): void {
     const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
+    const typedActivityTypeTimeSlot = activityTypeTimeSlot as Record<string, string[]>;
     const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
     console.log(`${activityType.toUpperCase()} ${timeSlot.toUpperCase()} UNDERSCHEDULED`);
     let underScheduled = false;
-    for (const activity of Object.keys(activityTypeTimeSlot)) {
-      const activityCount = activityTypeTimeSlot[activity as AllActivities].length;
+    for (const activity of Object.keys(typedActivityTypeTimeSlot)) {
+      const activityCount = typedActivityTypeTimeSlot[activity].length;
       const minRange = ranges[activity as AllActivities][0];
       if (activityCount < minRange && activityCount > 0) {
         underScheduled = true;
