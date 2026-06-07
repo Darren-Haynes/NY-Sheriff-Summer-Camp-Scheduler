@@ -58,6 +58,19 @@ export interface LandCount10am {
   arch: number;
 }
 
+export interface RescheduleMatches {
+  reScheduleKid: string;
+  fromActivity: AllActivities;
+  toActivity: AllActivities;
+}
+
+export interface RescheduleKidsData {
+  name: string;
+  activity: AllActivities;
+  activityType: AllowedActivityTypes;
+  timeSlot: AllowedTimes;
+}
+
 export type ActivityKidsMap = {
   [key: string]: string[];
 };
@@ -129,8 +142,7 @@ export type AllowedMaxMinSched = (typeof AllowedMaxMinSched)[number];
 const AllowedDoubleSingle = ['double', 'single'] as const;
 export type AllowedDoubleSingle = (typeof AllowedDoubleSingle)[number];
 
-const AllowedChoiceNums = 1 | 2 | (3 as const);
-export type AllowedChoiceNums = (typeof AllowedChoiceNums)[number];
+export type AllowedChoiceNums = 1 | 2 | 3;
 
 const AllowedActivities = ['swim', 'fish', 'canoe', 'snork', 'sail', 'pboard', 'kayak'] as const;
 export type AllowedActivities = (typeof AllowedActivities)[number];
