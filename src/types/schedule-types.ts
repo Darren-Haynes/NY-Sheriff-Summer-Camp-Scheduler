@@ -35,6 +35,29 @@ export interface NotScheduledActivities {
   timeSlot: AllowedTimes;
 }
 
+export interface LandCount9am {
+  [key: string]: number;
+  art: number;
+  hike: number;
+  bball: number;
+  cheer: number;
+  soc: number;
+  vball: number;
+  arch: number;
+}
+
+export interface LandCount10am {
+  [key: string]: number;
+  fris: number;
+  art: number;
+  hike: number;
+  pball: number;
+  fball: number;
+  lax: number;
+  yoga: number;
+  arch: number;
+}
+
 export type ActivityKidsMap = {
   [key: string]: string[];
 };

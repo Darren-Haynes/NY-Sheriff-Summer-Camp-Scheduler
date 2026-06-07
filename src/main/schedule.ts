@@ -19,6 +19,8 @@ import {
   WaterActivities,
   LandActivities9am,
   LandActivities10am,
+  LandCount9am,
+  LandCount10am,
   ScheduledLand9am,
   ScheduledLand10am,
   ScheduledWater,
@@ -2555,22 +2557,31 @@ export class Schedule {
     };
     for (const name of this.kids.names) {
       const timeSlots = this.schedule.get(name);
-      if (timeSlots.timeSlots.water9am) {
-        water9amActivityCount[timeSlots.timeSlots.water9am] += 1;
-        water9amTotalCount += 1;
-      }
-      if (timeSlots.timeSlots.water10am) {
-        water10amActivityCount[timeSlots.timeSlots.water10am] += 1;
-        water10amTotalCount += 1;
-      }
-      let nullCount = 0;
-      for (const time in timeSlots.timeSlots) {
-        if (timeSlots.timeSlots[time] === null) {
+      if (timeSlots !== undefined) {
+        if (timeSlots.timeSlots.water9am) {
+          water9amActivityCount[timeSlots.timeSlots.water9am] += 1;
+          water9amTotalCount += 1;
+        }
+        if (timeSlots.timeSlots.water10am) {
+          water10amActivityCount[timeSlots.timeSlots.water10am] += 1;
+          water10amTotalCount += 1;
+        }
+        let nullCount = 0;
+        if (timeSlots.timeSlots.water9am === null) {
           nullCount += 1;
         }
-      }
-      if (nullCount === 4) {
-        unscheduleKids.push({ name: name, timeSlot: timeSlots.timeSlots });
+        if (timeSlots.timeSlots.water10am === null) {
+          nullCount += 1;
+        }
+        if (timeSlots.timeSlots.land9am === null) {
+          nullCount += 1;
+        }
+        if (timeSlots.timeSlots.land10am === null) {
+          nullCount += 1;
+        }
+        if (nullCount === 4) {
+          unscheduleKids.push({ name: name, timeSlot: timeSlots.timeSlots });
+        }
       }
     }
 
@@ -2595,17 +2606,21 @@ export class Schedule {
       swim: 0,
     };
     for (const activity in this.water9am) {
-      water9amActivityCountAlt[activity] = this.water9am[activity].length;
+      const typedActivity = activity as WaterActivities;
+      water9amActivityCountAlt[typedActivity] = this.water9am[typedActivity].length;
     }
-    for (const activity in this.water9am) {
-      water10amActivityCountAlt[activity] = this.water10am[activity].length;
+    for (const activity in this.water10am) {
+      const typedActivity = activity as WaterActivities;
+      water10amActivityCountAlt[typedActivity] = this.water10am[typedActivity].length;
     }
 
     const keys1 = Object.keys(water9amActivityCountAlt).sort();
     const keys2 = Object.keys(water9amActivityCount).sort();
     const equalObjects9am = keys1.every(
       (key, index) =>
-        key === keys2[index] && water9amActivityCountAlt[key] === water9amActivityCount[key]
+        key === keys2[index] &&
+        water9amActivityCountAlt[key as WaterActivities] ===
+          water9amActivityCount[key as WaterActivities]
     );
     if (activityType === 'water' || activityType === 'final log') {
       if (equalObjects9am) {
@@ -2619,7 +2634,9 @@ export class Schedule {
     const keys2a = Object.keys(water10amActivityCount).sort();
     const equalObjects10am = keys1a.every(
       (key, index) =>
-        key === keys2a[index] && water10amActivityCountAlt[key] === water10amActivityCount[key]
+        key === keys2a[index] &&
+        water10amActivityCountAlt[key as WaterActivities] ===
+          water10amActivityCount[key as WaterActivities]
     );
     if (activityType === 'water' || activityType === 'final log') {
       if (equalObjects10am) {
@@ -2632,9 +2649,16 @@ export class Schedule {
     let landTotalCount = 0;
     let land9amTotalCount = 0;
     let land10amTotalCount = 0;
-    const unscheduleKidsLand = [];
-    const land9amActivityCount = { art: 0, hike: 0, bball: 0, cheer: 0, soc: 0, vball: 0, arch: 0 };
-    const land10amActivityCount = {
+    const land9amActivityCount: LandCount9am = {
+      art: 0,
+      hike: 0,
+      bball: 0,
+      cheer: 0,
+      soc: 0,
+      vball: 0,
+      arch: 0,
+    };
+    const land10amActivityCount: LandCount10am = {
       fris: 0,
       art: 0,
       hike: 0,
@@ -2647,28 +2671,37 @@ export class Schedule {
 
     for (const name of this.kids.names) {
       const timeSlots = this.schedule.get(name);
-      if (timeSlots.timeSlots.land9am) {
-        land9amActivityCount[timeSlots.timeSlots.land9am] += 1;
-        land9amTotalCount += 1;
-      }
-      if (timeSlots.timeSlots.land10am) {
-        land10amActivityCount[timeSlots.timeSlots.land10am] += 1;
-        land10amTotalCount += 1;
-      }
-      let nullCount = 0;
-      for (const time in timeSlots.timeSlots) {
-        if (timeSlots.timeSlots[time] === null) {
+      if (timeSlots !== undefined) {
+        if (timeSlots.timeSlots.land9am) {
+          land9amActivityCount[timeSlots.timeSlots.land9am] += 1;
+          land9amTotalCount += 1;
+        }
+        if (timeSlots.timeSlots.land10am) {
+          land10amActivityCount[timeSlots.timeSlots.land10am] += 1;
+          land10amTotalCount += 1;
+        }
+        let nullCount = 0;
+        if (timeSlots.timeSlots.water9am === null) {
           nullCount += 1;
         }
-      }
-      if (nullCount === 4) {
-        unscheduleKids.push({ name: name, timeSlot: timeSlots.timeSlots });
+        if (timeSlots.timeSlots.water10am === null) {
+          nullCount += 1;
+        }
+        if (timeSlots.timeSlots.land9am === null) {
+          nullCount += 1;
+        }
+        if (timeSlots.timeSlots.land10am === null) {
+          nullCount += 1;
+        }
+        if (nullCount === 4) {
+          unscheduleKids.push({ name: name, timeSlot: timeSlots.timeSlots });
+        }
       }
     }
 
     landTotalCount = land9amTotalCount + land10amTotalCount;
 
-    const land9amActivityCountAlt = {
+    const land9amActivityCountAlt: LandCount9am = {
       art: 0,
       hike: 0,
       bball: 0,
@@ -2677,7 +2710,7 @@ export class Schedule {
       vball: 0,
       arch: 0,
     };
-    const land10amActivityCountAlt = {
+    const land10amActivityCountAlt: LandCount10am = {
       fris: 0,
       art: 0,
       hike: 0,
@@ -2687,11 +2720,12 @@ export class Schedule {
       yoga: 0,
       arch: 0,
     };
+
     for (const activity in this.land9am) {
-      land9amActivityCountAlt[activity] = this.land9am[activity].length;
+      land9amActivityCountAlt[activity] = this.land9am[activity as LandActivities9am].length;
     }
     for (const activity in this.land10am) {
-      land10amActivityCountAlt[activity] = this.land10am[activity].length;
+      land10amActivityCountAlt[activity] = this.land10am[activity as LandActivities10am].length;
     }
 
     const keys1Land = Object.keys(land9amActivityCountAlt).sort();
