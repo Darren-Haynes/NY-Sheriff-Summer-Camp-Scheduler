@@ -24,6 +24,8 @@ import {
   ScheduledLand9am,
   ScheduledLand10am,
   ScheduledWater,
+  RescheduleMatches,
+  RescheduleKidsData,
   WaterOnly,
 } from '../types/schedule-types';
 import { Int } from '../types/num-types';
@@ -850,7 +852,7 @@ export class Schedule {
    */
   private setKidsTimeSlot(
     names: string[],
-    activity: LandActivities | WaterActivities,
+    activity: LandActivities | WaterActivities | null,
     activityTimeSlot: AllowedActivityTimes
   ): void {
     names.forEach(name => {
@@ -969,32 +971,32 @@ export class Schedule {
     activity: LandActivities | WaterActivities,
     timeSlot: AllowedTimes
   ): void {
-    if (timeSlot === 'both') {
-      this.AddToScheduled(names, activityType, activity, '9am');
-      this.AddToScheduled(names, activityType, activity, '10am');
-      return;
+    if (activityType === 'water') {
+      if (timeSlot === '9am') {
+        if (!this.scheduled9amWater.waterActivities.includes(activity as WaterActivities)) {
+          this.scheduled9amWater.waterActivities.push(activity as WaterActivities);
+        }
+        this.scheduled9amWater.names.push(...names);
+      } else {
+        if (!this.scheduled10amWater.waterActivities.includes(activity as WaterActivities)) {
+          this.scheduled10amWater.waterActivities.push(activity as WaterActivities);
+        }
+        this.scheduled10amWater.names.push(...names);
+      }
     }
-
-    const scheduledData = {
-      water: {
-        '9am': this.scheduled9amWater,
-        '10am': this.scheduled10amWater,
-      },
-      land: {
-        '9am': this.scheduled9amLand,
-        '10am': this.scheduled10amLand,
-      },
-    };
-
-    const target = scheduledData[activityType][timeSlot];
-
-    const activityList = activityType === 'water' ? target.waterActivities : target.landActivities;
-
-    if (!activityList.includes(activity as any)) {
-      activityList.push(activity as any);
+    if (activityType === 'land') {
+      if (timeSlot === '9am') {
+        if (!this.scheduled9amLand.landActivities.includes(activity as LandActivities9am)) {
+          this.scheduled9amLand.landActivities.push(activity as LandActivities9am);
+        }
+        this.scheduled9amLand.names.push(...names);
+      } else {
+        if (!this.scheduled10amLand.landActivities.includes(activity as LandActivities10am)) {
+          this.scheduled10amLand.landActivities.push(activity as LandActivities10am);
+        }
+        this.scheduled10amLand.names.push(...names);
+      }
     }
-
-    target.names.push(...names);
   }
 
   /**
@@ -1579,7 +1581,14 @@ export class Schedule {
       for (; i <= 3; i++) {
         const kidsActivity = activityKids[activity];
         if (kidsActivity !== undefined) {
-          kidsActivity.push(...this.getKidsbyActivityChoice(activity, activityType, i, timeSlot));
+          kidsActivity.push(
+            ...this.getKidsbyActivityChoice(
+              activity,
+              activityType,
+              i as AllowedChoiceNums,
+              timeSlot
+            )
+          );
         }
       }
     }
@@ -1895,7 +1904,7 @@ export class Schedule {
     activityType: AllowedActivityTypes,
     timeSlot: Allowed9and10Only
   ): void {
-    this.setKidsTimeSlot([name], null, activityType + timeSlot);
+    this.setKidsTimeSlot([name], null, (activityType + timeSlot) as AllowedActivityTimes);
     this.addKidToNotScheduled(name, activityType, timeSlot);
     this.removeKidFromScheduled(name, activityType, timeSlot);
     this.removeKidFromActivity(name, activity, activityType, timeSlot);
@@ -1907,7 +1916,10 @@ export class Schedule {
    * @param {object} kidtoScheduleData - data for the scheduling (not resheduling) a kid.
    * @returns {void}
    */
-  private scheduleNoChoicesMatchesFound(reScheduleData: object, kidtoScheduleData: object): void {
+  private scheduleNoChoicesMatchesFound(
+    reScheduleData: RescheduleMatches,
+    kidtoScheduleData: RescheduleKidsData
+  ): void {
     const { reScheduleKid, fromActivity, toActivity } = reScheduleData;
     const { name: mainName, activity, activityType, timeSlot } = kidtoScheduleData;
     this.unScheduleKid(reScheduleKid, fromActivity, activityType, timeSlot);
@@ -1955,25 +1967,39 @@ export class Schedule {
       if (uniqueChoice10am.has(activity)) {
         const uniqueNames9am = uniqueChoice9am.get(activity);
         const uniqueNames10am = uniqueChoice10am.get(activity);
-        const notInUniqueNames10am = uniqueNames9am.filter(item => !uniqueNames10am.includes(item));
-        const notInUniqueNames9am = uniqueNames10am.filter(item => !uniqueNames9am.includes(item));
-        if (notInUniqueNames10am.length > 0) {
-          const kidsScheduledCount9am = this.scheduleKids(
-            activityType,
-            activity,
-            '9am',
-            notInUniqueNames10am
-          );
-          totalKidsCount += kidsScheduledCount9am;
+        let notInUniqueNames10am: string[];
+        let notInUniqueNames9am: string[];
+        if (uniqueNames9am !== undefined && uniqueNames10am !== undefined) {
+          notInUniqueNames10am = uniqueNames9am.filter(item => !uniqueNames10am.includes(item));
+          if (notInUniqueNames10am.length > 0) {
+            const typedActivity =
+              activityType === 'water'
+                ? (activity as WaterActivities)
+                : (activity as LandActivities);
+            const kidsScheduledCount9am = this.scheduleKids(
+              activityType,
+              typedActivity,
+              '9am',
+              notInUniqueNames10am
+            );
+            totalKidsCount += kidsScheduledCount9am;
+          }
         }
-        if (notInUniqueNames9am.length > 0) {
-          const kidsScheduledCount10am = this.scheduleKids(
-            activityType,
-            activity,
-            '10am',
-            notInUniqueNames9am
-          );
-          totalKidsCount += kidsScheduledCount10am;
+        if (uniqueNames9am !== undefined && uniqueNames10am !== undefined) {
+          notInUniqueNames9am = uniqueNames10am.filter(item => !uniqueNames9am.includes(item));
+          if (notInUniqueNames9am.length > 0) {
+            const typedActivity =
+              activityType === 'water'
+                ? (activity as WaterActivities)
+                : (activity as LandActivities);
+            const kidsScheduledCount10am = this.scheduleKids(
+              activityType,
+              typedActivity,
+              '10am',
+              notInUniqueNames9am
+            );
+            totalKidsCount += kidsScheduledCount10am;
+          }
         }
       }
     }
@@ -2003,14 +2029,19 @@ export class Schedule {
     }
     if (notFullMatch.length > 0) {
       notFullMatch = notFullMatch.sort(
-        (a, b) => scheduledActivities.get(b) - scheduledActivities.get(a)
+        (a, b) => (scheduledActivities.get(b) || 0) - (scheduledActivities.get(a) || 0)
       );
     }
     for (const activity of notFullMatch) {
-      if (scheduledActivities.get(activity) > 0) {
-        const kidsScheduledCount = this.scheduleKids(activityType, notFullMatch[0], timeSlot, [
-          name,
-        ]);
+      const activityCount = scheduledActivities.get(activity);
+      if (activityCount !== undefined && activityCount > 0) {
+        const fullMatchActivity =
+          activityType === 'water'
+            ? (notFullMatch[0] as WaterActivities)
+            : timeSlot === '9am'
+              ? (notFullMatch[0] as LandActivities9am)
+              : (notFullMatch[0] as LandActivities10am);
+        this.scheduleKids(activityType, fullMatchActivity, timeSlot, [name]);
         return notFullMatch[0];
       }
     }
@@ -2040,7 +2071,9 @@ export class Schedule {
       );
       if (matchActivity !== 'no match') {
         const activityOpenSlotCount = scheduledChosenActivities.get(matchActivity);
-        scheduledChosenActivities.set(matchActivity, activityOpenSlotCount - 1);
+        if (activityOpenSlotCount !== undefined && activityOpenSlotCount > 0) {
+          scheduledChosenActivities.set(matchActivity, activityOpenSlotCount - 1);
+        }
       }
     }
   }
@@ -2092,7 +2125,9 @@ export class Schedule {
         );
         if (matchActivity !== 'no match') {
           const activityOpenSlotCount = scheduledChosenActivities9am.get(matchActivity);
-          scheduledChosenActivities.set(matchActivity, activityOpenSlotCount - 1);
+          if (activityOpenSlotCount !== undefined) {
+            scheduledChosenActivities.set(matchActivity, activityOpenSlotCount - 1);
+          }
         } else {
           if (currentTimeSlot === '10am') {
             currentTimeSlot = '9am';
@@ -2107,7 +2142,9 @@ export class Schedule {
           );
           if (matchActivity !== 'no match') {
             const activityOpenSlotCount = scheduledChosenActivities.get(matchActivity);
-            scheduledChosenActivities.set(matchActivity, activityOpenSlotCount - 1);
+            if (activityOpenSlotCount !== undefined) {
+              scheduledChosenActivities.set(matchActivity, activityOpenSlotCount - 1);
+            }
           }
         }
       }
@@ -2131,10 +2168,8 @@ export class Schedule {
     choiceNum: AllowedChoices
   ): object {
     const scheduledActivitiesNotFull = this.getScheduledActivitiesNotFull(activityType, timeSlot);
-    let fromActivity: LandActivities | WaterActivities;
-    let toActivity: LandActivities | WaterActivities;
     for (const name of names) {
-      const activityTypeChoice = this.getKidsChoice(activityType, [choiceNum][0]);
+      const activityTypeChoice = this.getKidsChoice(activityType, choiceNum[0]);
       const nameChoice = this.kids.choices[name][activityTypeChoice];
       if (nameChoice !== activity && scheduledActivitiesNotFull.has(nameChoice)) {
         return { reScheduleKid: name, fromActivity: activity, toActivity: nameChoice };
@@ -2166,14 +2201,14 @@ export class Schedule {
               activityType,
               timeSlot,
               typedChoiceNum
-            );
+            ) as RescheduleMatches;
             if (Object.prototype.hasOwnProperty.call(fullNamesChoices, 'reScheduleKid')) {
               const kidToScheduleData = {
                 name: name,
                 activity: choice,
                 activityType: activityType,
                 timeSlot: timeSlot,
-              };
+              } as RescheduleKidsData;
               this.scheduleNoChoicesMatchesFound(fullNamesChoices, kidToScheduleData);
               break mainChoiceLoop;
             }
@@ -2221,14 +2256,14 @@ export class Schedule {
               activityType,
               timeSlot,
               typedChoiceNum
-            );
+            ) as RescheduleMatches;
             if (Object.prototype.hasOwnProperty.call(fullNamesChoices, 'reScheduleKid')) {
               const kidToScheduleData = {
                 name: name,
                 activity: choice,
                 activityType: activityType,
                 timeSlot: timeSlot,
-              };
+              } as RescheduleKidsData;
               this.scheduleNoChoicesMatchesFound(fullNamesChoices, kidToScheduleData);
               break mainChoiceLoop;
             }
@@ -2889,8 +2924,6 @@ export class Schedule {
     activityType: AllowedActivityTypes,
     timeSlot: AllowedTimes
   ): boolean {
-    const allNames =
-      activityType === 'land' ? this.notScheduledAllNamesLand : this.notScheduledAllNamesWater;
     const scheduledTimeNames = this.getScheduledKidsList(activityType, timeSlot);
     const scheduledActivities = this.getScheduledActivitiesList(activityType, timeSlot);
     const notScheduledTimeNames = this.getNotScheduledKidsList(activityType, timeSlot, false);
