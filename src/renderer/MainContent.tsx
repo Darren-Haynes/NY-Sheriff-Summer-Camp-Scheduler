@@ -35,7 +35,8 @@ export default function MainContent() {
   }, []);
 
   // TODO: fix type error
-  const handleToggle = box => {
+  const handleToggle = (box: string) => {
+    console.log('Toggling to:', box); // Verify this prints
     setShowInputOptions(box);
   };
   return (
