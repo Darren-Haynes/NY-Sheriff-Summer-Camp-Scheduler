@@ -10,58 +10,66 @@ export type CampActivities = {
   land9am: LandKids9am;
   land10am: LandKids10am;
   landRanges: LandRanges;
-  landRanges9am: LandRanges;
-  landRanges10am: LandRanges;
+  landRanges9am: LandRanges9am;
+  landRanges10am: LandRanges10am;
   waterRanges: WaterRanges;
   waterActivitiesChoiceCount: WaterActivityCounts;
   landActivitiesChoiceCount: LandActivityCounts;
 };
 
-export type LandRanges = {
-  bball: Array<number>;
-  vball: Array<number>;
-  soc: Array<number>;
-  arch: Array<number>;
-  art: Array<number>;
-  hike: Array<number>;
-  cheer: Array<number>;
-  pball: Array<number>;
-  lax: Array<number>;
-  fball: Array<number>;
-  yoga: Array<number>;
-  fris: Array<number>;
-};
+type LandRangeType = [number, number, number];
 
-export type LandRanges9am = {
-  art: Array<number>;
-  hike: Array<number>;
-  bball: Array<number>;
-  cheer: Array<number>;
-  soc: Array<number>;
-  vball: Array<number>;
-  arch: Array<number>;
-};
+export interface LandRanges {
+  [key: string]: LandRangeType;
+  art: LandRangeType;
+  hike: LandRangeType;
+  bball: LandRangeType;
+  cheer: LandRangeType;
+  soc: LandRangeType;
+  vball: LandRangeType;
+  arch: LandRangeType;
+  pball: LandRangeType;
+  lax: LandRangeType;
+  fball: LandRangeType;
+  yoga: LandRangeType;
+  fris: LandRangeType;
+}
 
-export type LandRanges10am = {
-  fris: Array<number>;
-  art: Array<number>;
-  hike: Array<number>;
-  pball: Array<number>;
-  fball: Array<number>;
-  lax: Array<number>;
-  yoga: Array<number>;
-  arch: Array<number>;
-};
+export interface LandRanges9am {
+  [key: string]: LandRangeType;
+  art: LandRangeType;
+  hike: LandRangeType;
+  bball: LandRangeType;
+  cheer: LandRangeType;
+  soc: LandRangeType;
+  vball: LandRangeType;
+  arch: LandRangeType;
+}
 
-export type WaterRanges = {
-  swim: Array<number>;
-  fish: Array<number>;
-  canoe: Array<number>;
-  snork: Array<number>;
-  sail: Array<number>;
-  pboard: Array<number>;
-  kayak: Array<number>;
-};
+export interface LandRanges10am {
+  [key: string]: LandRangeType;
+  fris: LandRangeType;
+  art: LandRangeType;
+  hike: LandRangeType;
+  pball: LandRangeType;
+  fball: LandRangeType;
+  lax: LandRangeType;
+  yoga: LandRangeType;
+  arch: LandRangeType;
+}
+
+type WaterRangeType = [number, number, number, number, number];
+
+export interface WaterRanges {
+  [key: string]: WaterRangeType;
+  swim: WaterRangeType;
+  fish: WaterRangeType;
+  canoe: WaterRangeType;
+  snork: WaterRangeType;
+  sail: WaterRangeType;
+  pboard: WaterRangeType;
+  kayak: WaterRangeType;
+}
 
 export type WaterKids = {
   swim: Array<string>;

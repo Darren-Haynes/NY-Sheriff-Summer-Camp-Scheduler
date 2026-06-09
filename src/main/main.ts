@@ -52,8 +52,11 @@ const createWindow = (): void => {
       mainWindow.webContents.send('error-list', JSON.stringify(dataErrors.getErrorList()));
     } else {
       const result = scheduleKids(data);
-      result.schedule = Object.fromEntries(result.schedule);
-      mainWindow.webContents.send('result-list', JSON.stringify(result));
+      if (result) {
+        mainWindow.webContents.send('result-list', JSON.stringify(result));
+      } else {
+        mainWindow.webContents.send('result-list', JSON.stringify('No result'));
+      }
     }
   });
 
@@ -149,12 +152,12 @@ const createWindow = (): void => {
         filters: [{ name: 'Excel Files', extensions: ['xlsx'] }],
       });
       if (!canceled && filePath) {
-        fs.writeFileSync(filePath, buffer);
+        fs.writeFileSync(filePath, buffer as unknown as Uint8Array);
       }
     }
   );
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 };
 
 const joinNames = (names: string[]): string => {
