@@ -98,7 +98,7 @@ export const copySchedule = (
 };
 
 export const exportToExcel = (
-  result,
+  result: Schedule,
   waterActs: string[],
   land9amActs: string[],
   land10amActs: string[]
