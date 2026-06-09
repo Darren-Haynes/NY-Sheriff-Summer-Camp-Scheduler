@@ -1,9 +1,9 @@
 import { Activities } from './activities';
-import { KidsMap, KidsDataType, ErrorData } from '../types/dataInput-types';
+import { KidsDataType, ErrorData } from '../types/dataInput-types';
 
 export class KidsChoices {
   campData: string[][];
-  kidsMap: Map<string, KidsMap>;
+  kidsMap: Map<string, KidsDataType>;
   headerRow: boolean;
 
   constructor(data: string[][], header: boolean) {
@@ -174,7 +174,7 @@ export class DataErrorHandler {
       errorList.push(activityObj);
     }
     if (this.duplicateChoiceError.length !== 0) {
-      const duplicateChoiceObj: errorData = {
+      const duplicateChoiceObj: ErrorData = {
         header: this.duplicateChoiceErrorHeader.toUpperCase(),
         errorList: this.duplicateChoiceError,
       };

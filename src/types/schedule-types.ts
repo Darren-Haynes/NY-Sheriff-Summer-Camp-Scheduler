@@ -35,6 +35,46 @@ export interface NotScheduledActivities {
   timeSlot: AllowedTimes;
 }
 
+export interface LandCount9am {
+  [key: string]: number;
+  art: number;
+  hike: number;
+  bball: number;
+  cheer: number;
+  soc: number;
+  vball: number;
+  arch: number;
+}
+
+export interface LandCount10am {
+  [key: string]: number;
+  fris: number;
+  art: number;
+  hike: number;
+  pball: number;
+  fball: number;
+  lax: number;
+  yoga: number;
+  arch: number;
+}
+
+export interface RescheduleMatches {
+  reScheduleKid: string;
+  fromActivity: AllActivities;
+  toActivity: AllActivities;
+}
+
+export interface RescheduleKidsData {
+  name: string;
+  activity: AllActivities;
+  activityType: AllowedActivityTypes;
+  timeSlot: AllowedTimes;
+}
+
+export type ActivityKidsMap = {
+  [key: string]: string[];
+};
+
 export type WaterActivities = 'swim' | 'fish' | 'canoe' | 'snork' | 'sail' | 'pboard' | 'kayak';
 // TODO: uncomment the 2 line below to try and increase type safety
 // type Land9amActivities = 'bball' | 'vball' | 'soc' | 'arch' | 'art' | 'hike' | 'cheer';
@@ -67,9 +107,9 @@ export type LandActivities10am =
 
 export type AllActivities = LandActivities | WaterActivities;
 
-export type LandKids9am = Record<LandActivities9am, string[]>;
-export type LandKids10am = Record<LandActivities10am, string[]>;
-export type WaterKids = Record<WaterActivities, string[]>;
+export type LandKids9am = Record<LandActivities9am, string[]> | null;
+export type LandKids10am = Record<LandActivities10am, string[]> | null;
+export type WaterKids = Record<WaterActivities, string[]> | null;
 
 export interface ScheduledActivities {
   water9am: WaterKids;
@@ -102,8 +142,7 @@ export type AllowedMaxMinSched = (typeof AllowedMaxMinSched)[number];
 const AllowedDoubleSingle = ['double', 'single'] as const;
 export type AllowedDoubleSingle = (typeof AllowedDoubleSingle)[number];
 
-const AllowedChoiceNums = 1 | 2 | (3 as const);
-export type AllowedChoiceNums = (typeof AllowedChoiceNums)[number];
+export type AllowedChoiceNums = 1 | 2 | 3;
 
 const AllowedActivities = ['swim', 'fish', 'canoe', 'snork', 'sail', 'pboard', 'kayak'] as const;
 export type AllowedActivities = (typeof AllowedActivities)[number];
