@@ -1,15 +1,11 @@
 import { copySchedule, exportToExcel } from './ipcFunctions';
+import { Schedule } from '../main/schedule';
 import TimeSlot from './timeSlots';
 
 interface ToggleProps {
   isVisible: string;
   onToggle: (box: string) => void;
-  result: resultObjects[];
-}
-
-interface resultObjects {
-  header: string;
-  resultList: string[];
+  result: Schedule;
 }
 
 const ResultBox: React.FC<ToggleProps> = ({ isVisible, onToggle, result }) => {
