@@ -1,3 +1,6 @@
+import { Schedule } from '../main/schedule';
+import { LandActivities9am, LandActivities10am, WaterActivities } from '../types/schedule-types';
+
 // Get contents of textarea box
 export const submitTextboxContent = () => {
   const txtBox = document.getElementById('paste-textarea') as HTMLInputElement;
@@ -39,18 +42,39 @@ const joinNames = (names: string[]): string => {
   return nameOrder.slice(0, -2);
 };
 
-export const timeSlotData = (result, activities: string[], title: string, timeSlot: string) => {
+export const timeSlotData = (
+  result: Schedule,
+  activities: string[],
+  title: string,
+  timeSlot: string
+) => {
   let timeSlotText = `${title}\n`;
   for (const activity of activities) {
-    timeSlotText += `${activity} ${result[timeSlot][activity].length}\n`;
-    timeSlotText += `${joinNames(result[timeSlot][activity])}\n`;
+    let activityKids: string[] = [];
+    switch (timeSlot) {
+      case 'water9am':
+        activityKids = result['water9am'][activity as WaterActivities];
+        break;
+      case 'water10am':
+        activityKids = result['water10am'][activity as WaterActivities];
+        break;
+      case 'land9am':
+        activityKids = result['land9am'][activity as LandActivities9am];
+        break;
+      case 'land10am':
+        activityKids = result['land10am'][activity as LandActivities10am];
+        break;
+    }
+    const activityName = activityKids ? activity : 'No activity scheduled';
+    timeSlotText += `${activityName} ${activityKids.length}\n`;
+    timeSlotText += `${joinNames(activityKids)}\n`;
     timeSlotText += '\n';
   }
   return timeSlotText;
 };
 
 export const copySchedule = (
-  result,
+  result: Schedule,
   waterActs: string[],
   land9amActs: string[],
   land10amActs: string[]
@@ -74,7 +98,7 @@ export const copySchedule = (
 };
 
 export const exportToExcel = (
-  result,
+  result: Schedule,
   waterActs: string[],
   land9amActs: string[],
   land10amActs: string[]
