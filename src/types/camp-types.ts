@@ -51,7 +51,7 @@ export interface LandRanges10am {
   fris: LandRangeType;
   art: LandRangeType;
   hike: LandRangeType;
-  bball: LandRangeType;
+  pball: LandRangeType;
   fball: LandRangeType;
   lax: LandRangeType;
   yoga: LandRangeType;
