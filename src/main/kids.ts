@@ -1,4 +1,4 @@
-import { WaterActivityCounts, LandActivityCounts } from '../types/kids-types';
+import { WaterActivityCounts, LandActivityCounts, KidsChoices } from '../types/kids-types';
 
 /**
 Kids class contains the key data for each of the kids in the camp
@@ -9,6 +9,7 @@ export class Kids {
   count: number;
   waterActivitiesChoiceCount: WaterActivityCounts;
   landActivitiesChoiceCount: LandActivityCounts;
+  choices: Record<string, KidsChoices>;
 
   /**
    *
