@@ -174,7 +174,7 @@ export class DataErrorHandler {
       errorList.push(activityObj);
     }
     if (this.duplicateChoiceError.length !== 0) {
-      const duplicateChoiceObj: errorData = {
+      const duplicateChoiceObj: ErrorData = {
         header: this.duplicateChoiceErrorHeader.toUpperCase(),
         errorList: this.duplicateChoiceError,
       };
