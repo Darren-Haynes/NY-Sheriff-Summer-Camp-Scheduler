@@ -3,7 +3,7 @@ import TimeSlot from './timeSlots';
 
 interface ToggleProps {
   isVisible: string;
-  onToggle: React.MouseEventHandler<HTMLButtonElement>;
+  onToggle: (box: string) => void;
   result: resultObjects[];
 }
 

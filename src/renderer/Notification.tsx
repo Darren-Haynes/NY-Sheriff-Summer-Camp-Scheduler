@@ -1,6 +1,6 @@
 interface ToggleProps {
   isVisible: string;
-  onToggle: React.MouseEventHandler<HTMLButtonElement>;
+  onToggle: (box: string) => void;
   message: string;
 }
 

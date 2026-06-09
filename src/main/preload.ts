@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
-type IpcCallback = (data: unknown) => void;
+type IpcStringCallback = (data: string) => void;
 
 const preload = {
   send_text: (message: string) => ipcRenderer.invoke('submit-text', message),
@@ -9,11 +9,11 @@ const preload = {
     ipcRenderer.invoke('export-excel', report, waterActs, land9amActs, land10amActs),
   file_dialog: () => ipcRenderer.invoke('open-file-dialog'),
   // send_error: (errorData: []) => ipcRenderer.on('error-list', errorData),
-  send_error: (callback: IpcCallback) =>
+  send_error: (callback: IpcStringCallback) =>
     ipcRenderer.on('error-list', (_event, value) => callback(value)),
-  send_result: (callback: IpcCallback) =>
+  send_result: (callback: IpcStringCallback) =>
     ipcRenderer.on('result-list', (_event, value) => callback(value)),
-  send_clipboard: (callback: IpcCallback) =>
+  send_clipboard: (callback: IpcStringCallback) =>
     ipcRenderer.on('clipboard-content', (_event, value) => callback(value)),
 };
 
