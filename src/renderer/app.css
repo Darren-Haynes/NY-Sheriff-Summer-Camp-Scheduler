@@ -193,9 +193,12 @@ button:hover {
   opacity: 1;
 }
 
-#text-box {
+#text-box,
+#paste-text-box {
   box-sizing: border-box;
   width: 85%;
+}
+#text-box {
   overflow-y: scroll;
 }
 

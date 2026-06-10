@@ -12,7 +12,7 @@ const PasteBox: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
 
   return (
     <div id="input-box">
-      <div id="text-box" className="fade-in-1s">
+      <div id="paste-text-box" className="fade-in-1s">
         <textarea id="paste-textarea">Paste text here...</textarea>
       </div>
 
