@@ -1,15 +1,11 @@
 import { copySchedule, exportToExcel } from './ipcFunctions';
+import { Schedule } from '../main/schedule';
 import TimeSlot from './timeSlots';
 
 interface ToggleProps {
   isVisible: string;
-  onToggle: React.MouseEventHandler<HTMLButtonElement>;
-  result: resultObjects[];
-}
-
-interface resultObjects {
-  header: string;
-  resultList: string[];
+  onToggle: (box: string) => void;
+  result: Schedule | null;
 }
 
 const ResultBox: React.FC<ToggleProps> = ({ isVisible, onToggle, result }) => {
@@ -20,6 +16,10 @@ const ResultBox: React.FC<ToggleProps> = ({ isVisible, onToggle, result }) => {
   const waterActs: string[] = ['fish', 'pboard', 'snork', 'canoe', 'kayak', 'sail', 'swim'];
   const land9amActs: string[] = ['art', 'hike', 'bball', 'cheer', 'soc', 'vball', 'arch'];
   const land10amActs: string[] = ['fris', 'art', 'hike', 'pball', 'fball', 'lax', 'yoga', 'arch'];
+
+  if (!result) {
+    return null;
+  }
 
   return (
     <div id="result-box">
