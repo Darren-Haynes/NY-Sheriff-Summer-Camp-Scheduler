@@ -7,17 +7,22 @@
     "esModuleInterop": true,
     "noImplicitAny": true,
     "sourceMap": true,
-    "baseUrl": ".",
     "outDir": "dist",
     "rootDir": "./src",
-    "moduleResolution": "node",
+
+    /* 1. KEEP THIS AT BUNDLER */
+    "moduleResolution": "bundler",
+
+    /* 2. COMPLETELY REMOVED "baseUrl": "." LINE FROM HERE */
+
     "resolveJsonModule": true,
     "strictNullChecks": true,
     "jsx": "react-jsx",
+
+    /* 3. UPDATE PATHS TO USE RELATIVE PREFIX MAPPINGS */
     "paths": {
-      "*": ["node_modules/*"],
-      "@src/*": ["src/*"],
-      "@assets/*": ["assets/*"],
+      "@src/*": ["./src/*"],
+      "@assets/*": ["./assets/*"],
     },
   },
   "include": ["src/**/*", "assets/*", "src/renderer/**/*.d.ts"],
