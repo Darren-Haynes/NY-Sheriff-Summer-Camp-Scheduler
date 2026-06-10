@@ -28,6 +28,9 @@ const createWindow = (): void => {
     minWidth: 650,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: false, // ← Add this line
     },
   });
 
