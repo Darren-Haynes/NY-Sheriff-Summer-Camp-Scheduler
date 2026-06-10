@@ -27,4 +27,4 @@
  */
 
 import './app.css';
-import './App.tsx';
+import './App';
