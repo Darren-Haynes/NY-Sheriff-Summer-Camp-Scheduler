@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { Schedule } from '../main/schedule';
+import { ErrorData } from '../types/dataInput-types';
 import ErrorBox from './ErrorBox';
 import InputOptions from './InputOptions';
 import PasteBox from './PasteBox';
@@ -6,10 +8,10 @@ import ResultBox from './ResultBox';
 import NotificationBox from './Notification';
 
 export default function MainContent() {
-  const [showInputOptions, setShowInputOptions] = useState('input-box');
-  const [errorContent, setErrorContent] = useState([]);
-  const [resultContent, setResultContent] = useState([]);
-  const [showNotification, setNotificationContent] = useState('no-box');
+  const [showInputOptions, setShowInputOptions] = useState<string>('input-box');
+  const [errorContent, setErrorContent] = useState<ErrorData[]>([]);
+  const [resultContent, setResultContent] = useState<Schedule | null>(null);
+  const [showNotification, setNotificationContent] = useState<string>('no-box');
 
   useEffect(() => {
     // Recieve errorData from Main
@@ -28,14 +30,14 @@ export default function MainContent() {
   }, []);
 
   useEffect(() => {
-    // Recieve resultData from Main
+    // Trigger Notification in Main
     window.textAPI.send_clipboard(box => {
       setNotificationContent(box);
     });
   }, []);
 
-  // TODO: fix type error
-  const handleToggle = box => {
+  const handleToggle = (box: string) => {
+    console.log('Toggling to:', box); // Verify this prints
     setShowInputOptions(box);
   };
   return (

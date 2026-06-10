@@ -2,7 +2,7 @@ import { submitTextboxContent, fileUpload } from './ipcFunctions';
 
 interface ToggleProps {
   isVisible: string;
-  onToggle: React.MouseEventHandler<HTMLButtonElement>;
+  onToggle: (box: string) => void;
 }
 
 const PasteBox: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
