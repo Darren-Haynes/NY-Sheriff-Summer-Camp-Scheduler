@@ -18,5 +18,8 @@ const preload = {
 };
 
 contextBridge.exposeInMainWorld('textAPI', preload);
+contextBridge.exposeInMainWorld('appEnv', {
+  dirname: __dirname,
+});
 
 export type TPreload = typeof preload;

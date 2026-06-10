@@ -46,7 +46,7 @@ Main class that schedules the kids to activities.
 * @param {string} algo - name of algo that is being run to schedule kids
 */
 export class Schedule {
-  inputData: string;
+  inputData!: string;
   kids: Kids;
   schedule: KidsData;
   notScheduled9amWater: NotScheduledWater;
@@ -1014,7 +1014,8 @@ export class Schedule {
     maxOrMin: AllowedMaxMin,
     timeSlot: AllowedTimes
   ): void {
-    singleMaxActivities.forEach((activity: AllActivities) => {
+    (singleMaxActivities as AllActivities[]).forEach((activity: AllActivities) => {
+      // singleMaxActivities.forEach((activity: AllActivities) => {
       const resolvedTimeSlot = this.getTimeSlotConditional(activityType, timeSlot);
 
       let kidsByActivityChoice: string[] = [];
@@ -3141,7 +3142,7 @@ export class Schedule {
 
     for (let i = 0; i < waterMethods.length; i++) {
       console.log('ENTERING: ' + waterMethods[i].name + '()');
-      waterMethods[i](...waterMethodArgs[i]);
+      (waterMethods[i] as Function).apply(this, waterMethodArgs[i]);
       this.testScheduling('water', waterMethods[i].name + '()');
     }
 
@@ -3177,7 +3178,7 @@ export class Schedule {
 
     for (let i = 0; i < landMethods.length; i++) {
       console.log('ENTERING: ' + landMethods[i].name + '()');
-      landMethods[i](...landMethodArgs[i]);
+      (landMethods[i] as Function).apply(this, landMethodArgs[i]);
       this.testScheduling('land', landMethods[i].name + '()');
     }
 

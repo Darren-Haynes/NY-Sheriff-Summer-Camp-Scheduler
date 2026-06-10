@@ -37,6 +37,12 @@ const createWindow = (): void => {
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
+  mainWindow.once('ready-to-show', () => {
+    setTimeout(() => {
+      mainWindow.webContents.reloadIgnoringCache();
+      mainWindow.show();
+    }, 600); // Give the local Webpack dev server 600ms to pipe the React compilation
+  });
   // Open file Dialog for user to pick file.
   ipcMain.handle('open-file-dialog', async () => {
     const result = await dialog.showOpenDialog({
