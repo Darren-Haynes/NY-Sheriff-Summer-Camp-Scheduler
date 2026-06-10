@@ -4,10 +4,9 @@ import CampSign from '../../assets/its-all-about-the-kids.png';
 
 interface ToggleProps {
   isVisible: string;
-  onToggle: React.MouseEventHandler<HTMLButtonElement>;
+  onToggle: (box: string) => void;
 }
 
-// TODO: fix type error
 const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
   if (isVisible !== 'input-box') {
     return null;
@@ -31,7 +30,6 @@ const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
       </button>
       <p className="fade-in-1-5s">or paste sheet content</p>
       <button
-        // TODO: fix type error
         onClick={() => onToggle('paste-box')}
         type="button"
         id="paste-btn"
