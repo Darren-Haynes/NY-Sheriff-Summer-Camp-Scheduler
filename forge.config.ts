@@ -21,18 +21,24 @@ const config: ForgeConfig = {
   rebuildConfig: {},
   makers: [
     // new MakerSquirrel({ authors: 'Darren Haynes' }, ['win32']),
-    new MakerMSI({
-      description: "NY Sheriff Institute Summer Camp Scheduler",
-      exe: "NY Sheriff Summer Camp Scheduler",
-      icon: "./assets/icons/sheriff-badge-msi.ico",
-      ui: {
-        images: { banner: "C:/Users/darre/Projects/NY-Sheriff-Summer-Camp-Scheduler/assets/banner-msi.jpeg" },
-        chooseDirectory: true
+    new MakerMSI(
+      {
+        description: 'NY Sheriff Institute Summer Camp Scheduler',
+        exe: 'NY Sheriff Summer Camp Scheduler',
+        icon: './assets/icons/sheriff-badge-msi.ico',
+        ui: {
+          images: {
+            banner:
+              'C:/Users/darre/Projects/NY-Sheriff-Summer-Camp-Scheduler/assets/banner-msi.jpeg',
+          },
+          chooseDirectory: true,
+        },
+        manufacturer: 'Darren Haynes',
+        programFilesFolderName: 'NY Summer Camp',
+        version: '1.0.0',
       },
-      manufacturer: "Darren Haynes",
-      programFilesFolderName: "NY Summer Camp",
-      version: '1.0.0'
-    }, ['win32']),
+      ['win32']
+    ),
     new MakerZIP({}, ['darwin']),
     new MakerDMG({}, ['darwin']),
     new MakerRpm({}),
@@ -51,6 +57,10 @@ const config: ForgeConfig = {
             name: 'main_window',
             preload: {
               js: './src/main/preload.ts',
+              config: {
+                ...rendererConfig,
+                target: 'electron-preload',
+              },
             },
           },
         ],

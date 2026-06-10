@@ -4,13 +4,13 @@ import { Activities } from './activities';
 
 export class Camp {
   kids: Kids;
-  inputData: string;
-  inputDataArr: string[];
-  waterFirst: Schedule;
-  run: Schedule;
-  allRuns: Schedule[];
-  numOfRuns: number;
-  bestSchedule: Schedule | null;
+  inputData!: string;
+  inputDataArr!: string[];
+  waterFirst!: Schedule;
+  run!: Schedule;
+  allRuns!: Schedule[];
+  numOfRuns!: number;
+  bestSchedule!: Schedule | null;
 
   constructor(kids: Kids) {
     this.kids = kids;
