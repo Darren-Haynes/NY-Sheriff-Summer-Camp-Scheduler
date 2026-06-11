@@ -39,18 +39,36 @@ export class Camp {
    * The schedule can be ran 1 to 100 times. Since there is randomness in the scheduling algorithm,
    * multiple runs are necessary to find the best schedule. Best meaning the schedule that gives
    * the most kids one of their 3 scheduled choice for water and land activities.
-   * @param {numOfRuns} number - number of times to run the scheduling algorithm
+   * @param {number} numOfRuns - number of times to run the scheduling algorithm
    * @returns {void}
    */
   public scheduleTheKids(numOfRuns: number): void {
     if (numOfRuns < 1 || numOfRuns > 100) {
       throw new RangeError('Value must be between 1 and 100');
     }
+    let validResults = true;
+    let validCount = 0;
+    let invalidCount = 0;
     while (this.allRuns.length < numOfRuns) {
       this.run = new Schedule(this.kids, 'waterFirst');
-      this.run.runAlgo();
-      this.allRuns.push(this.run);
+      const validResult = this.run.runAlgo();
+      if (validResult) {
+        validCount++;
+        console.log('VALID RUN: ', validCount);
+        this.allRuns.push(this.run);
+      } else {
+        invalidCount++;
+        console.log('INVALID RUN: ', invalidCount);
+      }
+      if (invalidCount > numOfRuns) {
+        validResults = false;
+        break;
+      }
     }
-    this.bestSchedule = this.bestPercentagesSchedule();
+    if (!validResults) {
+      this.bestSchedule = null;
+    } else {
+      this.bestSchedule = this.bestPercentagesSchedule();
+    }
   }
 }
