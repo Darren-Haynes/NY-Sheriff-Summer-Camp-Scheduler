@@ -72,7 +72,9 @@ const createWindow = (): void => {
           JSON.stringify([
             {
               header: 'Unable to schedule kids',
-              errorList: ['This is most likely due to way too many kids making the same choice'],
+              errorList: [
+                'This is most likely due to way too many kids making the same choice or there are not enough total kids attending.',
+              ],
             },
           ])
         );
@@ -95,7 +97,9 @@ const createWindow = (): void => {
           JSON.stringify([
             {
               header: 'Unable to schedule kids',
-              errorList: ['This is most likely due to way too many kids making the same choice'],
+              errorList: [
+                'This is most likely due to way too many kids making the same choice or there are not enough total kids attending.',
+              ],
             },
           ])
         );
