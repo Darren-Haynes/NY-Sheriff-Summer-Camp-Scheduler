@@ -39,7 +39,7 @@ export class Camp {
    * The schedule can be ran 1 to 100 times. Since there is randomness in the scheduling algorithm,
    * multiple runs are necessary to find the best schedule. Best meaning the schedule that gives
    * the most kids one of their 3 scheduled choice for water and land activities.
-   * @param {numOfRuns} number - number of times to run the scheduling algorithm
+   * @param {number} numOfRuns - number of times to run the scheduling algorithm
    * @returns {void}
    */
   public scheduleTheKids(numOfRuns: number): void {
