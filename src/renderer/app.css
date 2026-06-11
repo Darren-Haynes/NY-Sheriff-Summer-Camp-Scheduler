@@ -194,11 +194,14 @@ button:hover {
 }
 
 #text-box,
-#paste-text-box {
+#paste-text-box,
+#stats-text-box {
   box-sizing: border-box;
   width: 85%;
 }
-#text-box {
+
+#text-box,
+#stats-text-box {
   overflow-y: scroll;
 }
 
@@ -209,12 +212,11 @@ button:hover {
 }
 
 #result-box-btns {
-  /*align-items: center;*/
   margin-left: 9px;
 }
 
 #result-box-btns-container {
-  margin-top: 20px;
+  margin-top: 0;
 }
 
 #error-box-btn {
@@ -228,8 +230,18 @@ button:hover {
   width: 145px;
 }
 
+#stats-btn {
+  margin-top: 35px;
+  background-color: white;
+}
+
+#kids-btn {
+  margin-top: 35px;
+  background-color: #45838d;
+}
+
 #close-btn {
-  margin-top: 55px;
+  margin-top: 10x;
   background-color: rgb(231, 95, 95);
 }
 
@@ -257,13 +269,6 @@ button:hover {
   box-sizing: border-box;
   border: 15px solid #fff;
   border-radius: 8px;
-}
-
-#result-textarea {
-  width: 95%;
-  height: 0vh;
-  resize: none;
-  box-sizing: border-box;
 }
 
 #error-textarea {
