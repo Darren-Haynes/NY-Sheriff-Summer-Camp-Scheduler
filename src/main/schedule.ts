@@ -2467,11 +2467,11 @@ export class Schedule {
    * @param {string} timeSlot - only 2 options -'9am' or '10am'
    * @returns {void}
    */
-  private printUnderScheduled(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): void {
+  private printUnderScheduled(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): boolean {
     const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
     const typedActivityTypeTimeSlot = activityTypeTimeSlot as Record<string, string[]>;
     const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
-    console.log(`${activityType.toUpperCase()} ${timeSlot.toUpperCase()} UNDERSCHEDULED`);
+    // console.log(`${activityType.toUpperCase()} ${timeSlot.toUpperCase()} UNDERSCHEDULED`);
     let underScheduled = false;
     for (const activity of Object.keys(typedActivityTypeTimeSlot)) {
       const activityCount = typedActivityTypeTimeSlot[activity].length;
@@ -2483,7 +2483,9 @@ export class Schedule {
     }
     if (!underScheduled) {
       console.log('No activities under scheduled');
+      return true;
     }
+    return false;
   }
 
   /**
@@ -3161,12 +3163,21 @@ export class Schedule {
     const notScheduledToScheduled = this.testUnscheduledToScheduled();
     const testSchedulingWater = this.testScheduling('water', 'no func', false);
     const testSchedulingLand = this.testScheduling('land', 'no func', false);
+    const printUnderScheduledWater9am = this.printUnderScheduled('water', '9am');
+    const printUnderScheduledLand9am = this.printUnderScheduled('land', '9am');
+    const printUnderScheduledWater10am = this.printUnderScheduled('water', '10am');
+    const printUnderScheduledLand10am = this.printUnderScheduled('land', '10am');
+
     const allTrue = [
       landPercentagesTrue,
       waterPercentagesTrue,
       notScheduledToScheduled,
       testSchedulingWater,
       testSchedulingLand,
+      printUnderScheduledWater9am,
+      printUnderScheduledLand9am,
+      printUnderScheduledWater10am,
+      printUnderScheduledLand10am,
     ].every(element => element === true);
 
     return allTrue;

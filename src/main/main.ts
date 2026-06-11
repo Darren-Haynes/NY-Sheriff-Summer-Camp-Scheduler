@@ -67,7 +67,15 @@ const createWindow = (): void => {
       if (result) {
         mainWindow.webContents.send('result-list', JSON.stringify(result));
       } else {
-        mainWindow.webContents.send('result-list', JSON.stringify('No result'));
+        mainWindow.webContents.send(
+          'error-list',
+          JSON.stringify([
+            {
+              header: 'Unable to schedule kids',
+              errorList: ['This is most likely due to way too many kids making the same choice'],
+            },
+          ])
+        );
       }
     }
   });
@@ -79,7 +87,19 @@ const createWindow = (): void => {
       mainWindow.webContents.send('error-list', JSON.stringify(dataErrors.getErrorList()));
     } else {
       const result = scheduleKids(data);
-      mainWindow.webContents.send('result-list', JSON.stringify(result));
+      if (result) {
+        mainWindow.webContents.send('result-list', JSON.stringify(result));
+      } else {
+        mainWindow.webContents.send(
+          'error-list',
+          JSON.stringify([
+            {
+              header: 'Unable to schedule kids',
+              errorList: ['This is most likely due to way too many kids making the same choice'],
+            },
+          ])
+        );
+      }
     }
   });
 

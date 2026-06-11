@@ -46,6 +46,7 @@ export class Camp {
     if (numOfRuns < 1 || numOfRuns > 100) {
       throw new RangeError('Value must be between 1 and 100');
     }
+    let validResults = true;
     let validCount = 0;
     let invalidCount = 0;
     while (this.allRuns.length < numOfRuns) {
@@ -57,12 +58,17 @@ export class Camp {
         this.allRuns.push(this.run);
       } else {
         invalidCount++;
-        console.log('INVALID RUN');
+        console.log('INVALID RUN: ', invalidCount);
       }
-      if (invalidCount > 100) {
+      if (invalidCount > numOfRuns) {
+        validResults = false;
         break;
       }
     }
-    this.bestSchedule = this.bestPercentagesSchedule();
+    if (!validResults) {
+      this.bestSchedule = null;
+    } else {
+      this.bestSchedule = this.bestPercentagesSchedule();
+    }
   }
 }
