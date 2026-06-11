@@ -1299,7 +1299,7 @@ export class Schedule {
       timeSlot
     );
     if (activitiesAboveSingleMin.length > 0) {
-      console.log('Activities above single minimum:', activitiesAboveSingleMin);
+      // console.log('Activities above single minimum:', activitiesAboveSingleMin);
       this.scheduleSingleActivities(
         activitiesAboveSingleMin,
         activityType,
@@ -1334,7 +1334,7 @@ export class Schedule {
       timeSlot
     );
     if (activitiesAboveDoubleMin.length > 0) {
-      console.log('Activities above double minimum:', activitiesAboveDoubleMin);
+      // console.log('Activities above double minimum:', activitiesAboveDoubleMin);
       this.scheduleDoubleActivities(
         activitiesAboveDoubleMin,
         activityType,
@@ -1369,7 +1369,7 @@ export class Schedule {
       timeSlot
     );
     if (activitiesAboveSingleMax.length > 0) {
-      console.log('Activities above single maximum:', activitiesAboveSingleMax);
+      // console.log('Activities above single maximum:', activitiesAboveSingleMax);
       this.scheduleSingleActivities(
         activitiesAboveSingleMax,
         activityType,
@@ -1403,7 +1403,7 @@ export class Schedule {
       timeSlot
     );
     if (activitiesAboveDoubleMax.length > 0) {
-      console.log('Activities above doulbe maximum:', activitiesAboveDoubleMax);
+      // console.log('Activities above doulbe maximum:', activitiesAboveDoubleMax);
       this.scheduleDoubleActivities(
         activitiesAboveDoubleMax,
         activityType,
@@ -2550,22 +2550,27 @@ export class Schedule {
 
   private testScheduling(
     activityType: AllowedActivityTypes | 'final log',
-    func_name: string
-  ): void {
-    console.log('\n');
-    console.log('______________________________________');
-    console.log(`\tENTERING LOGS -- ${activityType}`);
-    console.log('--------------------------------------');
-    console.log('\tAfter calling', func_name, '\n');
-
-    if (activityType === 'water' || activityType === 'final log') {
-      this.printUnscheduledData('water');
+    func_name: string,
+    logging: boolean = true
+  ): boolean {
+    if (logging) {
+      console.log('\n');
+      console.log('______________________________________');
+      console.log(`\tENTERING LOGS -- ${activityType}`);
+      console.log('--------------------------------------');
+      console.log('\tAfter calling', func_name, '\n');
     }
 
-    if (activityType === 'land' || activityType === 'final log') {
-      this.printUnscheduledData('land');
+    if (logging) {
+      if (activityType === 'water' || activityType === 'final log') {
+        this.printUnscheduledData('water');
+      }
+
+      if (activityType === 'land' || activityType === 'final log') {
+        this.printUnscheduledData('land');
+      }
     }
-    // const notScheduledAllNames = activityType === 'water' ? this.notScheduledAllNamesWater : this.notScheduledAllNamesLand;
+
     const totalKidsCountWater = this.kids.count - this.notScheduledAllNamesWater.length;
     const totalKidsCountLand = this.kids.count - this.notScheduledAllNamesLand.length;
 
@@ -2658,11 +2663,14 @@ export class Schedule {
         water9amActivityCountAlt[key as WaterActivities] ===
           water9amActivityCount[key as WaterActivities]
     );
-    if (activityType === 'water' || activityType === 'final log') {
-      if (equalObjects9am) {
-        console.log('WATER 9AM objects ARE EQUAL');
-      } else {
-        console.log('WATER 9AM objects ARE not EQUAL!');
+
+    if (logging) {
+      if (activityType === 'water' || activityType === 'final log') {
+        if (equalObjects9am) {
+          console.log('WATER 9AM objects ARE EQUAL');
+        } else {
+          console.log('WATER 9AM objects ARE not EQUAL!');
+        }
       }
     }
 
@@ -2674,11 +2682,14 @@ export class Schedule {
         water10amActivityCountAlt[key as WaterActivities] ===
           water10amActivityCount[key as WaterActivities]
     );
-    if (activityType === 'water' || activityType === 'final log') {
-      if (equalObjects10am) {
-        console.log('WATER 10AM objects ARE EQUAL');
-      } else {
-        console.log('WATER 10AM objects ARE not EQUAL!');
+
+    if (logging) {
+      if (activityType === 'water' || activityType === 'final log') {
+        if (equalObjects10am) {
+          console.log('WATER 10AM objects ARE EQUAL');
+        } else {
+          console.log('WATER 10AM objects ARE not EQUAL!');
+        }
       }
     }
 
@@ -2770,11 +2781,14 @@ export class Schedule {
       (key, index) =>
         key === keys2Land[index] && land9amActivityCountAlt[key] === land9amActivityCount[key]
     );
-    if (activityType === 'land' || activityType === 'final log') {
-      if (equalObjects9amLand) {
-        console.log('LAND 9AM objects ARE EQUAL');
-      } else {
-        console.log('LAND 9AM objects ARE not EQUAL!');
+
+    if (logging) {
+      if (activityType === 'land' || activityType === 'final log') {
+        if (equalObjects9amLand) {
+          console.log('LAND 9AM objects ARE EQUAL');
+        } else {
+          console.log('LAND 9AM objects ARE not EQUAL!');
+        }
       }
     }
 
@@ -2784,74 +2798,92 @@ export class Schedule {
       (key, index) =>
         key === keys2aLand[index] && land10amActivityCountAlt[key] === land10amActivityCount[key]
     );
-    if (activityType === 'land' || activityType === 'final log') {
-      if (equalObjects10amLand) {
-        console.log('LAND 10AM objects ARE EQUAL');
-      } else {
-        console.log('LAND 10AM objects ARE not EQUAL!');
+
+    if (logging) {
+      if (activityType === 'land' || activityType === 'final log') {
+        if (equalObjects10amLand) {
+          console.log('LAND 10AM objects ARE EQUAL');
+        } else {
+          console.log('LAND 10AM objects ARE not EQUAL!');
+        }
+      }
+    }
+    if (logging) {
+      if (activityType === 'water' || activityType === 'final log') {
+        this.printNameCounts('water');
+      }
+
+      if (activityType === 'land' || activityType === 'final log') {
+        this.printNameCounts('land');
+      }
+
+      if (activityType === 'water' || activityType === 'final log') {
+        this.printCorrectActivities('water', '9am');
+        this.printCorrectActivities('water', '10am');
+      }
+      if (activityType === 'land' || activityType === 'final log') {
+        this.printCorrectActivities('land', '9am');
+        this.printCorrectActivities('land', '10am');
+      }
+
+      if (activityType === 'water' || activityType === 'final log') {
+        this.printOverScheduled('water', '9am');
+        this.printOverScheduled('water', '10am');
+      }
+      if (activityType === 'land' || activityType === 'final log') {
+        this.printOverScheduled('land', '9am');
+        this.printOverScheduled('land', '10am');
+      }
+
+      if (activityType === 'water' || activityType === 'final log') {
+        this.printUnderScheduled('water', '9am');
+        this.printUnderScheduled('water', '10am');
+      }
+      if (activityType === 'land' || activityType === 'final log') {
+        this.printUnderScheduled('land', '9am');
+        this.printUnderScheduled('land', '10am');
       }
     }
 
-    if (activityType === 'water' || activityType === 'final log') {
-      this.printNameCounts('water');
-    }
+    const waterToKidsCount = waterTotalCount !== totalKidsCountWater;
+    const landToKidsCount = landTotalCount !== totalKidsCountLand;
+    if (logging) {
+      if (activityType === 'water' || activityType === 'final log') {
+        console.log('\nWater totals:');
+        if (waterToKidsCount) {
+          console.log(
+            'Water Scheduled # mismatch. this.Kids.timeSlots != this.kids.totalKidsCount: '
+          );
+          console.log(waterTotalCount, '!==', totalKidsCountWater);
+        } else {
+          console.log(
+            'Land Scheduled # MATCHES: this.Kids.timeSlots == this.kids.totalKidsCount: '
+          );
+          console.log(waterTotalCount, '==', totalKidsCountWater);
+        }
+      }
 
-    if (activityType === 'land' || activityType === 'final log') {
-      this.printNameCounts('land');
-    }
-
-    if (activityType === 'water' || activityType === 'final log') {
-      this.printCorrectActivities('water', '9am');
-      this.printCorrectActivities('water', '10am');
-    }
-    if (activityType === 'land' || activityType === 'final log') {
-      this.printCorrectActivities('land', '9am');
-      this.printCorrectActivities('land', '10am');
-    }
-
-    if (activityType === 'water' || activityType === 'final log') {
-      this.printOverScheduled('water', '9am');
-      this.printOverScheduled('water', '10am');
-    }
-    if (activityType === 'land' || activityType === 'final log') {
-      this.printOverScheduled('land', '9am');
-      this.printOverScheduled('land', '10am');
-    }
-
-    if (activityType === 'water' || activityType === 'final log') {
-      this.printUnderScheduled('water', '9am');
-      this.printUnderScheduled('water', '10am');
-    }
-    if (activityType === 'land' || activityType === 'final log') {
-      this.printUnderScheduled('land', '9am');
-      this.printUnderScheduled('land', '10am');
-    }
-
-    if (activityType === 'water' || activityType === 'final log') {
-      console.log('\nWater totals:');
-      if (waterTotalCount !== totalKidsCountWater) {
-        console.log(
-          'Water Scheduled # mismatch. this.Kids.timeSlots != this.kids.totalKidsCount: '
-        );
-        console.log(waterTotalCount, '!==', totalKidsCountWater);
-      } else {
-        console.log('Land Scheduled # MATCHES: this.Kids.timeSlots == this.kids.totalKidsCount: ');
-        console.log(waterTotalCount, '==', totalKidsCountWater);
+      if (activityType === 'land' || activityType === 'final log') {
+        console.log('\nLand totals:');
+        if (landToKidsCount) {
+          console.log(
+            '\n\nLand Scheduled # mismatch. this.Kids.timeSlots != this.kids.totalKidsCount: '
+          );
+          console.log(landTotalCount, '!==', totalKidsCountLand);
+        } else {
+          console.log(
+            'Land Scheduled # MATCHES:  this.Kids.timeSlots == this.kids.totalKidsCount: '
+          );
+          console.log(landTotalCount, '==', totalKidsCountLand);
+        }
       }
     }
 
-    if (activityType === 'land' || activityType === 'final log') {
-      console.log('\nLand totals:');
-      if (landTotalCount !== totalKidsCountLand) {
-        console.log(
-          '\n\nLand Scheduled # mismatch. this.Kids.timeSlots != this.kids.totalKidsCount: '
-        );
-        console.log(landTotalCount, '!==', totalKidsCountLand);
-      } else {
-        console.log('Land Scheduled # MATCHES:  this.Kids.timeSlots == this.kids.totalKidsCount: ');
-        console.log(landTotalCount, '==', totalKidsCountLand);
-      }
-    }
+    const allNotInTarget = this.notScheduled9amWater.names.every(
+      element => !this.notScheduled10amWater.names.includes(element)
+    );
+
+    const allNamesEmpty = this.notScheduledAllNamesWater.length === 0;
 
     if (func_name == 'end log') {
       console.log('\nTOTAL KIDS NOT SCHEDULED Water:', this.kids.count - totalKidsCountWater);
@@ -2860,34 +2892,41 @@ export class Schedule {
         console.log(kid);
       }
 
-      const allNotInTarget = this.notScheduled9amWater.names.every(
-        element => !this.notScheduled10amWater.names.includes(element)
-      );
-      console.log(
-        'this.notScheduled9amWater.names !== this.notScheduled10amWater.names:',
-        allNotInTarget
-      );
-      const allNamesEmpty = this.notScheduledAllNamesWater.length === 0;
-      console.log('this.notScheduledAllNamesWater.length === 0:', allNamesEmpty);
+      if (logging) {
+        console.log(
+          'this.notScheduled9amWater.names !== this.notScheduled10amWater.names:',
+          allNotInTarget
+        );
+        console.log('this.notScheduledAllNamesWater.length === 0:', allNamesEmpty);
+      }
     }
 
+    const notFullyScheduledWater9am = this.getInsufficientlyScheduledActivites('water', '9am');
+    const notFullyScheduledWater10am = this.getInsufficientlyScheduledActivites('water', '10am');
+    const notFullyScheduledLand9am = this.getInsufficientlyScheduledActivites('land', '9am');
+    const notFullyScheduledLand10am = this.getInsufficientlyScheduledActivites('land', '10am');
+
+    const oppositesEqualWaterString =
+      JSON.stringify(this.notScheduled9amWater.names.sort()) ===
+      JSON.stringify(this.scheduled10amWater.names.sort());
+    const oppositesEqualWaterString2 =
+      JSON.stringify(this.notScheduled9amWater.names.sort()) ===
+      JSON.stringify(this.scheduled10amWater.names.sort());
+
+    const EqualWaterString =
+      JSON.stringify(this.scheduled9amWater.names.sort()) ===
+      JSON.stringify(this.scheduled10amLand.names.sort());
+    const EqualWaterString2 =
+      JSON.stringify(this.scheduled10amWater.names.sort()) ===
+      JSON.stringify(this.scheduled9amLand.names.sort());
+
     if (func_name == 'end log') {
-      const notFullyScheduledWater9am = this.getInsufficientlyScheduledActivites('water', '9am');
-      const notFullyScheduledWater10am = this.getInsufficientlyScheduledActivites('water', '10am');
-      const notFullyScheduledLand9am = this.getInsufficientlyScheduledActivites('land', '9am');
-      const notFullyScheduledLand10am = this.getInsufficientlyScheduledActivites('land', '10am');
       console.log('NOT FULLY SCHEDULED ACTIVITIES');
       console.log('Water 9am:', notFullyScheduledWater9am);
       console.log('Water 10am:', notFullyScheduledWater10am);
       console.log('Land 9am:', notFullyScheduledLand9am);
       console.log('Land 10am:', notFullyScheduledLand10am);
       console.log('\n\nSCHEDULED LISTS -- FINAL REPORT');
-      const oppositesEqualWaterString =
-        JSON.stringify(this.notScheduled9amWater.names.sort()) ===
-        JSON.stringify(this.scheduled10amWater.names.sort());
-      const oppositesEqualWaterString2 =
-        JSON.stringify(this.notScheduled9amWater.names.sort()) ===
-        JSON.stringify(this.scheduled10amWater.names.sort());
       console.log(
         'STRINGIFY COMPARE WATER notScheduled9amWater.names == scheduled10amWater.names:',
         oppositesEqualWaterString
@@ -2898,12 +2937,6 @@ export class Schedule {
       );
 
       console.log('\nWater and Land opposite times should equal');
-      const EqualWaterString =
-        JSON.stringify(this.scheduled9amWater.names.sort()) ===
-        JSON.stringify(this.scheduled10amLand.names.sort());
-      const EqualWaterString2 =
-        JSON.stringify(this.scheduled10amWater.names.sort()) ===
-        JSON.stringify(this.scheduled9amLand.names.sort());
       console.log(
         'STRINGIFY COMPARE WATER to LAND this.scheduled9amWater.names == this.scheduled10amLand.names:',
         EqualWaterString
@@ -2913,6 +2946,23 @@ export class Schedule {
         EqualWaterString2
       );
     }
+
+    const allTrue = [
+      equalObjects9am,
+      equalObjects10am,
+      equalObjects9amLand,
+      equalObjects10amLand,
+      !waterToKidsCount,
+      !landToKidsCount,
+      allNotInTarget,
+      allNamesEmpty,
+      oppositesEqualWaterString,
+      oppositesEqualWaterString2,
+      EqualWaterString,
+      EqualWaterString2,
+    ].every(element => element === true);
+
+    return allTrue;
   }
 
   /**
@@ -3111,13 +3161,24 @@ export class Schedule {
   private stats(): boolean {
     const landTrue = this.calculateChoicesPercentages('land');
     const waterTrue = this.calculateChoicesPercentages('water');
-    return landTrue && waterTrue;
+    const notScheduledToScheduled = this.testUnscheduledToScheduled();
+    const testSchedulingWater = this.testScheduling('water', 'no func', false);
+    const testSchedulingLand = this.testScheduling('land', 'no func', false);
+    const allTrue = [
+      landTrue,
+      waterTrue,
+      notScheduledToScheduled,
+      testSchedulingWater,
+      testSchedulingLand,
+    ].every(element => element === true);
+
+    return allTrue;
   }
 
   runAlgo(): boolean {
     this.isLandFirst = false;
-    console.log(`${this.algo} algorithm initiated`);
-    this.schedulingLog('any scheduling', 'before');
+    // console.log(`${this.algo} algorithm initiated`);
+    // this.schedulingLog('any scheduling', 'before');
 
     // SCHEDULE WATER ACTIVITIES
     const waterMethods = [
@@ -3141,9 +3202,9 @@ export class Schedule {
     ];
 
     for (let i = 0; i < waterMethods.length; i++) {
-      console.log('ENTERING: ' + waterMethods[i].name + '()');
+      // console.log('ENTERING: ' + waterMethods[i].name + '()');
       (waterMethods[i] as Function).apply(this, waterMethodArgs[i]);
-      this.testScheduling('water', waterMethods[i].name + '()');
+      // this.testScheduling('water', waterMethods[i].name + '()', true);
     }
 
     // SCHEDULE LAND ACTIVITIES
@@ -3177,15 +3238,12 @@ export class Schedule {
     ];
 
     for (let i = 0; i < landMethods.length; i++) {
-      console.log('ENTERING: ' + landMethods[i].name + '()');
+      // console.log('ENTERING: ' + landMethods[i].name + '()');
       (landMethods[i] as Function).apply(this, landMethodArgs[i]);
-      this.testScheduling('land', landMethods[i].name + '()');
+      // this.testScheduling('land', landMethods[i].name + '()', true);
     }
 
-    this.testScheduling('final log', 'end log');
-
-    // TODO: use the return results of this.stats() to add to the allScheduleTests checks.this.stats()
-    this.stats();
-    return this.testUnscheduledToScheduled();
+    // this.testScheduling('final log', 'end log', true);
+    return this.stats();
   }
 }
