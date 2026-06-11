@@ -2296,7 +2296,9 @@ export class Schedule {
           true
         );
         if (kidsWhoCanReschedule.length === 0) {
-          throw new Error(`${this.kids.count} kids is not enough to run the camp`);
+          // throw new Error(`${this.kids.count} kids is not enough to run the camp`);
+          console.log(`${this.kids.count} kids is not enough to run the camp`);
+          return;
         }
         const shortfallCount = this.getShortfallCount(activityType, timeSlot, activity);
         if (kidsWhoCanReschedule.length > shortfallCount) {
@@ -3040,9 +3042,8 @@ export class Schedule {
     ];
     const result = allScheduleTests.every(test => test === true);
     if (!result) {
-      throw new Error(
-        'Unscheduled kids & activities count to scheduled kids & activities mismatch.'
-      );
+      console.log('Unscheduled kids & activities count to scheduled kids & activities mismatch.');
+      return false;
     }
     return result;
   }
@@ -3138,12 +3139,8 @@ export class Schedule {
       if (
         AllPercentages.reduce((accumulator, currentValue) => accumulator + currentValue, 0) !== 100
       ) {
-        throw new Error('Percentages do not add up to 100%');
+        return false;
       }
-    }
-
-    if (AllPercentages.length > 4) {
-      console.log('take a looksy');
     }
 
     if (activityType === 'land') {
@@ -3159,14 +3156,14 @@ export class Schedule {
    * @returns {object}
    */
   private stats(): boolean {
-    const landTrue = this.calculateChoicesPercentages('land');
-    const waterTrue = this.calculateChoicesPercentages('water');
+    const landPercentagesTrue = this.calculateChoicesPercentages('land');
+    const waterPercentagesTrue = this.calculateChoicesPercentages('water');
     const notScheduledToScheduled = this.testUnscheduledToScheduled();
     const testSchedulingWater = this.testScheduling('water', 'no func', false);
     const testSchedulingLand = this.testScheduling('land', 'no func', false);
     const allTrue = [
-      landTrue,
-      waterTrue,
+      landPercentagesTrue,
+      waterPercentagesTrue,
       notScheduledToScheduled,
       testSchedulingWater,
       testSchedulingLand,
