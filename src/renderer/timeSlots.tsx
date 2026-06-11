@@ -46,7 +46,6 @@ const TimeSlot: React.FC<TimeSlotData> = ({ heading, timeSlot, activities, resul
       <ul>
         {activities.map((activity, index) => (
           <li key={index}>
-            {/*{activity} {result[timeSlot][activity].length}*/}
             {activity} {getItem(timeSlot, activity).length}
             <p>{joinNames(getItem(timeSlot, activity))}</p>
           </li>
