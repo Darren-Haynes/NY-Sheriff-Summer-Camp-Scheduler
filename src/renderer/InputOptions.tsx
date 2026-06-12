@@ -5,9 +5,10 @@ import CampSign from '../../assets/its-all-about-the-kids.png';
 interface ToggleProps {
   isVisible: string;
   onToggle: (box: string) => void;
+  signVisible: boolean;
 }
 
-const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
+const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle, signVisible }) => {
   if (isVisible !== 'input-box') {
     return null;
   }
@@ -28,7 +29,7 @@ const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
       <button onClick={fileUpload} type="button" id="upload-btn" className="fade-in-1s">
         Upload
       </button>
-      <p className="fade-in-1-5s">or paste sheet content</p>
+      <p className="fade-in-1-5s">Paste sheet content</p>
       <button
         onClick={() => onToggle('paste-box')}
         type="button"
@@ -38,7 +39,19 @@ const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
         Paste Sheet
       </button>
 
-      {showCampSign && (
+      {!signVisible && (
+        <>
+          <hr id="inputbox-hr" className="fade-in-1s"></hr>
+          <p id="view-schedule-p" className="fade-in-1-5s">
+            View previous schedule data
+          </p>
+          <button onClick={fileUpload} type="button" id="view-schedule-btn" className="fade-in-1s">
+            View
+          </button>
+        </>
+      )}
+
+      {showCampSign && signVisible && (
         <div id="camp-sign" className="fade-in-3s">
           <img width="400" alt="icon" src={CampSign} />
         </div>

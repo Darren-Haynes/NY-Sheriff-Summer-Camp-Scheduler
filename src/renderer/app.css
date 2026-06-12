@@ -230,14 +230,21 @@ button:hover {
   width: 145px;
 }
 
-#stats-btn {
+#stats-btn,
+#kids-btn,
+#view-schedule-btn {
   margin-top: 35px;
   background-color: white;
+  border: 2px double black;
+}
+
+#view-schedule-btn {
+  margin-top: 10px;
 }
 
 #kids-btn {
-  margin-top: 35px;
   background-color: #45838d;
+  border: 2px double white;
 }
 
 #close-btn {
@@ -278,6 +285,20 @@ button:hover {
   opacity: 0.5;
   resize: none;
   box-sizing: border-box;
+}
+
+#inputbox-hr {
+  width: 60%;
+  margin: 0 auto;
+  margin-top: 50px;
+  height: 3px;
+  background-color: #45838d;
+}
+
+#view-schedule-p {
+  margin-top: 40px;
+  font-size: 18px;
+  color: silver;
 }
 
 /*
