@@ -1,5 +1,6 @@
 import { Activities } from './activities';
 import { KidsDataType, ErrorData } from '../types/dataInput-types';
+import { log } from 'console';
 
 export class KidsChoices {
   campData: string[][];
@@ -39,10 +40,13 @@ export class DataErrorHandler {
   activityErrorHeader: string;
   duplicateChoiceError: string[];
   duplicateChoiceErrorHeader: string;
+  duplicateNameError: string[];
+  duplicateNameErrorHeader: string;
   notEnoughKidsError: string[];
   notEnoughKidsHeader: string;
   tooManyKidsError: string[];
   tooManyKidsHeader: string;
+
   campData: string[][];
   headerRow: boolean;
 
@@ -55,6 +59,8 @@ export class DataErrorHandler {
     this.activityErrorHeader = `The Following Fields Contain Incorrect Activity Names`;
     this.duplicateChoiceError = [];
     this.duplicateChoiceErrorHeader = `The Following kids have chosen the same activity twice`;
+    this.duplicateNameError = [];
+    this.duplicateNameErrorHeader = `The Following kids have the same name`;
     this.notEnoughKidsError = [];
     this.notEnoughKidsHeader = `There are not enough kids scheduled for the camp`;
     this.tooManyKidsError = [];
@@ -122,7 +128,6 @@ export class DataErrorHandler {
     return this.activityError.length !== 0;
   }
 
-  // Let's see if we can get merge right this time.
   duplicateChoice(): boolean {
     /**
      * Check that no activity is chosen more than once.
@@ -131,11 +136,29 @@ export class DataErrorHandler {
       const choices = row.slice(3, 9);
       const uniqueChoices = new Set(choices);
       if (choices.length !== uniqueChoices.size) {
-        const errorMsg = `Row ${rowNum + 2}; duplicate choice`;
+        const errorMsg = `Row ${rowNum + 2}; duplicate choice - ${choices.join(', ')}`;
         this.duplicateChoiceError.push(errorMsg);
       }
     });
     return this.duplicateChoiceError.length !== 0;
+  }
+
+  /**
+   * Check that there are no duplicate kids names.
+   */
+  duplicateName(): boolean {
+    const nameMap = new Map();
+    this.campData.forEach((row, rowNum) => {
+      const name = row[0].trim() + row[1].trim();
+      if (nameMap.has(name)) {
+        const errorMsg1 = `Row ${rowNum + 2}; duplicate name - ${row[0].trim()} ${row[1].trim()}`;
+        const errorMsg2 = `Row ${nameMap.get(name) + 2}; duplicate name - ${row[0].trim()} ${row[1].trim()}`;
+        this.duplicateNameError.push(errorMsg2);
+        this.duplicateNameError.push(errorMsg1);
+      }
+      nameMap.set(name, rowNum);
+    });
+    return this.duplicateNameError.length !== 0;
   }
 
   getErrorList(): ErrorData[] {
@@ -179,6 +202,13 @@ export class DataErrorHandler {
         errorList: this.duplicateChoiceError,
       };
       errorList.push(duplicateChoiceObj);
+    }
+    if (this.duplicateNameError.length !== 0) {
+      const duplicateNameObj: ErrorData = {
+        header: this.duplicateNameErrorHeader.toUpperCase(),
+        errorList: this.duplicateNameError,
+      };
+      errorList.push(duplicateNameObj);
     }
     return errorList;
   }
