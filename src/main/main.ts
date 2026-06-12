@@ -228,6 +228,8 @@ const handleErrors = (data: string) => {
     dataErrors.wrongActivity(),
     dataErrors.notEnoughKids(),
     dataErrors.tooManyKids(),
+    dataErrors.duplicateName(),
+    dataErrors.duplicateChoice(),
   ];
   return { allErrors, dataErrors };
 };
