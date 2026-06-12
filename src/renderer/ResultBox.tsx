@@ -1,6 +1,8 @@
+import React, { useState } from 'react';
 import { copySchedule, exportToExcel } from './ipcFunctions';
 import { Schedule } from '../main/schedule';
-import TimeSlot from './timeSlots';
+import StatsData from './Stats';
+import ScheduleData from './Schedule';
 
 interface ToggleProps {
   isVisible: string;
@@ -21,42 +23,61 @@ const ResultBox: React.FC<ToggleProps> = ({ isVisible, onToggle, result }) => {
     return null;
   }
 
+  const [showStats, setShowStats] = useState<boolean>(false);
+  const toggleData = () => {
+    setShowStats(prevState => !prevState);
+  };
+
   return (
     <div id="result-box">
-      <div id="text-box" className="fade-in-1-5s">
-        <div id="result-textarea">
-          <TimeSlot
-            heading={'Water 9am'}
-            timeSlot={'water9am'}
-            activities={waterActs}
-            result={result}
-          />
-          <TimeSlot
-            heading={'Water 10am'}
-            timeSlot={'water10am'}
-            activities={waterActs}
-            result={result}
-          />
-          <TimeSlot
-            heading={'Land 9am'}
-            timeSlot={'land9am'}
-            activities={land9amActs}
-            result={result}
-          />
-          <TimeSlot
-            heading={'Land 10am'}
-            timeSlot={'land10am'}
-            activities={land10amActs}
-            result={result}
-          />
-        </div>
-      </div>
+      {!showStats && (
+        <ScheduleData
+          stats={false}
+          result={result}
+          waterActs={waterActs}
+          land9amActs={land9amActs}
+          land10amActs={land10amActs}
+        />
+      )}
+
+      {showStats && (
+        <StatsData
+          stats={true}
+          result={result}
+          waterActs={waterActs}
+          land9amActs={land9amActs}
+          land10amActs={land10amActs}
+        />
+      )}
 
       <div id="result-box-btns-container">
-        <h2 id="result-heading" className="fade-in-1-5s">
+        {/*<h2 id="result-heading" className="fade-in-1-5s">
           Camp Schedule
-        </h2>
+        </h2>*/}
         <div id="result-box-btns">
+          {!showStats && (
+            <button
+              onClick={() => toggleData()}
+              type="button"
+              id="stats-btn"
+              className="paste-box-btns fade-in-1s"
+            >
+              Stats 📈
+            </button>
+          )}
+          {showStats && (
+            <button
+              onClick={() => toggleData()}
+              type="button"
+              id="kids-btn"
+              className="paste-box-btns fade-in-1s"
+            >
+              Kids ⛵
+            </button>
+          )}
+
+          <hr></hr>
+
           <button
             onClick={() => onToggle('input-box')}
             type="button"
