@@ -8,7 +8,7 @@ interface ToggleProps {
   signVisible: boolean;
 }
 
-const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle, signVisible }) => {
+const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
   if (isVisible !== 'input-box') {
     return null;
   }
@@ -39,19 +39,7 @@ const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle, signVisible 
         Paste Sheet
       </button>
 
-      {!signVisible && (
-        <>
-          <hr id="inputbox-hr" className="fade-in-1s"></hr>
-          <p id="view-schedule-p" className="fade-in-1-5s">
-            View previous schedule data
-          </p>
-          <button onClick={fileUpload} type="button" id="view-schedule-btn" className="fade-in-1s">
-            View
-          </button>
-        </>
-      )}
-
-      {showCampSign && signVisible && (
+      {showCampSign && (
         <div id="camp-sign" className="fade-in-3s">
           <img width="400" alt="icon" src={CampSign} />
         </div>
