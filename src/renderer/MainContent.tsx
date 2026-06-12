@@ -3,6 +3,7 @@ import { Schedule } from '../main/schedule';
 import { ErrorData } from '../types/dataInput-types';
 import ErrorBox from './ErrorBox';
 import InputOptions from './InputOptions';
+import InputOptionsSchedule from './InputOptionsAndSchedule';
 import PasteBox from './PasteBox';
 import ResultBox from './ResultBox';
 import NotificationBox from './Notification';
@@ -43,21 +44,22 @@ export default function MainContent() {
     setShowInputOptions(box);
   };
 
-  const toggleShowSign = (bool: boolean) => {
-    setShowSign(bool);
-  };
-
   return (
     <main>
       <div className="bg-image">
         <div className="overlay">
           <div id="input-section">
             <div id="central-container">
-              <InputOptions
-                isVisible={showInputOptions}
-                onToggle={handleToggle}
-                signVisible={showSign}
-              />
+              {showSign && (
+                <InputOptions
+                  isVisible={showInputOptions}
+                  onToggle={handleToggle}
+                  signVisible={showSign}
+                />
+              )}
+              {!showSign && (
+                <InputOptionsSchedule isVisible={showInputOptions} onToggle={handleToggle} />
+              )}
               <PasteBox isVisible={showInputOptions} onToggle={handleToggle} />
               <ErrorBox
                 isVisible={showInputOptions}
