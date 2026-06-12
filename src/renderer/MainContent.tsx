@@ -3,11 +3,13 @@ import { Schedule } from '../main/schedule';
 import { ErrorData } from '../types/dataInput-types';
 import ErrorBox from './ErrorBox';
 import InputOptions from './InputOptions';
+import InputOptionsSchedule from './InputOptionsAndSchedule';
 import PasteBox from './PasteBox';
 import ResultBox from './ResultBox';
 import NotificationBox from './Notification';
 
 export default function MainContent() {
+  const [showSign, setShowSign] = useState<boolean>(true);
   const [showInputOptions, setShowInputOptions] = useState<string>('input-box');
   const [errorContent, setErrorContent] = useState<ErrorData[]>([]);
   const [resultContent, setResultContent] = useState<Schedule | null>(null);
@@ -26,6 +28,7 @@ export default function MainContent() {
     window.textAPI.send_result(resultData => {
       setShowInputOptions('result-box');
       setResultContent(JSON.parse(resultData));
+      setShowSign(false);
     });
   }, []);
 
@@ -40,13 +43,23 @@ export default function MainContent() {
     console.log('Toggling to:', box); // Verify this prints
     setShowInputOptions(box);
   };
+
   return (
     <main>
       <div className="bg-image">
         <div className="overlay">
           <div id="input-section">
             <div id="central-container">
-              <InputOptions isVisible={showInputOptions} onToggle={handleToggle} />
+              {showSign && (
+                <InputOptions
+                  isVisible={showInputOptions}
+                  onToggle={handleToggle}
+                  signVisible={showSign}
+                />
+              )}
+              {!showSign && (
+                <InputOptionsSchedule isVisible={showInputOptions} onToggle={handleToggle} />
+              )}
               <PasteBox isVisible={showInputOptions} onToggle={handleToggle} />
               <ErrorBox
                 isVisible={showInputOptions}

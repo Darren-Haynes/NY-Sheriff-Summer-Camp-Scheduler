@@ -5,6 +5,7 @@ import CampSign from '../../assets/its-all-about-the-kids.png';
 interface ToggleProps {
   isVisible: string;
   onToggle: (box: string) => void;
+  signVisible: boolean;
 }
 
 const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
@@ -28,7 +29,7 @@ const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
       <button onClick={fileUpload} type="button" id="upload-btn" className="fade-in-1s">
         Upload
       </button>
-      <p className="fade-in-1-5s">or paste sheet content</p>
+      <p className="fade-in-1-5s">Paste sheet content</p>
       <button
         onClick={() => onToggle('paste-box')}
         type="button"
