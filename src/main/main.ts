@@ -229,7 +229,7 @@ const handleErrors = (data: string) => {
     dataErrors.notEnoughKids(),
     dataErrors.tooManyKids(),
     dataErrors.duplicateName(),
-    dataErrors.duplicateChoice(),
+    // dataErrors.duplicateChoice(),
   ];
   return { allErrors, dataErrors };
 };
