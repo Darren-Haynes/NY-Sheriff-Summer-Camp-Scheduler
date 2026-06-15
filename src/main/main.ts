@@ -26,23 +26,32 @@ const createWindow = (): void => {
     minHeight: 650,
     width: 1200,
     minWidth: 650,
+    show: false,
+    backgroundColor: '#FFFFFF',
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false, // ← Add this line
+      sandbox: false,
     },
   });
 
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
-  mainWindow.once('ready-to-show', () => {
+  // Check if the entry URL points to a local network development port (Webpack Dev Server)
+  if (MAIN_WINDOW_WEBPACK_ENTRY.startsWith('http://')) {
     setTimeout(() => {
       mainWindow.webContents.reloadIgnoringCache();
       mainWindow.show();
-    }, 600); // Give the local Webpack dev server 600ms to pipe the React compilation
-  });
+      mainWindow.focus();
+    }, 600); // Retain your dev-server fallback safety net for local React updates
+  } else {
+    // Production Mode (Package/Playwright Tests): Open instantly and cleanly
+    mainWindow.show();
+    mainWindow.focus();
+  }
+
   // Open file Dialog for user to pick file.
   ipcMain.handle('open-file-dialog', async () => {
     const result = await dialog.showOpenDialog({
