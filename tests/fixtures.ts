@@ -26,6 +26,7 @@ export const test = base.extend<ElectronFixtures>({
 
     const electronApp = await electron.launch({
       executablePath: electronExecutablePath,
+      // Target the compiled main file. Adjust the path to match your specific forge config:
       args: [path.join(__dirname, '../.webpack/arm64/main/index.js')],
     });
 
@@ -43,12 +44,10 @@ export const test = base.extend<ElectronFixtures>({
       window = await electronApp.firstWindow();
     }
 
-    await window.waitForLoadState('domcontentloaded');
-
-    // Correct Fix: Pass BOTH control objects down in a single fixture bundle
+    // Use the fixtures
     await use({ electronApp, electronWindow: window });
 
-    // Clean up cleanly after tests complete
+    // Close app after test
     await electronApp.close();
   },
 });
