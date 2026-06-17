@@ -44,6 +44,7 @@ h4 {
 #logo {
   position: fixed;
   left: calc(50vw - 99.5px);
+  z-index: 10;
 }
 
 /*
@@ -54,16 +55,61 @@ main {
 }
 
 .bg-image {
-  background-image: url(../../assets/water-activity.jpg);
-  background-position: left center;
-  background-repeat: no-repeat;
   height: calc(100vh - 173.5px);
-  z-index: -1;
+  width: 100%;
+  position: relative; /* Base anchor block */
+}
+
+/* Isolated container for the background crossfade layer */
+.bg-canvas-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.bg-canvas-layer::before,
+.bg-canvas-layer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  transition: opacity 1.5s ease-in-out;
+}
+
+.bg-canvas-layer::before {
+  background-image: var(--bg-a);
+}
+.bg-canvas-layer::after {
+  background-image: var(--bg-b);
+}
+
+.bg-canvas-layer.show-layer-a::before {
+  opacity: 1;
+}
+.bg-canvas-layer.show-layer-a::after {
+  opacity: 0;
+}
+
+.bg-canvas-layer.show-layer-b::before {
+  opacity: 0;
+}
+.bg-canvas-layer.show-layer-b::after {
+  opacity: 1;
 }
 
 .overlay {
+  position: relative;
+  z-index: 2; /* Content stays on top */
   height: calc(100vh - 173.5px);
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
 }
 
@@ -302,37 +348,37 @@ button:hover {
 }
 
 /*
-Input Box Transitions
+Input Box Transitions (CLEANED AND DE-DUPLICATED)
 */
-
-.fade-in-05s {
-  animation-name: fade-in;
-  animation-duration: 0.5s;
-}
-
-.fade-in-1s {
-  animation-name: fade-in;
-  animation-duration: 1s;
-}
-
-.fade-in-1-5s {
-  animation-name: fade-in;
-  animation-duration: 1.5s;
-}
-
-.fade-in-2s {
-  animation-name: fade-in;
-  animation-duration: 2s;
-}
-
-.fade-in-3s {
-  animation-name: fade-in;
-  animation-duration: 3s;
-}
-
+.fade-in-05s,
+.fade-in-1s,
+.fade-in-1-5s,
+.fade-in-2s,
+.fade-in-3s,
 .fade-in-5s {
-  animation-name: fade-in;
-  animation-duration: 5s;
+  opacity: 0;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards; /* Holds the final 100% opacity state permanently */
+}
+
+/* 2. Standard animation assignments remain untouched */
+.fade-in-05s {
+  animation: fade-in 0.5s ease-out forwards;
+}
+.fade-in-1s {
+  animation: fade-in 1s ease-out forwards;
+}
+.fade-in-1-5s {
+  animation: fade-in 1.5s ease-out forwards;
+}
+.fade-in-2s {
+  animation: fade-in 2s ease-out forwards;
+}
+.fade-in-3s {
+  animation: fade-in 3s ease-out forwards;
+}
+.fade-in-5s {
+  animation: fade-in 5s ease-out forwards;
 }
 
 .fade-out-5s-stay {
@@ -340,24 +386,23 @@ Input Box Transitions
 }
 
 @keyframes fade-in {
-  from {
+  0% {
     opacity: 0;
   }
-
-  to {
+  100% {
     opacity: 1;
   }
 }
 
 @keyframes fade-out {
-  from {
+  0% {
     opacity: 1;
   }
-
-  to {
+  100% {
     opacity: 0;
   }
 }
+
 /*
 FOOTER
 */
@@ -371,6 +416,7 @@ footer {
   height: 25px;
   width: 100%;
   text-align: center;
+  z-index: 10;
 }
 
 footer > p {

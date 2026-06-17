@@ -27,7 +27,7 @@ const createWindow = (): void => {
     width: 1200,
     minWidth: 650,
     show: false,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#f6d25f',
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       contextIsolation: true,
@@ -41,15 +41,22 @@ const createWindow = (): void => {
 
   // Check if the entry URL points to a local network development port (Webpack Dev Server)
   if (MAIN_WINDOW_WEBPACK_ENTRY.startsWith('http://')) {
-    setTimeout(() => {
-      mainWindow.webContents.reloadIgnoringCache();
+    // 1. Listen for the native ready-to-show event to handle clean window display
+    mainWindow.once('ready-to-show', () => {
+      // 2. Wrap your development safety-net refresh inside the event lifecycle
+      setTimeout(() => {
+        mainWindow.webContents.reloadIgnoringCache();
+        mainWindow.show();
+        mainWindow.focus();
+      }, 600); // Retains your dev fallback but guarantees rendering layers have parsed first
+    });
+  } else {
+    // Production Mode / Playwright Automation Testing Environments:
+    // Display seamlessly the instant background rendering nodes conclude calculations
+    mainWindow.once('ready-to-show', () => {
       mainWindow.show();
       mainWindow.focus();
-    }, 600); // Retain your dev-server fallback safety net for local React updates
-  } else {
-    // Production Mode (Package/Playwright Tests): Open instantly and cleanly
-    mainWindow.show();
-    mainWindow.focus();
+    });
   }
 
   // Open file Dialog for user to pick file.

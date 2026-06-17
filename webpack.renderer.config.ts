@@ -8,8 +8,8 @@ rules.push({
 });
 
 rules.push({
-  test: /\.png$/,
-  use: 'file-loader',
+  test: /\.(png|jpe?g|gif|svg)$/i,
+  type: 'asset/resource', // Tells Webpack to emit files and export URLs
 });
 
 // 1. FILTER OUT THE HIDDEN ASSET-RELOCATOR-LOADER FOR THE FRONTEND RENDERER
