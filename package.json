@@ -9,7 +9,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "eslint --ext .ts,.tsx ."
+    "lint": "eslint --ext .ts,.tsx .",
+    "test": "npm run package && playwright test"
   },
   "keywords": [],
   "author": {
@@ -29,6 +30,8 @@
     "@electron-forge/plugin-fuses": "^7.10.2",
     "@electron-forge/plugin-webpack": "^7.10.2",
     "@electron/fuses": "^1.8.0",
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^25.9.3",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@typescript-eslint/eslint-plugin": "^8.59.0",
