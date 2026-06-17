@@ -1,3 +1,4 @@
+import React from 'react';
 import { useMediaQuery } from 'react-responsive';
 import { fileUpload } from './ipcFunctions';
 import CampSign from '../../assets/its-all-about-the-kids.png';
