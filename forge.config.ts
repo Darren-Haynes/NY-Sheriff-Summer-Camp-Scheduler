@@ -13,14 +13,19 @@ import { FuseV1Options, FuseVersion } from '@electron/fuses';
 import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
 
+// === INJECT TEST ENVIRONMENT FLAG FOR WEBPACK ===
+if (process.env.TEST_RUN === 'true') {
+  process.env.NODE_ENV = 'test';
+}
+
 const config: ForgeConfig = {
   packagerConfig: {
     name: 'NY Sheriff Summer Camp Scheduler',
     asar: true,
   },
   rebuildConfig: {},
+  // ... rest of your existing makers config remains untouched
   makers: [
-    // new MakerSquirrel({ authors: 'Darren Haynes' }, ['win32']),
     new MakerMSI(
       {
         description: 'NY Sheriff Institute Summer Camp Scheduler',
@@ -40,7 +45,6 @@ const config: ForgeConfig = {
       ['win32']
     ),
     new MakerZIP({}, ['darwin']),
-    // new MakerDMG({}, ['darwin']),
     new MakerRpm({}, ['linux']),
     new MakerDeb({}, ['linux']),
   ],
@@ -58,7 +62,7 @@ const config: ForgeConfig = {
             preload: {
               js: './src/main/preload.ts',
               config: {
-                ...rendererConfig,
+                ...mainConfig,
                 target: 'electron-preload',
               },
             },
@@ -66,8 +70,6 @@ const config: ForgeConfig = {
         ],
       },
     }),
-    // Fuses are used to enable/disable various Electron functionality
-    // at package time, before code signing the application
     new FusesPlugin({
       version: FuseVersion.V1,
       [FuseV1Options.RunAsNode]: false,

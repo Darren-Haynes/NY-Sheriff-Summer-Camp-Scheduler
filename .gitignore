@@ -102,3 +102,4 @@ out/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+mock_camp_schedule.xlsx
