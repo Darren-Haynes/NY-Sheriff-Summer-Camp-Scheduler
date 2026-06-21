@@ -811,7 +811,7 @@ export class Schedule {
         }
       }
     }
-    if (returnNoMatch) return kidsWhoCanRescheduleNoMatch;
+    if (returnNoMatch) return [...new Set(kidsWhoCanRescheduleNoMatch)];
     return kidsWhoCanReschedule;
   }
 
@@ -1596,32 +1596,26 @@ export class Schedule {
     return activityKids;
   }
 
+  /**
+   * Shortfall count is hom many more kids are required to reach minumum count
+   * required to schedule an activity. E.g 'arch' requires a minumum of 8 kids,
+   * but only 5 kids are scheduled. The shortfall count is 3.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {string} timeSlot - only 2 options: '9am' or '10am'.
+   * @param {string} activity - activity such as 'canoe', 'pboard' or 'bball;
+   * @returns {number} - simple int of the shortfall count
+   */
   private getShortfallCount(
     activityType: AllowedActivityTypes,
     timeSlot: AllowedTimes,
     activity: AllActivities
   ): number {
     const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
+    const typedActivityTypeTimeSlot = activityTypeTimeSlot as Record<string, string[]>;
+    const activityCount = typedActivityTypeTimeSlot[activity].length;
     const range = this.getRange(activityType, timeSlot);
-
-    let typedTimeSlot: string;
-    if (activityType === 'water') {
-      typedTimeSlot = timeSlot as WaterActivities;
-    } else if (activityType === 'land' && timeSlot === '9am') {
-      typedTimeSlot = timeSlot as LandActivities9am;
-    } else {
-      typedTimeSlot = timeSlot as LandActivities10am;
-    }
-
-    const targetObj = activityTypeTimeSlot[typedTimeSlot as keyof typeof activityTypeTimeSlot];
-
-    // Fix: Check if targetObj is defined before using 'in' operator
-    if (targetObj && this.hasKey(targetObj, activity)) {
-      const indexedObj = targetObj as Record<string, { length: number }>;
-      return range[activity][0] - indexedObj[activity].length;
-    }
-
-    return 0; // Fallback if targetObj is undefined or key doesn't exist
+    const minimum = range[activity][0];
+    return minimum - activityCount;
   }
 
   // Type guard to check if a key exists on an object
