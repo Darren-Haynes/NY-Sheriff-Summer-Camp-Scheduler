@@ -13,8 +13,13 @@ const preload = {
     ipcRenderer.on('error-list', (_event, value) => callback(value)),
   send_result: (callback: IpcStringCallback) =>
     ipcRenderer.on('result-list', (_event, value) => callback(value)),
-  send_clipboard: (callback: IpcStringCallback) =>
-    ipcRenderer.on('clipboard-content', (_event, value) => callback(value)),
+  send_clipboard: (callback: IpcStringCallback) => {
+    const subscription = (_event: any, value: string) => callback(value);
+    ipcRenderer.on('clipboard-content', subscription);
+    return () => {
+      ipcRenderer.removeListener('clipboard-content', subscription);
+    };
+  },
 };
 
 contextBridge.exposeInMainWorld('textAPI', preload);

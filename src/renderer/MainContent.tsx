@@ -7,38 +7,7 @@ import InputOptionsSchedule from './InputOptionsAndSchedule';
 import PasteBox from './PasteBox';
 import ResultBox from './ResultBox';
 import NotificationBox from './Notification';
-
-import waterActivityImg from '../../assets/water-activity.jpg';
-import cabinsImg from '../../assets/cabins.jpg';
-import nightFireImg from '../../assets/night-fire.jpg';
-import sailingImg from '../../assets/sailing-2018.jpg';
-import waterBottleImg from '../../assets/water-bottles.jpg';
-import horseImg from '../../assets/horse.jpg';
-import officerImg from '../../assets/officer-k9.jpg';
-import helicopterImg from '../../assets/helicopter.jpg';
-import spongeImg from '../../assets/sponge-toss.jpg';
-import duskFireImg from '../../assets/dusk-fire.jpg';
-import helicopter2Img from '../../assets/helicopter2.jpg';
-import cornHoleImg from '../../assets/corn-hole.jpg';
-import vanImg from '../../assets/van.jpg';
-import archeryImg from '../../assets/archery.jpeg';
-
-const imageUrls = [
-  `url("${waterActivityImg}")`,
-  `url("${cabinsImg}")`,
-  `url("${nightFireImg}")`,
-  `url("${sailingImg}")`,
-  `url("${waterBottleImg}")`,
-  `url("${horseImg}")`,
-  `url("${officerImg}")`,
-  `url("${helicopterImg}")`,
-  `url("${spongeImg}")`,
-  `url("${duskFireImg}")`,
-  `url("${helicopter2Img}")`,
-  `url("${archeryImg}")`,
-  `url("${cornHoleImg}")`,
-  `url("${vanImg}")`,
-];
+import imageUrls from './imageUrls';
 
 // 1. Isolate the style-updating block into an independent sub-component
 const BackgroundCanvas = memo(({ currentBgImage }: { currentBgImage: number }) => {
@@ -65,6 +34,7 @@ export default function MainContent() {
   const [showSign, setShowSign] = useState<boolean>(true);
   const [showInputOptions, setShowInputOptions] = useState<string>('input-box');
   const [showNotification, setNotificationContent] = useState<string>('no-box');
+  const [notificationKey, setNotificationKey] = useState<number>(0);
   const [errorContent, setErrorContent] = useState<ErrorData[]>([]);
   const [resultContent, setResultContent] = useState<Schedule | null>(null);
   const [currentBgImage, setCurrentBgImage] = useState<number>(0);
@@ -105,6 +75,15 @@ export default function MainContent() {
     setNotificationContent(box);
   };
 
+  useEffect(() => {
+    const unsubscribe = window.textAPI.send_clipboard(box => {
+      setNotificationContent(box);
+      setNotificationKey(prev => prev + 1); // Forces a fresh React key on every click
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
     <main className="bg-image">
       {/* 2. Background Canvas floats isolated underneath everything inside the layout frame */}
@@ -132,8 +111,8 @@ export default function MainContent() {
               onToggle={handleToggle}
               result={resultContent}
             />
-
             <NotificationBox
+              key={notificationKey} // React will destroy and recreate the component when this changes
               isVisible={showNotification}
               onToggle={handleNotificationToggle}
               message={'Copied to clipboard!'}
