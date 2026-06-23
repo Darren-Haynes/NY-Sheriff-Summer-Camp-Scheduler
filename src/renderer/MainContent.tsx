@@ -34,6 +34,7 @@ export default function MainContent() {
   const [showSign, setShowSign] = useState<boolean>(true);
   const [showInputOptions, setShowInputOptions] = useState<string>('input-box');
   const [showNotification, setNotificationContent] = useState<string>('no-box');
+  const [notificationKey, setNotificationKey] = useState<number>(0);
   const [errorContent, setErrorContent] = useState<ErrorData[]>([]);
   const [resultContent, setResultContent] = useState<Schedule | null>(null);
   const [currentBgImage, setCurrentBgImage] = useState<number>(0);
@@ -77,9 +78,10 @@ export default function MainContent() {
   useEffect(() => {
     const unsubscribe = window.textAPI.send_clipboard(box => {
       setNotificationContent(box);
+      setNotificationKey(prev => prev + 1); // Forces a fresh React key on every click
     });
 
-    return () => unsubscribe(); // Removes the Electron IPC listener when component unmounts
+    return () => unsubscribe();
   }, []);
 
   return (
@@ -109,8 +111,8 @@ export default function MainContent() {
               onToggle={handleToggle}
               result={resultContent}
             />
-
             <NotificationBox
+              key={notificationKey} // React will destroy and recreate the component when this changes
               isVisible={showNotification}
               onToggle={handleNotificationToggle}
               message={'Copied to clipboard!'}
