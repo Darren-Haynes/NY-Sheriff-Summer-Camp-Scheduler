@@ -109,7 +109,7 @@ main {
   position: relative;
   z-index: 2; /* Content stays on top */
   height: calc(100vh - 173.5px);
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(40, 41, 51, 0.6);
   display: flex;
 }
 
