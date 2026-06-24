@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { copySchedule, exportToExcel } from './ipcFunctions';
+import { copySchedule, copyStats, exportToExcel } from './ipcFunctions';
 import { Schedule } from '../main/schedule';
 import StatsData from './Stats';
 import ScheduleData from './Schedule';
@@ -11,6 +11,8 @@ interface ToggleProps {
 }
 
 const ResultBox: React.FC<ToggleProps> = ({ isVisible, onToggle, result }) => {
+  const [showStats, setShowStats] = useState<boolean>(false);
+
   if (isVisible !== 'result-box') {
     return null;
   }
@@ -23,7 +25,6 @@ const ResultBox: React.FC<ToggleProps> = ({ isVisible, onToggle, result }) => {
     return null;
   }
 
-  const [showStats, setShowStats] = useState<boolean>(false);
   const toggleData = () => {
     setShowStats(prevState => !prevState);
   };
@@ -95,7 +96,12 @@ const ResultBox: React.FC<ToggleProps> = ({ isVisible, onToggle, result }) => {
             Export 📤
           </button>
           <button
-            onClick={() => copySchedule(result, waterActs, land9amActs, land10amActs)}
+            onClick={
+              () =>
+                showStats
+                  ? copyStats(result) // Function A when true
+                  : copySchedule(result, waterActs, land9amActs, land10amActs) // Function B when false
+            }
             type="button"
             id="submit-btn"
             className="paste-box-btns fade-in-5s"
