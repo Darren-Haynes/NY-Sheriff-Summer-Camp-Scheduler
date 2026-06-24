@@ -811,7 +811,7 @@ export class Schedule {
         }
       }
     }
-    if (returnNoMatch) return kidsWhoCanRescheduleNoMatch;
+    if (returnNoMatch) return [...new Set(kidsWhoCanRescheduleNoMatch)];
     return kidsWhoCanReschedule;
   }
 
@@ -1596,32 +1596,26 @@ export class Schedule {
     return activityKids;
   }
 
+  /**
+   * Shortfall count is hom many more kids are required to reach minumum count
+   * required to schedule an activity. E.g 'arch' requires a minumum of 8 kids,
+   * but only 5 kids are scheduled. The shortfall count is 3.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {string} timeSlot - only 2 options: '9am' or '10am'.
+   * @param {string} activity - activity such as 'canoe', 'pboard' or 'bball;
+   * @returns {number} - simple int of the shortfall count
+   */
   private getShortfallCount(
     activityType: AllowedActivityTypes,
     timeSlot: AllowedTimes,
     activity: AllActivities
   ): number {
     const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
+    const typedActivityTypeTimeSlot = activityTypeTimeSlot as Record<string, string[]>;
+    const activityCount = typedActivityTypeTimeSlot[activity].length;
     const range = this.getRange(activityType, timeSlot);
-
-    let typedTimeSlot: string;
-    if (activityType === 'water') {
-      typedTimeSlot = timeSlot as WaterActivities;
-    } else if (activityType === 'land' && timeSlot === '9am') {
-      typedTimeSlot = timeSlot as LandActivities9am;
-    } else {
-      typedTimeSlot = timeSlot as LandActivities10am;
-    }
-
-    const targetObj = activityTypeTimeSlot[typedTimeSlot as keyof typeof activityTypeTimeSlot];
-
-    // Fix: Check if targetObj is defined before using 'in' operator
-    if (targetObj && this.hasKey(targetObj, activity)) {
-      const indexedObj = targetObj as Record<string, { length: number }>;
-      return range[activity][0] - indexedObj[activity].length;
-    }
-
-    return 0; // Fallback if targetObj is undefined or key doesn't exist
+    const minimum = range[activity][0];
+    return minimum - activityCount;
   }
 
   // Type guard to check if a key exists on an object
@@ -3051,6 +3045,34 @@ export class Schedule {
   }
 
   /**
+   * Remove duplicate choices from the second and third choices arrays, based on the first choices array.
+   * Why? This is only necessary when a kid makes the same choice more than once.
+   * @param {string[]} firstChoices - the first choices for each kid.
+   * @param {string[]} secondChoices - the second choices for each kid.
+   * @param {string[]} thirdChoices - the third choices for each kid.
+   * @returns {void}
+   */
+  private removeDupChoices(
+    firstChoices: string[],
+    secondChoices: string[],
+    thirdChoices: string[]
+  ): void {
+    firstChoices.forEach(name => {
+      if (secondChoices.includes(name)) {
+        this.removeElementsFromArray(secondChoices, [name]);
+      }
+      if (thirdChoices.includes(name)) {
+        this.removeElementsFromArray(thirdChoices, [name]);
+      }
+    });
+    secondChoices.forEach(name => {
+      if (thirdChoices.includes(name)) {
+        this.removeElementsFromArray(thirdChoices, [name]);
+      }
+    });
+  }
+
+  /**
    * Get the percentage of kids who got the activity they wanted for their 1st, 2nd, 3rd or no choices.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @returns {void}
@@ -3062,6 +3084,12 @@ export class Schedule {
     const secondChoices10am: string[] = this.getScheduledChoicesNames(activityType, '10am', 2);
     const thirdChoices9am: string[] = this.getScheduledChoicesNames(activityType, '9am', 3);
     const thirdChoices10am: string[] = this.getScheduledChoicesNames(activityType, '10am', 3);
+    if (this.kids.duplicateChoice) {
+      this.removeDupChoices(firstChoices9am, secondChoices9am, thirdChoices9am);
+      this.removeDupChoices(firstChoices10am, secondChoices10am, thirdChoices10am);
+      this.removeDupChoices(firstChoices9am, secondChoices9am, thirdChoices9am);
+      this.removeDupChoices(firstChoices10am, secondChoices10am, thirdChoices10am);
+    }
     const noChoices: string[] = this.kids.names.filter(
       item =>
         ![
