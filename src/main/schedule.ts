@@ -3045,6 +3045,34 @@ export class Schedule {
   }
 
   /**
+   * Remove duplicate choices from the second and third choices arrays, based on the first choices array.
+   * Why? This is only necessary when a kid makes the same choice more than once.
+   * @param {string[]} firstChoices - the first choices for each kid.
+   * @param {string[]} secondChoices - the second choices for each kid.
+   * @param {string[]} thirdChoices - the third choices for each kid.
+   * @returns {void}
+   */
+  private removeDupChoices(
+    firstChoices: string[],
+    secondChoices: string[],
+    thirdChoices: string[]
+  ): void {
+    firstChoices.forEach(name => {
+      if (secondChoices.includes(name)) {
+        this.removeElementsFromArray(secondChoices, [name]);
+      }
+      if (thirdChoices.includes(name)) {
+        this.removeElementsFromArray(thirdChoices, [name]);
+      }
+    });
+    secondChoices.forEach(name => {
+      if (thirdChoices.includes(name)) {
+        this.removeElementsFromArray(thirdChoices, [name]);
+      }
+    });
+  }
+
+  /**
    * Get the percentage of kids who got the activity they wanted for their 1st, 2nd, 3rd or no choices.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @returns {void}
@@ -3056,6 +3084,12 @@ export class Schedule {
     const secondChoices10am: string[] = this.getScheduledChoicesNames(activityType, '10am', 2);
     const thirdChoices9am: string[] = this.getScheduledChoicesNames(activityType, '9am', 3);
     const thirdChoices10am: string[] = this.getScheduledChoicesNames(activityType, '10am', 3);
+    if (this.kids.duplicateChoice) {
+      this.removeDupChoices(firstChoices9am, secondChoices9am, thirdChoices9am);
+      this.removeDupChoices(firstChoices10am, secondChoices10am, thirdChoices10am);
+      this.removeDupChoices(firstChoices9am, secondChoices9am, thirdChoices9am);
+      this.removeDupChoices(firstChoices10am, secondChoices10am, thirdChoices10am);
+    }
     const noChoices: string[] = this.kids.names.filter(
       item =>
         ![
