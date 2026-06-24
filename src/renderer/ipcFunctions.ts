@@ -1,5 +1,6 @@
 import { Schedule } from '../main/schedule';
 import { LandActivities9am, LandActivities10am, WaterActivities } from '../types/schedule-types';
+import StatsData from './Stats';
 
 // Get contents of textarea box
 export const submitTextboxContent = () => {
@@ -42,12 +43,7 @@ const joinNames = (names: string[]): string => {
   return nameOrder.slice(0, -2);
 };
 
-export const timeSlotData = (
-  result: Schedule,
-  activities: string[],
-  title: string,
-  timeSlot: string
-) => {
+const timeSlotData = (result: Schedule, activities: string[], title: string, timeSlot: string) => {
   let timeSlotText = `${title}\n`;
   for (const activity of activities) {
     let activityKids: string[] = [];
@@ -85,6 +81,30 @@ export const copySchedule = (
   const land10amText = timeSlotData(result, land10amActs, 'LAND 10AM', 'land10am');
   const reply = window.textAPI.copy_schedule(
     water9amText + '\n' + water10amText + '\n' + land9amText + '\n' + land10amText
+  );
+  reply
+    .then((value): string[] => {
+      console.log(value);
+      return value;
+    })
+    .catch(error => {
+      console.error('Promise rejected with:', error);
+    });
+  // return water9amText;
+};
+
+const statsData = (percentageData: number[]): string => {
+  const choicesText = ['First choice: ', 'Second choice: ', 'Third choice: ', 'No choice: '];
+  return choicesText.map((text, index) => text + percentageData[index] + '%').join('\n');
+};
+
+export const copyStats = (result: Schedule) => {
+  const waterHeader = 'WATER CHOICES';
+  const waterText = statsData(result.waterPercentages);
+  const landHeader = 'LAND CHOICES';
+  const landText = statsData(result.landPercentages);
+  const reply = window.textAPI.copy_schedule(
+    waterHeader + '\n' + waterText + '\n\n' + landHeader + '\n' + landText
   );
   reply
     .then((value): string[] => {
