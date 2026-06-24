@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, clipboard } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, clipboard, Menu } from 'electron';
 import fs from 'fs';
 import Excel from 'exceljs';
 import { dataParser, DataErrorHandler } from './dataInput';
@@ -249,6 +249,8 @@ const handleErrors = (data: string) => {
   ];
   return { allErrors, dataErrors };
 };
+
+Menu.setApplicationMenu(null);
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
