@@ -1,3 +1,4 @@
+import { notDeepEqual } from 'assert/strict';
 import { WaterActivityCounts, LandActivityCounts, KidsChoices } from '../types/kids-types';
 
 /**
@@ -10,6 +11,7 @@ export class Kids {
   waterActivitiesChoiceCount: WaterActivityCounts;
   landActivitiesChoiceCount: LandActivityCounts;
   choices: Record<string, KidsChoices>;
+  duplicateChoice: boolean;
 
   /**
    *
@@ -20,6 +22,7 @@ export class Kids {
     this.names = [];
     this.count = 0;
     this.choices = {};
+    this.duplicateChoice = false;
     this.setKidsData();
     this.waterActivitiesChoiceCount = {
       swim: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
@@ -47,6 +50,12 @@ export class Kids {
     this.countChoices();
   }
 
+  private detectDuplicateChoices(choice1: string, choice2: string, choice3: string): void {
+    if (choice1 === choice2 || choice1 === choice3 || choice2 === choice3) {
+      this.duplicateChoice = true;
+    }
+  }
+
   /**
    * Create a map of kids and their choices and time slots
    * @returns void
@@ -60,13 +69,23 @@ export class Kids {
       const name = col[0] + ' ' + col[1];
       this.names.push(name);
       this.count += 1;
+      const land1choice = col[3].toLowerCase();
+      const land2choice = col[4].toLowerCase();
+      const land3choice = col[5].toLowerCase();
+      const water1choice = col[6].toLowerCase();
+      const water2choice = col[7].toLowerCase();
+      const water3choice = col[8].toLowerCase();
+      if (!this.duplicateChoice) {
+        this.detectDuplicateChoices(water1choice, water2choice, water3choice);
+      }
+
       this.choices[name] = {
-        land1: col[3].toLowerCase(),
-        land2: col[4].toLowerCase(),
-        land3: col[5].toLowerCase(),
-        water1: col[6].toLowerCase(),
-        water2: col[7].toLowerCase(),
-        water3: col[8].toLowerCase(),
+        land1: land1choice,
+        land2: land2choice,
+        land3: land3choice,
+        water1: water1choice,
+        water2: water2choice,
+        water3: water3choice,
       };
     });
   }
