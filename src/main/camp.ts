@@ -66,7 +66,11 @@ export class Camp {
       }
     }
     if (!validResults) {
-      this.bestSchedule = null;
+      if (validCount > 0) {
+        this.bestSchedule = this.bestPercentagesSchedule();
+      } else {
+        this.bestSchedule = null;
+      }
     } else {
       this.bestSchedule = this.bestPercentagesSchedule();
     }
