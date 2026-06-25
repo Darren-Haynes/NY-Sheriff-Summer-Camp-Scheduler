@@ -1,5 +1,6 @@
 import { app, BrowserWindow, dialog, ipcMain, clipboard, Menu } from 'electron';
 import fs from 'fs';
+import path from 'path';
 import Excel from 'exceljs';
 import { dataParser, DataErrorHandler } from './dataInput';
 import { Camp } from './camp';
@@ -28,6 +29,8 @@ const createWindow = (): void => {
     minWidth: 650,
     show: false,
     backgroundColor: '#f6d25f',
+    // fallback icon if wix doesn't provide the icon during make file
+    icon: path.join(__dirname, '../assets/icons/sheriff-badge-msi.ico'),
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       contextIsolation: true,
