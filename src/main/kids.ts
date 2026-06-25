@@ -76,6 +76,7 @@ export class Kids {
       const water3choice = col[8].toLowerCase();
       if (!this.duplicateChoice) {
         this.detectDuplicateChoices(water1choice, water2choice, water3choice);
+        this.detectDuplicateChoices(land1choice, land2choice, land3choice);
       }
 
       this.choices[name] = {
