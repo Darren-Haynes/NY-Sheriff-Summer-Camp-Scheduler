@@ -2290,8 +2290,7 @@ export class Schedule {
           true
         );
         if (kidsWhoCanReschedule.length === 0) {
-          // throw new Error(`${this.kids.count} kids is not enough to run the camp`);
-          console.log(`${this.kids.count} kids is not enough to run the camp`);
+          // console.log(`${this.kids.count} kids is not enough to run the camp`);
           return;
         }
         const shortfallCount = this.getShortfallCount(activityType, timeSlot, activity);
@@ -2472,11 +2471,10 @@ export class Schedule {
       const minRange = ranges[activity as AllActivities][0];
       if (activityCount < minRange && activityCount > 0) {
         underScheduled = true;
-        console.log(activity, 'has', activityCount, 'kids scheduled, min is', minRange);
+        // console.log(activity, 'has', activityCount, 'kids scheduled, min is', minRange);
       }
     }
     if (!underScheduled) {
-      console.log('No activities under scheduled');
       return true;
     }
     return false;
@@ -2982,9 +2980,9 @@ export class Schedule {
       const scheduledAndNotScheduledCompareToAllNames =
         scheduledTimeNames.length + notScheduledTimeNames.length === this.kids.count;
       if (!scheduledAndNotScheduledCompareToAllNames) {
-        console.log(
-          `Water scheduled names (${scheduledTimeNames.length}) + not scheduled names (${notScheduledTimeNames.length}) does not equal total kids count (${this.kids.count})`
-        );
+        // console.log(
+        //   `Water scheduled names (${scheduledTimeNames.length}) + not scheduled names (${notScheduledTimeNames.length}) does not equal total kids count (${this.kids.count})`
+        // );
         return false;
       }
     }
@@ -3038,7 +3036,7 @@ export class Schedule {
     ];
     const result = allScheduleTests.every(test => test === true);
     if (!result) {
-      console.log('Unscheduled kids & activities count to scheduled kids & activities mismatch.');
+      // console.log('Unscheduled kids & activities count to scheduled kids & activities mismatch.');
       return false;
     }
     return result;
@@ -3085,8 +3083,6 @@ export class Schedule {
     const thirdChoices9am: string[] = this.getScheduledChoicesNames(activityType, '9am', 3);
     const thirdChoices10am: string[] = this.getScheduledChoicesNames(activityType, '10am', 3);
     if (this.kids.duplicateChoice) {
-      this.removeDupChoices(firstChoices9am, secondChoices9am, thirdChoices9am);
-      this.removeDupChoices(firstChoices10am, secondChoices10am, thirdChoices10am);
       this.removeDupChoices(firstChoices9am, secondChoices9am, thirdChoices9am);
       this.removeDupChoices(firstChoices10am, secondChoices10am, thirdChoices10am);
     }
@@ -3202,6 +3198,7 @@ export class Schedule {
       notScheduledToScheduled,
       testSchedulingWater,
       testSchedulingLand,
+      // uncomment the logging in the 4 methods below for debugging
       printUnderScheduledWater9am,
       printUnderScheduledLand9am,
       printUnderScheduledWater10am,

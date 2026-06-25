@@ -219,9 +219,6 @@ export function dataParser(data: string) {
   const trimTrailing = data.replace(/[ \t\f\v]+$/g, '');
   const lines: string[] = trimTrailing.split('\n');
   if (lines[0].includes('Last Name')) {
-    lines.forEach((line, index) => {
-      console.log(line);
-    });
     lines.shift();
     header = true;
   }
