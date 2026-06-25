@@ -231,7 +231,7 @@ const joinNames = (names: string[]): string => {
 const scheduleKids = (data: string) => {
   const kids = new Kids(data);
   const camp = new Camp(kids);
-  camp.scheduleTheKids(100);
+  camp.scheduleTheKids(1000);
   CAMP_BEST_SCHEDULE = camp.bestSchedule;
   return camp.bestSchedule;
 };
