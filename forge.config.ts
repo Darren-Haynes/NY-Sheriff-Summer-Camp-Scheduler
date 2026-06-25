@@ -22,6 +22,7 @@ const config: ForgeConfig = {
   packagerConfig: {
     name: 'NY Sheriff Summer Camp Scheduler',
     asar: true,
+    icon: './assets/icons/sheriff-badge-msi.ico',
   },
   rebuildConfig: {},
   // ... rest of your existing makers config remains untouched
@@ -29,7 +30,7 @@ const config: ForgeConfig = {
     new MakerMSI(
       {
         description: 'NY Sheriff Institute Summer Camp Scheduler',
-        exe: 'NY Sheriff Summer Camp Scheduler',
+        exe: 'NY Sheriff Summer Camp Scheduler.exe',
         icon: './assets/icons/sheriff-badge-msi.ico',
         ui: {
           images: {
