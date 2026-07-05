@@ -1,7 +1,6 @@
 # User
 sample_data/
 src/main/scheduler.js
-.nvmrc
 
 # Logs
 logs
