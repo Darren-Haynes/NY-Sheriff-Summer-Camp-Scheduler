@@ -1,4 +1,3 @@
-import { notDeepEqual } from 'assert/strict';
 import { WaterActivityCounts, LandActivityCounts, KidsChoices } from '../types/kids-types';
 
 /**
