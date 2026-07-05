@@ -20,11 +20,20 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18' # or '20' if you prefer
+          node-version: ${{ matrix.node-version }}
           cache: 'npm' # enables npm cache
 
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
+
+      - name: Print versions (debug)
+        run: |
+          echo "Host Node:"
+          node -v
+          npm -v
+          echo "Electron (if available):"
+          npx electron --version || echo "electron binary not installed"
+          npx electron --eval "console.log('electron', process.versions.electron, 'node', process.versions.node, 'chrome', process.versions.chrome)" || true
 
       - name: Run tests & coverage
         run: npm run test:coverage
