@@ -37,18 +37,50 @@ jobs:
           npx electron --version || echo "electron binary not installed"
           npx electron --eval "console.log('electron', process.versions.electron, 'node', process.versions.node, 'chrome', process.versions.chrome)" || true
 
-      - name: Run tests & coverage
+      - name: Run Vitest & coverage
         run: npm run test:coverage
         env:
           CI: true
 
-      - name: Upload coverage artifact
+      - name: Upload Vitest coverage artifact
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
+          name: vitest-coverage-report
           path: coverage
 
-      - name: Upload coverage to Codecov
+      - name: Build Electron app for e2e tests
+        run: npm run package
+        env:
+          CI: true
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright e2e tests
+        run: npm run test:e2e
+        env:
+          CI: true
+
+      - name: Upload Playwright test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: test-results/
+          retention-days: 30
+
+      - name: Merge coverage reports
+        run: |
+          mkdir -p .nyc_output
+          if [ -d ".nyc_output" ] && [ "$(ls -A .nyc_output)" ]; then
+            echo "E2E coverage found, merging with Vitest coverage..."
+          fi
+
+      - name: Generate combined coverage report
+        run: |
+          npm run coverage:report || true
+
+      - name: Upload combined coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           files: ./coverage/lcov.info
