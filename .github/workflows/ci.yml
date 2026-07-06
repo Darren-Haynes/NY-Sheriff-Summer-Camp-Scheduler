@@ -52,6 +52,8 @@ jobs:
         run: npm run package
         env:
           CI: true
+          TEST_RUN: 'true'
+          NODE_ENV: test
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
@@ -62,8 +64,6 @@ jobs:
         run: npx playwright test && npx nyc report
         env:
           CI: true
-          TEST_RUN: 'true'
-          NODE_ENV: test
 
       - name: Upload Playwright test results
         uses: actions/upload-artifact@v4
