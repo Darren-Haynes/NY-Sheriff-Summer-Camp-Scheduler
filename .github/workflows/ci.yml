@@ -61,7 +61,7 @@ jobs:
           CI: true
 
       - name: Run Playwright e2e tests
-        run: npx playwright test && npx nyc report
+        run: xvfb-run --auto-servernum --server-args="-screen
         env:
           CI: true
 
