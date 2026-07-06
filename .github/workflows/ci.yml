@@ -55,9 +55,11 @@ jobs:
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
+        env:
+          CI: true
 
       - name: Run Playwright e2e tests
-        run: playwright test && nyc report
+        run: npx playwright test && npx nyc report
         env:
           CI: true
           TEST_RUN: 'true'
