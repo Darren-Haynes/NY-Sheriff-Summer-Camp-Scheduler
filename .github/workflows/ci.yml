@@ -59,20 +59,12 @@ jobs:
         env:
           CI: true
 
-      - name: Upload Vitest coverage to Codecov
+      - name: Upload all metrics to Codecov
         uses: codecov/codecov-action@v5
         with:
-          files: ./coverage/vitest/lcov.info
-          flags: unit-tests
-          fail_ci_if_error: false
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Upload Playwright coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          files: ./coverage/lcov.info
-          flags: e2e-tests
+          files: ./coverage/vitest/lcov.info,./coverage/lcov.info
+          flags: unit-tests,e2e-tests
+          disable_search: true
           fail_ci_if_error: false
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
