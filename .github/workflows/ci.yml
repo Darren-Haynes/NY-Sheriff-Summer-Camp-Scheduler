@@ -57,7 +57,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright e2e tests
-        run: npm run test:e2e
+        run: cross-env TEST_RUN=true NODE_ENV=test playwright test && nyc report
         env:
           CI: true
 
