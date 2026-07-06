@@ -57,9 +57,11 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright e2e tests
-        run: cross-env TEST_RUN=true NODE_ENV=test playwright test && nyc report
+        run: playwright test && nyc report
         env:
           CI: true
+          TEST_RUN: 'true'
+          NODE_ENV: test
 
       - name: Upload Playwright test results
         uses: actions/upload-artifact@v4
