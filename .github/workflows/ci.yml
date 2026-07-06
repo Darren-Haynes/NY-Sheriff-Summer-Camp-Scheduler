@@ -46,7 +46,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: vitest-coverage-report
-          path: coverage
+          path: coverage/vitest
 
       - name: Build Electron app for e2e tests
         run: npm run package
@@ -87,7 +87,9 @@ jobs:
       - name: Upload combined coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          files: ./coverage/lcov.info
+          files: |
+            ./coverage/vitest/lcov.info
+            ./coverage/lcov.info
           fail_ci_if_error: false
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
