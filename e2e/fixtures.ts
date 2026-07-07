@@ -14,6 +14,7 @@ export const test = base.extend<ElectronFixtures>({
   appContext: async ({}, use, testInfo) => {
     let electronExecutablePath = '';
 
+    // Resolve the correct prebuilt Electron executable per platform
     if (process.platform === 'darwin') {
       electronExecutablePath = path.join(
         __dirname,
@@ -25,10 +26,20 @@ export const test = base.extend<ElectronFixtures>({
       electronExecutablePath = path.join(__dirname, '../node_modules/electron/dist/electron');
     }
 
+    // Dynamic directory scanning for Electron Forge's platform output
+    let webpackMainEntry = path.join(__dirname, '../.webpack/main/index.js');
+    const arm64Entry = path.join(__dirname, '../.webpack/arm64/main/index.js');
+    const x64Entry = path.join(__dirname, '../.webpack/x64/main/index.js');
+
+    if (fs.existsSync(arm64Entry)) {
+      webpackMainEntry = arm64Entry; // Apple Silicon Mac
+    } else if (fs.existsSync(x64Entry)) {
+      webpackMainEntry = x64Entry; // GitHub Actions Ubuntu runner (or Intel Mac)
+    }
+
     const electronApp = await electron.launch({
       executablePath: electronExecutablePath,
-      // Target the compiled main file. Adjust the path to match your specific forge config:
-      args: [path.join(__dirname, '../.webpack/arm64/main/index.js')],
+      args: [webpackMainEntry], // Target the programmatically detected main bundle
     });
 
     let window: Page | undefined;
