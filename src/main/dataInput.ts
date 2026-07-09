@@ -1,6 +1,5 @@
 import { Activities } from './activities';
 import { KidsDataType, ErrorData } from '../types/dataInput-types';
-import { log } from 'console';
 
 export class KidsChoices {
   campData: string[][];
@@ -117,11 +116,11 @@ export class DataErrorHandler {
      */
     this.campData.forEach((row, rowNum) => {
       // First check for incorrect land activities
-      for (let i = 3; i < 6; i++) {
+      for (let i = 2; i < 5; i++) {
         this.#wrongActivity(Activities.landActs, rowNum, i, row);
       }
       // Then check for incorrect water activities
-      for (let i = 6; i < 9; i++) {
+      for (let i = 5; i < 8; i++) {
         this.#wrongActivity(Activities.waterActs, rowNum, i, row);
       }
     });
@@ -218,7 +217,7 @@ export function dataParser(data: string) {
   let header = false;
   const trimTrailing = data.replace(/[ \t\f\v]+$/g, '');
   const lines: string[] = trimTrailing.split('\n');
-  if (lines[0].includes('Last Name')) {
+  if (lines[0].toLowerCase().includes('last name')) {
     lines.shift();
     header = true;
   }

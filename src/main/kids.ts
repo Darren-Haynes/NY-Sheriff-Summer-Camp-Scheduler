@@ -1,5 +1,5 @@
-import { notDeepEqual } from 'assert/strict';
 import { WaterActivityCounts, LandActivityCounts, KidsChoices } from '../types/kids-types';
+import { Int } from '../types/num-types';
 
 /**
 Kids class contains the key data for each of the kids in the camp
@@ -57,24 +57,83 @@ export class Kids {
   }
 
   /**
+   * Get the column indices for the names and activities columns based on the header row.
+   * @param {string} headerRow - header row of spreadsheet.
+   * @returns {Int[]} - Array of column indices for names and activities.
+   */
+  private getNamesAndActivitiesColumns(headerRow: string): Int[] {
+    const columns = headerRow.split('\t');
+    let firstName = -1 as Int;
+    let lastName = -1 as Int;
+    let waterActivity1 = -1 as Int;
+    let waterActivity2 = -1 as Int;
+    let waterActivity3 = -1 as Int;
+    let landActivity1 = -1 as Int;
+    let landActivity2 = -1 as Int;
+    let landActivity3 = -1 as Int;
+    for (let i = 0; i < columns.length; i++) {
+      const column = columns[i].toLowerCase();
+      if (column.includes('first name')) {
+        firstName = i as Int;
+      } else if (column.includes('last name')) {
+        lastName = i as Int;
+      } else if (column === 'w1') {
+        waterActivity1 = i as Int;
+      } else if (column === 'w2') {
+        waterActivity2 = i as Int;
+      } else if (column === 'w3') {
+        waterActivity3 = i as Int;
+      } else if (column === 'l1') {
+        landActivity1 = i as Int;
+      } else if (column === 'l2') {
+        landActivity2 = i as Int;
+      } else if (column === 'l3') {
+        landActivity3 = i as Int;
+      }
+    }
+    return [
+      firstName,
+      lastName,
+      waterActivity1,
+      waterActivity2,
+      waterActivity3,
+      landActivity1,
+      landActivity2,
+      landActivity3,
+    ];
+  }
+
+  /**
    * Create a map of kids and their choices and time slots
    * @returns void
    */
   private setKidsData(): void {
     const inputDataArr = this.inputData.split('\n');
+    const headerRow = inputDataArr.shift();
+    if (!headerRow) return;
+    const [
+      firstName,
+      lastName,
+      waterActivity1,
+      waterActivity2,
+      waterActivity3,
+      landActivity1,
+      landActivity2,
+      landActivity3,
+    ] = this.getNamesAndActivitiesColumns(headerRow);
     inputDataArr.pop(); // remove last empty line
-    inputDataArr.shift(); // remove spreadsheet header
+
     inputDataArr.forEach((line: string) => {
       const col = line.split('\t');
-      const name = col[0] + ' ' + col[1];
+      const name = col[firstName] + ' ' + col[lastName];
       this.names.push(name);
       this.count += 1;
-      const land1choice = col[3].toLowerCase();
-      const land2choice = col[4].toLowerCase();
-      const land3choice = col[5].toLowerCase();
-      const water1choice = col[6].toLowerCase();
-      const water2choice = col[7].toLowerCase();
-      const water3choice = col[8].toLowerCase();
+      const land1choice = col[landActivity1].toLowerCase();
+      const land2choice = col[landActivity2].toLowerCase();
+      const land3choice = col[landActivity3].toLowerCase();
+      const water1choice = col[waterActivity1].toLowerCase();
+      const water2choice = col[waterActivity2].toLowerCase();
+      const water3choice = col[waterActivity3].toLowerCase();
       if (!this.duplicateChoice) {
         this.detectDuplicateChoices(water1choice, water2choice, water3choice);
         this.detectDuplicateChoices(land1choice, land2choice, land3choice);
