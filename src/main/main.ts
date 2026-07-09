@@ -72,13 +72,102 @@ const createWindow = (): void => {
     const workbook = new Excel.Workbook();
     await workbook.xlsx.readFile(result.filePaths[0]);
     let data = '';
-    workbook.worksheets[0].eachRow({ includeEmpty: true }, function (row) {
-      let s = JSON.stringify(row.values);
-      s = s.replace(/\[null,"|"\]/g, '');
-      s = s.replace(/","|",|,"/g, '\t');
-      data += s + '\n';
+
+    let worksheet = workbook.worksheets[0];
+    const sheetCount = workbook.worksheets.length;
+    if (worksheet !== undefined && sheetCount > 1) {
+      const targetSheet = workbook.worksheets.find(ws => ws.name.toLowerCase().includes('campers'));
+      if (targetSheet) {
+        worksheet = workbook.getWorksheet(targetSheet.name);
+      }
+    }
+    let firstNameCol = -1;
+    let lastNameCol = -1;
+    let landActivity1Col = -1;
+    let landActivity2Col = -1;
+    let landActivity3Col = -1;
+    let waterActivity1Col = -1;
+    let waterActivity2Col = -1;
+    let waterActivity3Col = -1;
+
+    console.log("FIRST ROW", worksheet.getRow(1).values)
+    for (let i = 1; i < worksheet.getRow(1).values.length; i++) {
+      const cell = worksheet.getRow(1).values[i];
+      if (cell !== undefined && typeof cell === 'string') {
+        const cellContent = cell.toLowerCase();
+        console.log("CELL CONTENT", cellContent, typeof cellContent)
+        if (cellContent.includes('first name')) {
+          firstNameCol = i;
+        } else if (cellContent.includes('last name')) {
+          lastNameCol = i;
+        } else if (cellContent.includes('l1')) {
+          landActivity1Col = i;
+        } else if (cellContent.includes('l2')) {
+          landActivity2Col = i;
+        } else if (cellContent.includes('l3')) {
+          landActivity3Col = i;
+        } else if (cellContent.includes('w1')) {
+          waterActivity1Col = i;
+        } else if (cellContent.includes('w2')) {
+          waterActivity2Col = i;
+        } else if (cellContent.includes('w3')) {
+          waterActivity3Col = i;
+        }
+      }
+    }
+    console.log("firstNameCol", firstNameCol, "lastNameCol", lastNameCol, "landActivity1Col", landActivity1Col, "landActivity2Col", landActivity2Col, "landActivity3Col", landActivity3Col, "waterActivity1Col", waterActivity1Col, "waterActivity2Col", waterActivity2Col, "waterActivity3Col", waterActivity3Col)
+
+
+    const activityData: string[][] = [];
+    let firstName = '';
+    let lastName = '';
+    let landActivity1 = '';
+    let landActivity2 = '';
+    let landActivity3 = '';
+    let waterActivity1 = '';
+    let waterActivity2 = '';
+    let waterActivity3 = '';
+    worksheet.eachRow({ includeEmpty: true }, function (row) {
+      const firstNameCell = row.getCell( firstNameCol );
+      if (firstNameCell.type === Excel.ValueType.String) {
+        firstName = firstNameCell.value as string;
+      }
+      const lastNameCell = row.getCell( lastNameCol );
+      if (lastNameCell.type === Excel.ValueType.String) {
+        lastName = lastNameCell.value as string;
+      }
+      const landActivity1Cell = row.getCell( landActivity1Col );
+      if (landActivity1Cell.type === Excel.ValueType.String) {
+        landActivity1 = landActivity1Cell.value as string;
+      }
+      const landActivity2Cell = row.getCell( landActivity2Col );
+      if (landActivity2Cell.type === Excel.ValueType.String) {
+        landActivity2 = landActivity2Cell.value as string;
+      }
+      const landActivity3Cell = row.getCell( landActivity3Col );
+      if (landActivity3Cell.type === Excel.ValueType.String) {
+        landActivity3 = landActivity3Cell.value as string;
+      }
+      const waterActivity1Cell = row.getCell( waterActivity1Col );
+      if (waterActivity1Cell.type === Excel.ValueType.String) {
+        waterActivity1 = waterActivity1Cell.value as string;
+      }
+      const waterActivity2Cell = row.getCell( waterActivity2Col );
+      if (waterActivity2Cell.type === Excel.ValueType.String) {
+        waterActivity2 = waterActivity2Cell.value as string;
+      }
+      const waterActivity3Cell = row.getCell( waterActivity3Col );
+      if (waterActivity3Cell.type === Excel.ValueType.String) {
+        waterActivity3 = waterActivity3Cell.value as string;
+      }
+      activityData.push([firstName, lastName, landActivity1, landActivity2, landActivity3, waterActivity1, waterActivity2, waterActivity3]);
+      // let s = JSON.stringify(row.values);
+      // s = s.replace(/\[null,"|"\]/g, '');
+      // s = s.replace(/","|",|,"/g, '\t');
+      // data += s + '\n';
     });
-    const { allErrors, dataErrors } = handleErrors(data);
+    const activityDataWithoutHeader = activityData.slice(1);
+    const { allErrors, dataErrors } = handleErrors(activityDataWithoutHeader);
     if (!allErrors.every(item => item === false)) {
       mainWindow.webContents.send('error-list', JSON.stringify(dataErrors.getErrorList()));
     } else {
@@ -239,11 +328,11 @@ const scheduleKids = (data: string) => {
   return camp.bestSchedule;
 };
 
-const handleErrors = (data: string) => {
-  const { campData, headerRow } = dataParser(data);
-  const dataErrors = new DataErrorHandler(campData, headerRow);
+const handleErrors = (data: string[][]) => {
+  // const { campData, headerRow } = dataParser(data);
+  const dataErrors = new DataErrorHandler(data, false);
   const allErrors: boolean[] = [
-    dataErrors.numOfFields(),
+    // dataErrors.numOfFields(),
     dataErrors.wrongActivity(),
     dataErrors.notEnoughKids(),
     dataErrors.tooManyKids(),
