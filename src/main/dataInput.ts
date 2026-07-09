@@ -213,18 +213,18 @@ export class DataErrorHandler {
   }
 }
 
-export function dataParser(data: string) {
-  let header = false;
-  const trimTrailing = data.replace(/[ \t\f\v]+$/g, '');
-  const lines: string[] = trimTrailing.split('\n');
-  if (lines[0].toLowerCase().includes('last name')) {
-    lines.shift();
-    header = true;
-  }
-  lines.pop(); // last line is an empty string we don't want
-  const parsedData = lines.map(line => line.split(/\t/));
-  return {
-    campData: parsedData,
-    headerRow: header,
-  };
-}
+// export function dataParser(data: string) {
+//   let header = false;
+//   const trimTrailing = data.replace(/[ \t\f\v]+$/g, '');
+//   const lines: string[] = trimTrailing.split('\n');
+//   if (lines[0].toLowerCase().includes('last name')) {
+//     lines.shift();
+//     header = true;
+//   }
+//   lines.pop(); // last line is an empty string we don't want
+//   const parsedData = lines.map(line => line.split(/\t/));
+//   return {
+//     campData: parsedData,
+//     headerRow: header,
+//   };
+// }
