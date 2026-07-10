@@ -31,12 +31,12 @@ export class KidsChoices {
   createKidsMap(): void {
     this.campData.forEach(line => {
       const kidData: KidsDataType = {
-        land1: line[3],
-        land2: line[4],
-        land3: line[5],
-        water1: line[6],
-        water2: line[7],
-        water3: line[8],
+        land1: line[2],
+        land2: line[3],
+        land3: line[4],
+        water1: line[5],
+        water2: line[6],
+        water3: line[7],
       };
       this.kidsMap.set(line[1] + ' ' + line[0], kidData);
     });
