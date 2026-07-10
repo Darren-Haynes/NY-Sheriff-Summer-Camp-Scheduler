@@ -21,12 +21,10 @@ const ACTIVITY_COLUMNS: { index: number; label: string; acts: string[] }[] = [
 export class KidsChoices {
   campData: string[][];
   kidsMap: Map<string, KidsDataType>;
-  headerRow: boolean;
 
-  constructor(data: string[][], header: boolean) {
+  constructor(data: string[][]) {
     this.campData = data;
     this.kidsMap = new Map();
-    this.headerRow = header;
     this.createKidsMap();
   }
 
