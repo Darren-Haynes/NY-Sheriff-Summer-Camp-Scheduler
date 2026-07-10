@@ -241,8 +241,7 @@ const scheduleKids = (data: string[][]) => {
 };
 
 const handleErrors = (data: string[][]) => {
-  // const { campData, headerRow } = dataParser(data);
-  const dataErrors = new DataErrorHandler(data, false);
+  const dataErrors = new DataErrorHandler(data);
   const allErrors: boolean[] = [
     // dataErrors.numOfFields(),
     dataErrors.wrongActivity(),
