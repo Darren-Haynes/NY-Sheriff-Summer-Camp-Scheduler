@@ -1,7 +1,34 @@
 import * as Excel from 'exceljs';
 import { CellValue } from 'exceljs';
-import { findKidsColumnIndices } from './kidsColumnMapper';
+import { findKidsColumnIndices, hasAllKidsColumns, KidsColumnIndices } from './kidsColumnMapper';
 
+/**
+ * Finds the worksheet that actually contains the kids' activity choice data,
+ * regardless of what it's named. A workbook may contain many unrelated
+ * sheets (bus lists, no-show lists, per-county staging sheets, etc.), and
+ * the client isn't always consistent about naming the sheet we want. The one
+ * constant is the header row, so we scan each sheet's first row and pick the
+ * first one where every required column (first name, last name, L1-L3,
+ * W1-W3) is found.
+ *
+ * Falls back to the first worksheet if none match, which also covers the
+ * original single-sheet workbook format.
+ */
+function findCampersWorksheet(
+  workbook: Excel.Workbook
+): { worksheet: Excel.Worksheet; indices: KidsColumnIndices } {
+  for (const sheet of workbook.worksheets) {
+    const headerValues = sheet.getRow(1).values as CellValue[];
+    const indices = findKidsColumnIndices(headerValues);
+    if (hasAllKidsColumns(indices)) {
+      return { worksheet: sheet, indices };
+    }
+  }
+
+  const worksheet = workbook.worksheets[0];
+  const indices = findKidsColumnIndices(worksheet.getRow(1).values as CellValue[]);
+  return { worksheet, indices };
+}
 
 /**
  * Extracts the kids' names and activity choices from the Excel file.
@@ -9,18 +36,10 @@ import { findKidsColumnIndices } from './kidsColumnMapper';
  * @returns {Promise<string[][]>} A promise that resolves to a 2D array of strings representing the kids' activity choices.
  */
 export default async function extractKidsChoicesData(filePath: string): Promise<string[][]> {
-    let workbook = new Excel.Workbook();
+    const workbook = new Excel.Workbook();
     await workbook.xlsx.readFile(filePath);
-    let worksheet = workbook.worksheets[0];
-    const sheetCount = workbook.worksheets.length;
-    if (worksheet !== undefined && sheetCount > 1) {
-      const targetSheet = workbook.worksheets.find(ws => ws.name.toLowerCase().includes('campers'));
-      if (targetSheet) {
-        const worksheet = workbook.getWorksheet(targetSheet.name);
-      }
-    }
-    const row = worksheet.getRow(1);
-    const values = row.values as CellValue[];
+
+    const { worksheet, indices } = findCampersWorksheet(workbook);
     const {
       firstNameCol,
       lastNameCol,
@@ -30,7 +49,7 @@ export default async function extractKidsChoicesData(filePath: string): Promise<
       waterActivity1Col,
       waterActivity2Col,
       waterActivity3Col,
-    } = findKidsColumnIndices(values);
+    } = indices;
 
     const activityData: string[][] = [];
     let firstName = '';
