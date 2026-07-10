@@ -1,5 +1,6 @@
 import * as Excel from 'exceljs';
 import { CellValue } from 'exceljs';
+import { findKidsColumnIndices } from './kidsColumnMapper';
 
 
 /**
@@ -18,43 +19,18 @@ export default async function extractKidsChoicesData(filePath: string): Promise<
         const worksheet = workbook.getWorksheet(targetSheet.name);
       }
     }
-    let firstNameCol = -1;
-    let lastNameCol = -1;
-    let landActivity1Col = -1;
-    let landActivity2Col = -1;
-    let landActivity3Col = -1;
-    let waterActivity1Col = -1;
-    let waterActivity2Col = -1;
-    let waterActivity3Col = -1;
-
     const row = worksheet.getRow(1);
     const values = row.values as CellValue[];
-    const worksheetLength = values.length;
-    if (typeof worksheetLength === "number") {
-      for (let i = 1; i < worksheetLength; i++) {
-        const cell = values[i];
-        if (cell !== undefined && typeof cell === 'string') {
-          const cellContent = cell.toLowerCase();
-          if (cellContent.includes('first name')) {
-            firstNameCol = i;
-          } else if (cellContent.includes('last name')) {
-            lastNameCol = i;
-          } else if (cellContent.includes('l1')) {
-            landActivity1Col = i;
-          } else if (cellContent.includes('l2')) {
-            landActivity2Col = i;
-          } else if (cellContent.includes('l3')) {
-            landActivity3Col = i;
-          } else if (cellContent.includes('w1')) {
-            waterActivity1Col = i;
-          } else if (cellContent.includes('w2')) {
-            waterActivity2Col = i;
-          } else if (cellContent.includes('w3')) {
-            waterActivity3Col = i;
-          }
-        }
-      }
-    }
+    const {
+      firstNameCol,
+      lastNameCol,
+      landActivity1Col,
+      landActivity2Col,
+      landActivity3Col,
+      waterActivity1Col,
+      waterActivity2Col,
+      waterActivity3Col,
+    } = findKidsColumnIndices(values);
 
     const activityData: string[][] = [];
     let firstName = '';
