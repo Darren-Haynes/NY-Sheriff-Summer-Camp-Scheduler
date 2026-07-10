@@ -9,7 +9,7 @@ test.describe('PasteBox Real-World Dataset Testing', () => {
     const { electronWindow } = appContext;
     await electronWindow.waitForTimeout(700);
 
-    const fileSpecPath = path.join(__dirname, 'fixtures/error-wrong-activities.txt');
+    const fileSpecPath = path.join(__dirname, 'fixtures/original-format/error-wrong-activities.txt');
     const malformedData = fs.readFileSync(fileSpecPath, 'utf8');
 
     const pasteNavBtn = electronWindow.locator('#paste-btn');
@@ -34,7 +34,7 @@ test.describe('PasteBox Real-World Dataset Testing', () => {
     const { electronWindow, electronApp } = appContext;
     await electronWindow.waitForTimeout(700);
 
-    const fileSpecPath = path.join(__dirname, 'fixtures/success-104-kids.txt');
+    const fileSpecPath = path.join(__dirname, 'fixtures/original-format/success-104-kids.txt');
     const productionData = fs.readFileSync(fileSpecPath, 'utf8');
 
     const pasteNavBtn = electronWindow.locator('#paste-btn');
