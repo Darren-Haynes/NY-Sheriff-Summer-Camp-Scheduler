@@ -64,10 +64,8 @@ export class DataErrorHandler {
   tooManyKidsHeader: string;
 
   campData: string[][];
-  headerRow: boolean;
 
-  constructor(data: string[][], header: boolean) {
-    this.headerRow = header;
+  constructor(data: string[][]) {
     this.campData = data;
     this.numOfFieldsError = [];
     this.fieldsErrorHeader = `The Following rows have too few or too many columns`;
@@ -110,14 +108,17 @@ export class DataErrorHandler {
       if (this.campData[i].length != 9) {
         let s = JSON.stringify(this.campData[i]);
         s = this.campData[i].join(',').replace(/[[]?null/g, 'Empty Cell');
-        this.numOfFieldsError.push(`Line ${i + 2}: ${s}`);
+        this.numOfFieldsError.push(`Line ${i + 1}: ${s}`);
       }
     }
     return this.numOfFieldsError.length !== 0;
   }
 
   #wrongActivity(acts: string[], rowNum: number, index: number, label: string, row: any): void {
-    const rowNumOffset: number = this.headerRow ? rowNum + 2 : rowNum + 1;
+    // campData never includes a header row (excel-parser.ts and
+    // text-parser.ts both strip it before this class ever sees the data),
+    // so the displayed row number is always just rowNum + 1.
+    const rowNumOffset: number = rowNum + 1;
     if (!row[index]) {
       const errorMsg = `Row ${rowNumOffset}; column ${label} -- NO SPORT EMPTY CELL`;
       this.activityError.push(errorMsg);
@@ -147,7 +148,7 @@ export class DataErrorHandler {
       const choices = row.slice(ACTIVITIES_START_COL, ACTIVITIES_END_COL);
       const uniqueChoices = new Set(choices);
       if (choices.length !== uniqueChoices.size) {
-        const errorMsg = `Row ${rowNum + 2}; duplicate choice - ${choices.join(', ')}`;
+        const errorMsg = `Row ${rowNum + 1}; duplicate choice - ${choices.join(', ')}`;
         this.duplicateChoiceError.push(errorMsg);
       }
     });
@@ -162,8 +163,8 @@ export class DataErrorHandler {
     this.campData.forEach((row, rowNum) => {
       const name = row[0].trim() + row[1].trim();
       if (nameMap.has(name)) {
-        const errorMsg1 = `Row ${rowNum + 2}; duplicate name - ${row[0].trim()} ${row[1].trim()}`;
-        const errorMsg2 = `Row ${nameMap.get(name) + 2}; duplicate name - ${row[0].trim()} ${row[1].trim()}`;
+        const errorMsg1 = `Row ${rowNum + 1}; duplicate name - ${row[0].trim()} ${row[1].trim()}`;
+        const errorMsg2 = `Row ${nameMap.get(name) + 1}; duplicate name - ${row[0].trim()} ${row[1].trim()}`;
         this.duplicateNameError.push(errorMsg2);
         this.duplicateNameError.push(errorMsg1);
       }
