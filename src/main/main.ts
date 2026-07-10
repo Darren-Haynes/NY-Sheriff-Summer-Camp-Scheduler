@@ -41,6 +41,11 @@ const createWindow = (): void => {
     },
   });
 
+  // Hide the menu bar itself (Windows/Linux only; macOS menu bar lives at
+  // the top of the screen, not the window). The menu is still attached via
+  // Menu.setApplicationMenu so Cmd/Ctrl+C/V/X/A/Z accelerators keep working.
+  mainWindow.setMenuBarVisibility(false);
+
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
@@ -247,7 +252,16 @@ const handleErrors = (data: string[][]) => {
   return { allErrors, dataErrors };
 };
 
-Menu.setApplicationMenu(null);
+// Keep an Edit menu (even though it's not shown) so that standard
+// clipboard/text-editing keyboard shortcuts (Cmd/Ctrl+C/V/X/A/Z) keep
+// working. Setting the application menu to `null` outright also strips
+// out these accelerators, breaking paste in text areas like PasteBox.
+const menu = Menu.buildFromTemplate([
+  {
+    role: 'editMenu',
+  },
+]);
+Menu.setApplicationMenu(menu);
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
