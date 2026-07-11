@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - testing
+  pull_request:
+    branches:
+      - main
+      - testing
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '25'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Print versions (debug)
+        run: |
+          echo "Host Node:"
+          node -v
+          npm -v
+          echo "Electron (if available):"
+          npx electron --version || echo "electron binary not installed"
+          npx electron --eval "console.log('electron', process.versions.electron, 'node', process.versions.node, 'chrome', process.versions.chrome)" || true
+
+      - name: Run Vitest & coverage
+        run: npm run test:coverage
+        env:
+          CI: true
+
+      - name: Build Electron app for e2e tests
+        run: npm run package
+        env:
+          CI: true
+          TEST_RUN: 'true'
+          NODE_ENV: test
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+        env:
+          CI: true
+
+      - name: Run Playwright e2e tests
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" npx playwright test && npx nyc report
+        env:
+          CI: true
+
+      - name: Upload Vitest coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage/vitest/lcov.info
+          flags: unit-tests
+          disable_search: true # Keeps this step isolated to only the Vitest file
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload Playwright coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage/lcov.info
+          flags: e2e-tests
+          disable_search: true # Keeps this step isolated to only the Playwright file
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
