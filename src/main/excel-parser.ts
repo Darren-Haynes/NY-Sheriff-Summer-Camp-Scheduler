@@ -1,6 +1,7 @@
 import * as Excel from 'exceljs';
 import { CellValue } from 'exceljs';
 import { findKidsColumnIndices, hasAllKidsColumns, KidsColumnIndices } from './kidsColumnMapper';
+import { normalizeActivityName } from './activityAliases';
 
 /**
  * Finds the worksheet that actually contains the kids' activity choice data,
@@ -72,32 +73,32 @@ export default async function extractKidsChoicesData(filePath: string): Promise<
       const landActivity1Cell = row.getCell( landActivity1Col );
       if (landActivity1Cell.type === Excel.ValueType.String) {
         const landActivity = landActivity1Cell.value as string;
-        landActivity1 = landActivity.toLowerCase();
+        landActivity1 = normalizeActivityName(landActivity)
       }
       const landActivity2Cell = row.getCell( landActivity2Col );
       if (landActivity2Cell.type === Excel.ValueType.String) {
         const landActivity = landActivity2Cell.value as string;
-        landActivity2 = landActivity.toLowerCase();
+        landActivity2 = normalizeActivityName(landActivity)
       }
       const landActivity3Cell = row.getCell( landActivity3Col );
       if (landActivity3Cell.type === Excel.ValueType.String) {
         const landActivity = landActivity3Cell.value as string;
-        landActivity3 = landActivity.toLowerCase();
+        landActivity3 = normalizeActivityName(landActivity)
       }
       const waterActivity1Cell = row.getCell( waterActivity1Col );
       if (waterActivity1Cell.type === Excel.ValueType.String) {
         const waterActivity = waterActivity1Cell.value as string;
-        waterActivity1 = waterActivity.toLowerCase();
+        waterActivity1 = normalizeActivityName(waterActivity)
       }
       const waterActivity2Cell = row.getCell( waterActivity2Col );
       if (waterActivity2Cell.type === Excel.ValueType.String) {
         const waterActivity = waterActivity2Cell.value as string;
-        waterActivity2 = waterActivity.toLowerCase();
+        waterActivity2 = normalizeActivityName(waterActivity)
       }
       const waterActivity3Cell = row.getCell( waterActivity3Col );
       if (waterActivity3Cell.type === Excel.ValueType.String) {
         const waterActivity = waterActivity3Cell.value as string;
-        waterActivity3 = waterActivity.toLowerCase();
+        waterActivity3 = normalizeActivityName(waterActivity)
       }
       activityData.push([firstName, lastName, landActivity1, landActivity2, landActivity3, waterActivity1, waterActivity2, waterActivity3]);
     });
