@@ -56,10 +56,10 @@ describe('DataErrorHandler (original spreadsheet format fixtures)', () => {
 
     expect(dataErrors.duplicateName()).toBe(true);
     expect(dataErrors.duplicateNameError).toEqual([
-      'Row 1; duplicate name - Bob Hoskins',
       'Row 2; duplicate name - Bob Hoskins',
-      'Row 13; duplicate name - Felix Gibson',
+      'Row 3; duplicate name - Bob Hoskins',
       'Row 14; duplicate name - Felix Gibson',
+      'Row 15; duplicate name - Felix Gibson',
     ]);
   });
 
@@ -71,9 +71,9 @@ describe('DataErrorHandler (original spreadsheet format fixtures)', () => {
 
       expect(dataErrors.wrongActivity()).toBe(true);
       expect(dataErrors.activityError).toEqual([
-        'Row 80; column W1 -- praying',
-        'Row 96; column L2 -- flying',
-        'Row 102; column L3 -- diving',
+        'Row 81; column W1 -- praying',
+        'Row 97; column L2 -- flying',
+        'Row 103; column L3 -- diving',
       ]);
 
     // Sanity check: this fixture should only trip duplicateName, not the other checks.

@@ -64,11 +64,13 @@ export default async function extractKidsChoicesData(filePath: string): Promise<
     worksheet.eachRow({ includeEmpty: false }, function (row) {
       const firstNameCell = row.getCell( firstNameCol );
       if (firstNameCell.type === Excel.ValueType.String) {
-        firstName = firstNameCell.value as string;
+        const firstNameRaw = firstNameCell.value as string;
+        firstName = firstNameRaw.charAt(0).toUpperCase() + firstNameRaw.slice(1).toLowerCase();
       }
       const lastNameCell = row.getCell( lastNameCol );
       if (lastNameCell.type === Excel.ValueType.String) {
-        lastName = lastNameCell.value as string;
+        const lastNameRaw = lastNameCell.value as string;
+        lastName = lastNameRaw.charAt(0).toUpperCase() + lastNameRaw.slice(1).toLowerCase();
       }
       const landActivity1Cell = row.getCell( landActivity1Col );
       if (landActivity1Cell.type === Excel.ValueType.String) {
