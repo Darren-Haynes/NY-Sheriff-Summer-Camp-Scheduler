@@ -1,0 +1,19 @@
+# codecov.yml
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+    patch:
+      default:
+        target: auto
+
+flags:
+  unit-tests:
+    carryforward: true
+    paths:
+      - tests/ # Only track files in your unit tests folder
+  e2e-tests:
+    carryforward: true
+    paths:
+      - src/renderer/ # Only track files targeted by Playwright
