@@ -10,19 +10,19 @@ import { DataErrorHandler } from '../../src/main/dataInput';
  * the single error condition it's meant to trigger, so each test also
  * confirms the fixture doesn't unexpectedly trip any of the other checks.
  */
-const originalFormatFixture = (name: string) =>
-  path.join(__dirname, '../../e2e/fixtures/original-format', name);
+const newFormatFixture = (name: string) =>
+  path.join(__dirname, '../../e2e/fixtures/new-format', name);
 
 describe('DataErrorHandler (original spreadsheet format fixtures)', () => {
-  test('notEnoughKids() flags a roster with fewer than 50 kids (error-40-kids.xlsx)', async () => {
-    const data = await extractKidsChoicesData(originalFormatFixture('error-40-kids.xlsx'));
-    expect(data.length).toBe(40);
+  test('notEnoughKids() flags a roster with fewer than 50 kids (error-49-kids.xlsx)', async () => {
+    const data = await extractKidsChoicesData(newFormatFixture('error-49-kids.xlsx'));
+    expect(data.length).toBe(49);
 
     const dataErrors = new DataErrorHandler(data);
 
     expect(dataErrors.notEnoughKids()).toBe(true);
     expect(dataErrors.notEnoughKidsError).toEqual([
-      'The number of kids scheduled for camp is 40, but 50 or more are required',
+      'The number of kids scheduled for camp is 49, but 50 or more are required',
     ]);
 
     // Sanity check: this fixture should only trip notEnoughKids, not the other checks.
@@ -32,7 +32,7 @@ describe('DataErrorHandler (original spreadsheet format fixtures)', () => {
   });
 
   test('tooManyKids() flags a roster with more than 146 kids (error-147-kids.xlsx)', async () => {
-    const data = await extractKidsChoicesData(originalFormatFixture('error-147-kids.xlsx'));
+    const data = await extractKidsChoicesData(newFormatFixture('error-147-kids.xlsx'));
     expect(data.length).toBe(147);
 
     const dataErrors = new DataErrorHandler(data);
@@ -49,23 +49,23 @@ describe('DataErrorHandler (original spreadsheet format fixtures)', () => {
   });
 
   test('duplicateName() flags kids who appear twice in the roster (error-duplicate-names.xlsx)', async () => {
-    const data = await extractKidsChoicesData(originalFormatFixture('error-duplicate-names.xlsx'));
-    expect(data.length).toBe(104);
+    const data = await extractKidsChoicesData(newFormatFixture('error-duplicate-names.xlsx'));
+    expect(data.length).toBe(117);
 
     const dataErrors = new DataErrorHandler(data);
 
     expect(dataErrors.duplicateName()).toBe(true);
     expect(dataErrors.duplicateNameError).toEqual([
-      'Row 2; duplicate name - Bob Hoskins',
-      'Row 3; duplicate name - Bob Hoskins',
-      'Row 14; duplicate name - Felix Gibson',
-      'Row 15; duplicate name - Felix Gibson',
+      'Row 18; duplicate name - Patrick Lee',
+      'Row 19; duplicate name - Patrick Lee',
+      'Row 43; duplicate name - Cali Head',
+      'Row 44; duplicate name - Cali Head',
     ]);
   });
 
     test('wrongActivity() flags incorrect activities in the roster (error-wrong-activities.xlsx)', async () => {
-      const data = await extractKidsChoicesData(originalFormatFixture('error-wrong-activities.xlsx'));
-      expect(data.length).toBe(104);
+      const data = await extractKidsChoicesData(newFormatFixture('error-wrong-activities.xlsx'));
+      expect(data.length).toBe(117);
 
       const dataErrors = new DataErrorHandler(data);
 
@@ -76,9 +76,9 @@ describe('DataErrorHandler (original spreadsheet format fixtures)', () => {
         'Row 103; column L3 -- diving',
       ]);
 
-    // Sanity check: this fixture should only trip duplicateName, not the other checks.
+    // Sanity check: this fixture should only trip wrongActivity, not the other checks.
     expect(dataErrors.notEnoughKids()).toBe(false);
     expect(dataErrors.tooManyKids()).toBe(false);
-    expect(dataErrors.wrongActivity()).toBe(true);
+    expect(dataErrors.duplicateName()).toBe(false);
   });
 });
