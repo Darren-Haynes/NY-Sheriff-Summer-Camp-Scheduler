@@ -116,7 +116,7 @@ export class DataErrorHandler {
     // campData never includes a header row (excel-parser.ts and
     // text-parser.ts both strip it before this class ever sees the data),
     // so the displayed row number is always just rowNum + 1.
-    const rowNumOffset: number = rowNum + 1;
+    const rowNumOffset: number = rowNum + 2;
     if (!row[index]) {
       const errorMsg = `Row ${rowNumOffset}; column ${label} -- NO SPORT EMPTY CELL`;
       this.activityError.push(errorMsg);
@@ -161,8 +161,8 @@ export class DataErrorHandler {
     this.campData.forEach((row, rowNum) => {
       const name = row[0].trim() + row[1].trim();
       if (nameMap.has(name)) {
-        const errorMsg1 = `Row ${rowNum + 1}; duplicate name - ${row[0].trim()} ${row[1].trim()}`;
-        const errorMsg2 = `Row ${nameMap.get(name) + 1}; duplicate name - ${row[0].trim()} ${row[1].trim()}`;
+        const errorMsg1 = `Row ${rowNum + 2}; duplicate name - ${row[0].trim()} ${row[1].trim()}`;
+        const errorMsg2 = `Row ${nameMap.get(name) + 2}; duplicate name - ${row[0].trim()} ${row[1].trim()}`;
         this.duplicateNameError.push(errorMsg2);
         this.duplicateNameError.push(errorMsg1);
       }
