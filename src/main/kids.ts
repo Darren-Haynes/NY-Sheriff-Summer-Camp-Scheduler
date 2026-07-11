@@ -4,7 +4,7 @@ import { WaterActivityCounts, LandActivityCounts, KidsChoices } from '../types/k
 Kids class contains the key data for each of the kids in the camp
 */
 export class Kids {
-  inputData: string;
+  inputData: string[][];
   names: Array<string>;
   count: number;
   waterActivitiesChoiceCount: WaterActivityCounts;
@@ -16,7 +16,7 @@ export class Kids {
    *
    * @param inputData a string of all the Kids choices
    */
-  constructor(inputData: string) {
+  constructor(inputData: string[][]) {
     this.inputData = inputData;
     this.names = [];
     this.count = 0;
@@ -49,53 +49,34 @@ export class Kids {
     this.countChoices();
   }
 
-  private detectDuplicateChoices(choice1: string, choice2: string, choice3: string): void {
-    if (choice1 === choice2 || choice1 === choice3 || choice2 === choice3) {
-      this.duplicateChoice = true;
-    }
-  }
-
   /**
    * Create a map of kids and their choices and time slots
    * @returns void
    */
   private setKidsData(): void {
-    const inputDataArr = this.inputData.split('\n');
-    inputDataArr.pop(); // remove last empty line
-    inputDataArr.shift(); // remove spreadsheet header
-    inputDataArr.forEach((line: string) => {
-      const col = line.split('\t');
-      const name = col[0] + ' ' + col[1];
+    for (const entry of this.inputData) {
+      const name = entry[0] + ' ' + entry[1];
       this.names.push(name);
       this.count += 1;
-      const land1choice = col[3].toLowerCase();
-      const land2choice = col[4].toLowerCase();
-      const land3choice = col[5].toLowerCase();
-      const water1choice = col[6].toLowerCase();
-      const water2choice = col[7].toLowerCase();
-      const water3choice = col[8].toLowerCase();
-      if (!this.duplicateChoice) {
-        this.detectDuplicateChoices(water1choice, water2choice, water3choice);
-        this.detectDuplicateChoices(land1choice, land2choice, land3choice);
-      }
-
       this.choices[name] = {
-        land1: land1choice,
-        land2: land2choice,
-        land3: land3choice,
-        water1: water1choice,
-        water2: water2choice,
-        water3: water3choice,
+        land1: entry[2],
+        land2: entry[3],
+        land3: entry[4],
+        water1: entry[5],
+        water2: entry[6],
+        water3: entry[7],
       };
-    });
+    }
   }
 
   private countChoices(): void {
     for (const name in this.choices) {
-      const kidsChoice = this.choices[name];
-      const landChoices = [kidsChoice.land1, kidsChoice.land2, kidsChoice.land3];
-      const waterChoices = [kidsChoice.water1, kidsChoice.water2, kidsChoice.water3];
+      const kidsChoices = this.choices[name];
+      const landChoices = [kidsChoices.land1, kidsChoices.land2, kidsChoices.land3];
+      const waterChoices = [kidsChoices.water1, kidsChoices.water2, kidsChoices.water3];
       for (let i = 1; i <= landChoices.length; i++) {
+        console.log(landChoices)
+        console.log(waterChoices)
         const choice = landChoices[i - 1];
         this.landActivitiesChoiceCount[choice].total++;
         switch (i) {
