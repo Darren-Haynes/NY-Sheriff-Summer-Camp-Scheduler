@@ -75,8 +75,6 @@ export class Kids {
       const landChoices = [kidsChoices.land1, kidsChoices.land2, kidsChoices.land3];
       const waterChoices = [kidsChoices.water1, kidsChoices.water2, kidsChoices.water3];
       for (let i = 1; i <= landChoices.length; i++) {
-        console.log(landChoices)
-        console.log(waterChoices)
         const choice = landChoices[i - 1];
         this.landActivitiesChoiceCount[choice].total++;
         switch (i) {
