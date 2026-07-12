@@ -12,8 +12,6 @@ export default defineConfig({
     coverage: {
       provider: 'v8', // use built-in v8 coverage provider (no extra deps)
       reporter: ['text', 'lcov'],
-      // Prevents Vitest and Playwright from overwriting each other
-      reportsDirectory: './coverage/vitest',
     },
   },
 });

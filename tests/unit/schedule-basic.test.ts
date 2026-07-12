@@ -18,8 +18,8 @@ describe('Schedule mutator basics', () => {
   });
 
   test('setKidsTimeSlot updates schedule map', () => {
-    const rows = [['John', 'Doe', '', 'bball', 'art', 'hike', 'canoe', 'swim', 'fish']];
-    const input = HEADER + rows.map(r => r.join('\t')).join('\n') + '\n';
+    const input = [['John', 'Doe', 'bball', 'art', 'hike', 'canoe', 'swim', 'fish']];
+    // const input = HEADER + rows.map(r => r.join('\t')).join('\n') + '\n';
     const kids = new Kids(input);
     const scheduler = new Schedule(kids, 'waterFirst');
 
@@ -42,8 +42,8 @@ describe('Schedule mutator basics', () => {
   });
 
   test('addKidToActivity and removeKidFromActivity update activity pools', () => {
-    const rows = [['Alice', 'Smith', '', 'fris', 'art', 'hike', 'swim', 'canoe', 'fish']];
-    const input = HEADER + rows.map(r => r.join('\t')).join('\n') + '\n';
+    const input = [['Alice', 'Smith', 'fris', 'art', 'hike', 'swim', 'canoe', 'fish']];
+    // const input = HEADER + rows.map(r => r.join('\t')).join('\n') + '\n';
     const kids = new Kids(input);
     const scheduler = new Schedule(kids, 'waterFirst');
 
@@ -67,8 +67,8 @@ describe('Schedule mutator basics', () => {
   });
 
   test('addKidToNotScheduled and scheduleKid / unScheduleKid perform full lifecycle', () => {
-    const rows = [['Tim', 'Lee', '', 'bball', 'vball', 'soc', 'canoe', 'kayak', 'swim']];
-    const input = HEADER + rows.map(r => r.join('\t')).join('\n') + '\n';
+    const input = [['Tim', 'Lee', 'bball', 'vball', 'soc', 'canoe', 'kayak', 'swim']];
+    // const input = HEADER + rows.map(r => r.join('\t')).join('\n') + '\n';
     const kids = new Kids(input);
     const scheduler = new Schedule(kids, 'waterFirst');
 
@@ -124,11 +124,11 @@ describe('Schedule mutator basics', () => {
   });
 
   test('removeKidFromScheduled helper removes name from scheduled list', () => {
-    const rows = [
-      ['Sam', 'Cole', '', 'art', 'hike', 'bball', 'swim', 'canoe', 'fish'],
-      ['Ria', 'Lopez', '', 'art', 'hike', 'bball', 'swim', 'canoe', 'fish'],
+    const input = [
+      ['Sam', 'Cole', 'art', 'hike', 'bball', 'swim', 'canoe', 'fish'],
+      ['Ria', 'Lopez', 'art', 'hike', 'bball', 'swim', 'canoe', 'fish'],
     ];
-    const input = HEADER + rows.map(r => r.join('\t')).join('\n') + '\n';
+    // const input = HEADER + rows.map(r => r.join('\t')).join('\n') + '\n';
     const kids = new Kids(input);
     const scheduler = new Schedule(kids, 'waterFirst');
 
