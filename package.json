@@ -15,7 +15,7 @@
     "test:vitest": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test": "run-s test:vitest test:e2e"
+    "test": "run-s test:coverage test:e2e"
   },
   "keywords": [],
   "author": {
