@@ -10,7 +10,6 @@ export class Kids {
   waterActivitiesChoiceCount: WaterActivityCounts;
   landActivitiesChoiceCount: LandActivityCounts;
   choices: Record<string, KidsChoices>;
-  duplicateChoice: boolean;
 
   /**
    *
@@ -21,7 +20,6 @@ export class Kids {
     this.names = [];
     this.count = 0;
     this.choices = {};
-    this.duplicateChoice = false;
     this.setKidsData();
     this.waterActivitiesChoiceCount = {
       swim: { total: 0, choice1: 0, choice2: 0, choice3: 0 },

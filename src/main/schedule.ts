@@ -3082,10 +3082,9 @@ export class Schedule {
     const secondChoices10am: string[] = this.getScheduledChoicesNames(activityType, '10am', 2);
     const thirdChoices9am: string[] = this.getScheduledChoicesNames(activityType, '9am', 3);
     const thirdChoices10am: string[] = this.getScheduledChoicesNames(activityType, '10am', 3);
-    if (this.kids.duplicateChoice) {
-      this.removeDupChoices(firstChoices9am, secondChoices9am, thirdChoices9am);
-      this.removeDupChoices(firstChoices10am, secondChoices10am, thirdChoices10am);
-    }
+    this.removeDupChoices(firstChoices9am, secondChoices9am, thirdChoices9am);
+    this.removeDupChoices(firstChoices10am, secondChoices10am, thirdChoices10am);
+
     const noChoices: string[] = this.kids.names.filter(
       item =>
         ![
