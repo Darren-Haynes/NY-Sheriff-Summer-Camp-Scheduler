@@ -81,4 +81,23 @@ describe('DataErrorHandler (original spreadsheet format fixtures)', () => {
     expect(dataErrors.tooManyKids()).toBe(false);
     expect(dataErrors.duplicateName()).toBe(false);
   });
+
+    test('wrongActivity() flags incorrect activities in the roster (error-wrong-activities.xlsx)', async () => {
+      const data = await extractKidsChoicesData(newFormatFixture('error-wrong-activities.xlsx'));
+      expect(data.length).toBe(117);
+
+      const dataErrors = new DataErrorHandler(data);
+
+      expect(dataErrors.wrongActivity()).toBe(true);
+      expect(dataErrors.activityError).toEqual([
+        'Row 81; column W1 -- praying',
+        'Row 97; column L2 -- flying',
+        'Row 103; column L3 -- diving',
+      ]);
+
+    // Sanity check: this fixture should only trip wrongActivity, not the other checks.
+    expect(dataErrors.notEnoughKids()).toBe(false);
+    expect(dataErrors.tooManyKids()).toBe(false);
+    expect(dataErrors.duplicateName()).toBe(false);
+  });
 });
