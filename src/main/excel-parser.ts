@@ -53,15 +53,15 @@ export default async function extractKidsChoicesData(filePath: string): Promise<
     } = indices;
 
     const activityData: string[][] = [];
-    let firstName = '';
-    let lastName = '';
-    let landActivity1 = '';
-    let landActivity2 = '';
-    let landActivity3 = '';
-    let waterActivity1 = '';
-    let waterActivity2 = '';
-    let waterActivity3 = '';
     worksheet.eachRow({ includeEmpty: false }, function (row) {
+      let firstName = '';
+      let lastName = '';
+      let landActivity1 = '';
+      let landActivity2 = '';
+      let landActivity3 = '';
+      let waterActivity1 = '';
+      let waterActivity2 = '';
+      let waterActivity3 = '';
       const firstNameCell = row.getCell( firstNameCol );
       if (firstNameCell.type === Excel.ValueType.String) {
         const firstNameRaw = firstNameCell.value as string;
