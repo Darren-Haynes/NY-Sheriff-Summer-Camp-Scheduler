@@ -38,9 +38,11 @@ export function findKidsColumnIndices(headerCells: unknown[]): KidsColumnIndices
       return;
     }
     const cellContent = cell.toLowerCase();
-    if (cellContent.includes('first name')) {
+    // Since client worksheet uploads are not always perfect, add a check for
+    // "first" and "last" as well, since sometimes the word "name" is omitted.
+    if (cellContent.includes('first name') || cellContent.includes('first')) {
       indices.firstNameCol = i;
-    } else if (cellContent.includes('last name')) {
+    } else if (cellContent.includes('last name') || cellContent.includes('last')) {
       indices.lastNameCol = i;
     } else if (cellContent.includes('l1')) {
       indices.landActivity1Col = i;

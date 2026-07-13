@@ -4,7 +4,7 @@ import extractKidsChoicesData from '../../src/main/excel-parser';
 
 describe('extractKidsChoicesData', () => {
   test('finds the campers data by header content across a multi-sheet workbook', async () => {
-    const fixturePath = path.join(__dirname, '../../e2e/fixtures/new-format/new-excel-format.xlsx');
+    const fixturePath = path.join(__dirname, '../../e2e/fixtures/new-format/success-117-kids.xlsx');
 
     const data = await extractKidsChoicesData(fixturePath);
 
