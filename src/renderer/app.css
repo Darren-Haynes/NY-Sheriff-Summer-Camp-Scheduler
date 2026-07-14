@@ -271,9 +271,15 @@ button:hover {
   width: 100%;
 }
 
-.paste-box-btns {
+.standard-box-btns {
   margin: 15px;
   width: 145px;
+}
+
+.close-btn-in-paste-box {
+    margin: 15px;
+    margin-top: 35px;
+    width: 145px;
 }
 
 #stats-btn,

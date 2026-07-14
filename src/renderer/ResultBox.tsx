@@ -61,7 +61,7 @@ const ResultBox: React.FC<ToggleProps> = ({ isVisible, onToggle, result }) => {
               onClick={() => toggleData()}
               type="button"
               id="stats-btn"
-              className="paste-box-btns fade-in-1s"
+              className="standard-box-btns fade-in-1s"
             >
               Stats 📈
             </button>
@@ -71,7 +71,7 @@ const ResultBox: React.FC<ToggleProps> = ({ isVisible, onToggle, result }) => {
               onClick={() => toggleData()}
               type="button"
               id="kids-btn"
-              className="paste-box-btns fade-in-1s"
+              className="standard-box-btns fade-in-1s"
             >
               Kids ⛵
             </button>
@@ -83,7 +83,7 @@ const ResultBox: React.FC<ToggleProps> = ({ isVisible, onToggle, result }) => {
             onClick={() => onToggle('input-box')}
             type="button"
             id="close-btn"
-            className="paste-box-btns fade-in-1s"
+            className="standard-box-btns fade-in-1s"
           >
             Close ❌
           </button>
@@ -91,7 +91,7 @@ const ResultBox: React.FC<ToggleProps> = ({ isVisible, onToggle, result }) => {
             onClick={() => exportToExcel(result, waterActs, land9amActs, land10amActs)}
             type="button"
             id="upload-btn-2"
-            className="paste-box-btns fade-in-3s"
+            className="standard-box-btns fade-in-3s"
           >
             Export 📤
           </button>
@@ -104,7 +104,7 @@ const ResultBox: React.FC<ToggleProps> = ({ isVisible, onToggle, result }) => {
             }
             type="button"
             id="submit-btn"
-            className="paste-box-btns fade-in-5s"
+            className="standard-box-btns fade-in-5s"
           >
             Copy 📋
           </button>

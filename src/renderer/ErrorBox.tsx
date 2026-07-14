@@ -34,7 +34,7 @@ const errorBox: React.FC<ToggleProps> = ({ isVisible, onToggle, errors }) => {
           onClick={() => onToggle('input-box')}
           type="button"
           id="close-btn-error"
-          className="paste-box-btns fade-in-1s"
+          className="standard-box-btns fade-in-1s"
         >
           ❌
         </button>
