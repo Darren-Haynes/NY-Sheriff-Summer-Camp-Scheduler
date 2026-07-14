@@ -47,6 +47,12 @@ export default function MainContent() {
   }, []);
 
   useEffect(() => {
+    window.textAPI.send_no_paste_content(noPasteData => {
+      setShowInputOptions('paste-box');
+    });
+  }, []);
+
+  useEffect(() => {
     window.textAPI.send_result(resultData => {
       setShowInputOptions('result-box');
       setResultContent(JSON.parse(resultData));

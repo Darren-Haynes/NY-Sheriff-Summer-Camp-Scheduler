@@ -124,3 +124,59 @@ test.describe('PasteBox Real-World Dataset Testing', () => {
     console.log('🎯 All coverage pathways completely cleared out.');
   });
 });
+
+test.describe('PasteBox Test close button opens input options box',  () => {
+  test('clicking close button should close paste box and open input box', async ({
+    appContext,
+  }) => {
+    const { electronWindow } = appContext;
+    await electronWindow.waitForTimeout(700);
+
+    const fileSpecPath = path.join(__dirname, 'fixtures/original-format/error-wrong-activities.txt');
+    const malformedData = fs.readFileSync(fileSpecPath, 'utf8');
+
+    const pasteNavBtn = electronWindow.locator('#paste-btn');
+    await pasteNavBtn.click({ force: true });
+
+    const closeBtn = electronWindow.locator('#close-btn');
+    await closeBtn.click({ force: true });
+
+    const inputBox = electronWindow.locator('#input-options, .error-box-container');
+    await expect(inputBox).toBeAttached({ timeout: 5000 });
+  });
+});
+
+test.describe('PasteBox default text and no text',  () => {
+  test('clicking submit button with default placeholder text or no text', async ({
+    appContext,
+  }) => {
+    const { electronWindow } = appContext;
+    await electronWindow.waitForTimeout(700);
+
+    const fileSpecPath = path.join(__dirname, 'fixtures/original-format/error-wrong-activities.txt');
+    const malformedData = fs.readFileSync(fileSpecPath, 'utf8');
+
+    const pasteNavBtn = electronWindow.locator('#paste-btn');
+    await pasteNavBtn.click({ force: true });
+
+    let textarea = electronWindow.locator('#paste-textarea');
+    await expect(textarea).toBeAttached();
+    await expect(textarea).toHaveValue('Paste text here...');
+
+    let submitBtn = electronWindow.locator('#submit-btn');
+    await submitBtn.click({ force: true });
+
+    const pasteBox = electronWindow.locator('#paste-text-box');
+    await expect(pasteBox).toBeAttached({ timeout: 5000 });
+    textarea = electronWindow.locator('#paste-textarea');
+    await expect(textarea).toBeAttached();
+    await expect(textarea).toHaveValue('Paste text here...');
+
+    await textarea.focus();
+    await textarea.clear();
+    await textarea.fill('');
+    submitBtn = electronWindow.locator('#submit-btn');
+    await submitBtn.click({ force: true });
+    await expect(textarea).toHaveValue('');
+  });
+});
