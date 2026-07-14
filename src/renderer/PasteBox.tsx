@@ -21,23 +21,16 @@ const PasteBox: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
           onClick={() => onToggle('input-box')}
           type="button"
           id="close-btn"
-          className="paste-box-btns fade-in-1s"
+          className="close-btn-in-paste-box fade-in-1s"
         >
           Close ❌
         </button>
-        <button
-          onClick={fileUpload}
-          type="button"
-          id="upload-btn-2"
-          className="paste-box-btns fade-in-3s"
-        >
-          Upload 📤
-        </button>
+
         <button
           onClick={submitTextboxContent}
           type="button"
           id="submit-btn"
-          className="paste-box-btns fade-in-5s"
+          className="standard-box-btns fade-in-5s"
         >
           Submit ✅
         </button>

@@ -12,7 +12,7 @@ body {
 }
 
 /*
-NAVBAR
+TOPBAR
 */
 #navbar {
   display: flex;
@@ -48,7 +48,7 @@ h4 {
 }
 
 /*
-Main Background
+BACKGROUND IMAGES
 */
 main {
   height: calc(100vh - 173.5px);
@@ -57,10 +57,9 @@ main {
 .bg-image {
   height: calc(100vh - 173.5px);
   width: 100%;
-  position: relative; /* Base anchor block */
+  position: relative;
 }
 
-/* Isolated container for the background crossfade layer */
 .bg-canvas-layer {
   position: absolute;
   top: 0;
@@ -114,9 +113,8 @@ main {
 }
 
 /*
-Input Sections
+INPUT SECTIONS
 */
-
 #central-container {
   position: fixed;
   width: 100%;
@@ -220,6 +218,9 @@ result-content {
   height: 95%;
 }
 
+/*
+BUTTONS
+*/
 button {
   background-color: rgba(246, 210, 95, 1);
   color: rgba(0, 0, 0, 1);
@@ -239,16 +240,9 @@ button:hover {
   opacity: 1;
 }
 
-#text-box,
-#paste-text-box,
-#stats-text-box {
-  box-sizing: border-box;
-  width: 85%;
-}
-
-#text-box,
-#stats-text-box {
-  overflow-y: scroll;
+button:focus-visible {
+  outline: 3px solid #ff9900;
+  outline-offset: 2px;
 }
 
 #text-box-btns,
@@ -271,9 +265,15 @@ button:hover {
   width: 100%;
 }
 
-.paste-box-btns {
+.standard-box-btns {
   margin: 15px;
   width: 145px;
+}
+
+.close-btn-in-paste-box {
+    margin: 15px;
+    margin-top: 35px;
+    width: 145px;
 }
 
 #stats-btn,
@@ -312,6 +312,21 @@ button:hover {
   margin-right: -30px;
 }
 
+/*
+TEXT AREA INPUTS / TEXT BOXES
+*/
+#text-box,
+#paste-text-box,
+#stats-text-box {
+  box-sizing: border-box;
+  width: 85%;
+}
+
+#text-box,
+#stats-text-box {
+  overflow-y: scroll;
+}
+
 #paste-textarea {
   width: 90%;
   height: 49.5vh;
@@ -348,7 +363,7 @@ button:hover {
 }
 
 /*
-Input Box Transitions (CLEANED AND DE-DUPLICATED)
+INPUT BOX TRANSITIONS
 */
 .fade-in-05s,
 .fade-in-1s,
@@ -361,7 +376,6 @@ Input Box Transitions (CLEANED AND DE-DUPLICATED)
   animation-fill-mode: forwards; /* Holds the final 100% opacity state permanently */
 }
 
-/* 2. Standard animation assignments remain untouched */
 .fade-in-05s {
   animation: fade-in 0.5s ease-out forwards;
 }
