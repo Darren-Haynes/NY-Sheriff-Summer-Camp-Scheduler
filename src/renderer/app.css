@@ -239,6 +239,11 @@ button:hover {
   opacity: 1;
 }
 
+button:focus-visible {
+  outline: 3px solid #ff9900;
+  outline-offset: 2px;
+}
+
 #text-box,
 #paste-text-box,
 #stats-text-box {
