@@ -14,19 +14,19 @@ import vanImg from '../../assets/van.jpg';
 import archeryImg from '../../assets/archery.jpeg';
 
 const imageUrls = [
-  `url("${waterActivityImg}")`,
   `url("${cabinsImg}")`,
-  `url("${nightFireImg}")`,
   `url("${sailingImg}")`,
+  `url("${helicopterImg}")`,
+  `url("${nightFireImg}")`,
   `url("${waterBottleImg}")`,
   `url("${horseImg}")`,
   `url("${officerImg}")`,
-  `url("${helicopterImg}")`,
   `url("${spongeImg}")`,
   `url("${duskFireImg}")`,
   `url("${helicopter2Img}")`,
   `url("${archeryImg}")`,
   `url("${cornHoleImg}")`,
+  `url("${waterActivityImg}")`,
   `url("${vanImg}")`,
 ];
 
