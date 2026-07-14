@@ -103,6 +103,11 @@ const createWindow = (): void => {
 
   // Handle input via the pastebox
   ipcMain.handle('submit-text', async (event, data) => {
+    const noWhiteSpace = data.replace(/\s/g, '')
+    if (noWhiteSpace === '' || noWhiteSpace === "Pastetexthere...") {
+      mainWindow.webContents.send('send_no_paste_content');
+      return
+    }
     const kidsActivityData = parsePastedText(data);
     const { allErrors, dataErrors } = handleErrors(kidsActivityData);
     if (!allErrors.every(item => item === false)) {
