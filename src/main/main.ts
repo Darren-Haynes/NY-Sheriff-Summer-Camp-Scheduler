@@ -103,6 +103,20 @@ const createWindow = (): void => {
 
   // Handle input via the pastebox
   ipcMain.handle('submit-text', async (event, data) => {
+    // Handle case when there is no input data
+    const noWhiteSpace = data.replace(/\s/g, '')
+    if (noWhiteSpace === '' || noWhiteSpace === "Pastetexthere...") {
+      mainWindow.webContents.send('send_no_paste_content');
+      return
+    }
+
+    // Handle case where there is not the correct column headings.
+    const headerErrors = checkHeaderData(data)
+    if (headerErrors.length > 0) {
+      mainWindow.webContents.send('error-list', JSON.stringify(headerErrors));
+      return
+    }
+
     const kidsActivityData = parsePastedText(data);
     const { allErrors, dataErrors } = handleErrors(kidsActivityData);
     if (!allErrors.every(item => item === false)) {
@@ -240,15 +254,29 @@ const scheduleKids = (data: string[][]) => {
   return camp.bestSchedule;
 };
 
+const checkHeaderData = (data: string) => {
+  const malformedHeaderHeader = 'Incorrect column headers detected';
+  const malformedHeaderError = [];
+  const expectedHeadings = ['first', 'last', 'w1', 'w2', 'w3', 'l1', 'l2', 'l3']
+  for (const colHeader of expectedHeadings) {
+    if (!data.toLowerCase().includes(colHeader)) {
+      const errorMsg = `Header column ${colHeader.toUpperCase()} not detected`;
+      malformedHeaderError.push(errorMsg);
+    }
+  }
+  if (malformedHeaderError.length > 0) {
+    return [{ header: malformedHeaderHeader, errorList: malformedHeaderError }]
+  }
+  return []
+}
+
 const handleErrors = (data: string[][]) => {
   const dataErrors = new DataErrorHandler(data);
   const allErrors: boolean[] = [
-    // dataErrors.numOfFields(),
     dataErrors.wrongActivity(),
     dataErrors.notEnoughKids(),
     dataErrors.tooManyKids(),
     dataErrors.duplicateName(),
-    // dataErrors.duplicateChoice(),
   ];
   return { allErrors, dataErrors };
 };
