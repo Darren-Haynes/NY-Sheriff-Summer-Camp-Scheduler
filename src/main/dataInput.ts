@@ -60,7 +60,6 @@ export class DataErrorHandler {
   notEnoughKidsHeader: string;
   tooManyKidsError: string[];
   tooManyKidsHeader: string;
-
   campData: string[][];
 
   constructor(data: string[][]) {
@@ -178,6 +177,7 @@ export class DataErrorHandler {
      * all errors found for that category of error.
      */
     const errorList: ErrorData[] = [];
+
     if (this.notEnoughKidsError.length !== 0) {
       const notEnoughKidsObj: ErrorData = {
         header: this.notEnoughKidsHeader.toUpperCase(),
@@ -223,19 +223,3 @@ export class DataErrorHandler {
     return errorList;
   }
 }
-
-// export function dataParser(data: string) {
-//   let header = false;
-//   const trimTrailing = data.replace(/[ \t\f\v]+$/g, '');
-//   const lines: string[] = trimTrailing.split('\n');
-//   if (lines[0].toLowerCase().includes('last name')) {
-//     lines.shift();
-//     header = true;
-//   }
-//   lines.pop(); // last line is an empty string we don't want
-//   const parsedData = lines.map(line => line.split(/\t/));
-//   return {
-//     campData: parsedData,
-//     headerRow: header,
-//   };
-// }
