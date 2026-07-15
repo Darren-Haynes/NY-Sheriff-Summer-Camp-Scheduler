@@ -82,6 +82,11 @@ test.describe('PasteBox Testing Real-World Dataset With Errors', () => {
     const errorBox = electronWindow.locator('#error-box, .error-box-container');
     await expect(errorBox).toBeAttached({ timeout: 5000 });
 
+    const closeBtn = electronWindow.locator('#close-btn-error');
+    await closeBtn.click({ force: true });
+
+    const inputBox = electronWindow.locator('#input-options');
+    await expect(inputBox).toBeAttached({ timeout: 5000 });
     });
 });
 
