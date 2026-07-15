@@ -30,7 +30,6 @@ const errorBox: React.FC<ToggleProps> = ({ isVisible, onToggle, errors }) => {
       <div id="error-box-btn">
         <h3 id="error-heading">Fix Data Errors:</h3>
         <button
-          // TODO: fix type error
           onClick={() => onToggle('input-box')}
           type="button"
           id="close-btn-error"
