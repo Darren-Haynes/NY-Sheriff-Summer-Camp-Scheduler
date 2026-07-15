@@ -1,15 +1,16 @@
 import { test, expect } from './fixtures';
 import * as fs from 'fs';
 import * as path from 'path';
+import parsePastedText from '../src/main/text-parser'
 
-test.describe('PasteBox Real-World Dataset Testing', () => {
-  test('Gracefully captures and verifies the misformatted activity data', async ({
+test.describe('PasteBox Testing Real-World Dataset With Errors', () => {
+  test('Gracefully captures and verifies data with wrong activities data', async ({
     appContext,
   }) => {
     const { electronWindow } = appContext;
     await electronWindow.waitForTimeout(700);
 
-    const fileSpecPath = path.join(__dirname, 'fixtures/original-format/error-wrong-activities.txt');
+    const fileSpecPath = path.join(__dirname, 'fixtures/mock-data/error-wrong-activities.txt');
     const malformedData = fs.readFileSync(fileSpecPath, 'utf8');
 
     const pasteNavBtn = electronWindow.locator('#paste-btn');
@@ -28,14 +29,71 @@ test.describe('PasteBox Real-World Dataset Testing', () => {
     await expect(errorBox).toBeAttached({ timeout: 5000 });
   });
 
+  test('Gracefully captures and verifies placeholder text or no text', async ({
+    appContext,
+  }) => {
+    const { electronWindow } = appContext;
+    await electronWindow.waitForTimeout(700);
+
+    const pasteNavBtn = electronWindow.locator('#paste-btn');
+    await pasteNavBtn.click({ force: true });
+
+    let textarea = electronWindow.locator('#paste-textarea');
+    await expect(textarea).toBeAttached();
+    await expect(textarea).toHaveValue('Paste text here...');
+
+    let submitBtn = electronWindow.locator('#submit-btn');
+    await submitBtn.click({ force: true });
+
+    const pasteBox = electronWindow.locator('#paste-text-box');
+    await expect(pasteBox).toBeAttached({ timeout: 5000 });
+    textarea = electronWindow.locator('#paste-textarea');
+    await expect(textarea).toBeAttached();
+    await expect(textarea).toHaveValue('Paste text here...');
+
+    await textarea.focus();
+    await textarea.clear();
+    await textarea.fill('');
+    submitBtn = electronWindow.locator('#submit-btn');
+    await submitBtn.click({ force: true });
+    await expect(textarea).toHaveValue('');
+  });
+
+  test('Gracefully captures and verifies data without a header', async ({
+    appContext,
+  }) => {
+    const { electronWindow } = appContext;
+    await electronWindow.waitForTimeout(700);
+
+    const pasteNavBtn = electronWindow.locator('#paste-btn');
+    await pasteNavBtn.click({ force: true });
+
+    const fileSpecPath = path.join(__dirname, 'fixtures/mock-data/success-104-kids.txt');
+    const productionData= fs.readFileSync(fileSpecPath, 'utf8');
+
+    let textarea = electronWindow.locator('#paste-textarea');
+    await textarea.focus();
+    await textarea.clear();
+    await textarea.fill(productionData);
+
+    const submitBtn = electronWindow.locator('#submit-btn');
+    await submitBtn.click({ force: true });
+
+    const errorBox = electronWindow.locator('#error-box, .error-box-container');
+    await expect(errorBox).toBeAttached({ timeout: 5000 });
+
+    });
+});
+
+test.describe('PasteBox Testing Real-World Dataset Without Errors', () => {
   test('Processes production 104-camper spreadsheet data and yields schedule layouts', async ({
     appContext,
   }) => {
     const { electronWindow, electronApp } = appContext;
     await electronWindow.waitForTimeout(700);
 
-    const fileSpecPath = path.join(__dirname, 'fixtures/original-format/success-104-kids.txt');
-    const productionData = fs.readFileSync(fileSpecPath, 'utf8');
+    const fileSpecPath = path.join(__dirname, 'fixtures/mock-data/success-104-kids-with-header.txt');
+    const productionData= fs.readFileSync(fileSpecPath, 'utf8');
 
     const pasteNavBtn = electronWindow.locator('#paste-btn');
     await pasteNavBtn.click({ force: true });
@@ -73,7 +131,7 @@ test.describe('PasteBox Real-World Dataset Testing', () => {
     try {
       await electronApp.evaluate(async ({ dialog }) => {
         dialog.showSaveDialog = async () => {
-          return { canceled: false, filePath: 'mock_camp_schedule.xlsx' };
+          return { canceled: false, filePath: './e2e/fixtures/mock-data/mock_camp_schedule.xlsx' };
         };
       });
 
@@ -121,18 +179,18 @@ test.describe('PasteBox Real-World Dataset Testing', () => {
       console.log('Safely handled dashboard navigation reset step.');
     }
 
-    console.log('🎯 All coverage pathways completely cleared out.');
+    console.log('All coverage pathways completely cleared out.');
   });
 });
 
-test.describe('PasteBox Test close button opens input options box',  () => {
+test.describe('PasteBox test close button functionality',  () => {
   test('clicking close button should close paste box and open input box', async ({
     appContext,
   }) => {
     const { electronWindow } = appContext;
     await electronWindow.waitForTimeout(700);
 
-    const fileSpecPath = path.join(__dirname, 'fixtures/original-format/error-wrong-activities.txt');
+    const fileSpecPath = path.join(__dirname, 'fixtures/mock-data/error-wrong-activities.txt');
     const malformedData = fs.readFileSync(fileSpecPath, 'utf8');
 
     const pasteNavBtn = electronWindow.locator('#paste-btn');
@@ -143,40 +201,5 @@ test.describe('PasteBox Test close button opens input options box',  () => {
 
     const inputBox = electronWindow.locator('#input-options, .error-box-container');
     await expect(inputBox).toBeAttached({ timeout: 5000 });
-  });
-});
-
-test.describe('PasteBox default text and no text',  () => {
-  test('clicking submit button with default placeholder text or no text', async ({
-    appContext,
-  }) => {
-    const { electronWindow } = appContext;
-    await electronWindow.waitForTimeout(700);
-
-    const fileSpecPath = path.join(__dirname, 'fixtures/original-format/error-wrong-activities.txt');
-    const malformedData = fs.readFileSync(fileSpecPath, 'utf8');
-
-    const pasteNavBtn = electronWindow.locator('#paste-btn');
-    await pasteNavBtn.click({ force: true });
-
-    let textarea = electronWindow.locator('#paste-textarea');
-    await expect(textarea).toBeAttached();
-    await expect(textarea).toHaveValue('Paste text here...');
-
-    let submitBtn = electronWindow.locator('#submit-btn');
-    await submitBtn.click({ force: true });
-
-    const pasteBox = electronWindow.locator('#paste-text-box');
-    await expect(pasteBox).toBeAttached({ timeout: 5000 });
-    textarea = electronWindow.locator('#paste-textarea');
-    await expect(textarea).toBeAttached();
-    await expect(textarea).toHaveValue('Paste text here...');
-
-    await textarea.focus();
-    await textarea.clear();
-    await textarea.fill('');
-    submitBtn = electronWindow.locator('#submit-btn');
-    await submitBtn.click({ force: true });
-    await expect(textarea).toHaveValue('');
   });
 });
