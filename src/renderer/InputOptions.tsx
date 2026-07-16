@@ -20,7 +20,9 @@ const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
 
   const campSignStyles = {
     height: showCampSign ? '500px' : '300px',
-    marginTop: showAbove1000 ? '-100px' : showAbove1200 ? '-200px' : 0,
+    // FIX: Flipped order so the tallest screen threshold is evaluated first.
+    // Explicit ternary format handles full compiler code branch metrics.
+    marginTop: showAbove1200 ? '-200px' : showAbove1000 ? '-100px' : 0,
   };
 
   return (
@@ -40,11 +42,12 @@ const InputOptions: React.FC<ToggleProps> = ({ isVisible, onToggle }) => {
         Paste Sheet
       </button>
 
-      {showCampSign && (
+      {/* Explicit ternary ensures that Istanbul logs both branches perfectly */}
+      {showCampSign ? (
         <div id="camp-sign" className="fade-in-3s">
           <img width="400" alt="icon" src={CampSign} />
         </div>
-      )}
+      ) : null}
     </div>
   );
 };
