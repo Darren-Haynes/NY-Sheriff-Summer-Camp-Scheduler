@@ -29,6 +29,11 @@ const ResultBox: React.FC<ToggleProps> = ({ isVisible, onToggle, result }) => {
     setShowStats(prevState => !prevState);
   };
 
+  // 1. Force a completely clean, isolated statement line for coverage tracking
+  const triggerExportData = () => {
+    exportToExcel(result, waterActs, land9amActs, land10amActs);
+  };
+
   return (
     <div id="result-box">
       {!showStats && (
@@ -88,7 +93,7 @@ const ResultBox: React.FC<ToggleProps> = ({ isVisible, onToggle, result }) => {
             Close ❌
           </button>
           <button
-            onClick={() => exportToExcel(result, waterActs, land9amActs, land10amActs)}
+            onClick={triggerExportData}
             type="button"
             id="upload-btn-2"
             className="standard-box-btns fade-in-3s"
