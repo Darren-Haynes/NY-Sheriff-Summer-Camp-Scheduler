@@ -56,10 +56,10 @@ describe('DataErrorHandler (original spreadsheet format fixtures)', () => {
 
     expect(dataErrors.duplicateName()).toBe(true);
     expect(dataErrors.duplicateNameError).toEqual([
-      'Row 18; duplicate name - Patrick Lee',
-      'Row 19; duplicate name - Patrick Lee',
-      'Row 43; duplicate name - Cali Head',
-      'Row 44; duplicate name - Cali Head',
+      'Row 6; duplicate name - David Jones',
+      'Row 7; duplicate name - David Jones',
+      'Row 17; duplicate name - Nancy Thomas',
+      'Row 18; duplicate name - Nancy Thomas',
     ]);
   });
 

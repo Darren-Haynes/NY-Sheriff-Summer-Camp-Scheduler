@@ -14,8 +14,8 @@ describe('extractKidsChoicesData', () => {
     expect(data.length).toBeGreaterThan(100);
 
     const [firstName, lastName, land1, land2, land3, water1, water2, water3] = data[0];
-    expect(firstName).toBe('Lucas');
-    expect(lastName).toBe('Heidrich');
+    expect(firstName).toBe('John');
+    expect(lastName).toBe('Smith');
     expect([land1, land2, land3]).toEqual(['arch', 'hike', 'bball']);
     expect([water1, water2, water3]).toEqual(['swim', 'sail', 'fish']);
 
