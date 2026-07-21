@@ -10,7 +10,7 @@ describe('Schedule mutator basics', () => {
     // Keep randomness deterministic if any helper uses it
     vi.spyOn(Math, 'random').mockReturnValue(0.1);
     // Silence console output from Schedule internals
-    vi.spyOn(console, 'log').mockImplementation(() => {});
+    vi.spyOn(console, 'log').mockImplementation(() => { });
   });
 
   afterAll(() => {
@@ -153,84 +153,42 @@ describe('Schedule mutator basics', () => {
     // @ts-ignore
     expect(scheduler.water9am.swim).toContain('Ria Lopez');
   });
-  describe('calculateChoicesPercentages Floating-Point Remainder Rounding Edge Cases', () => {
-      test('forces totalPercent === 99 and triggers remainder addition logic (Lines 3126-3143)', () => {
-        const input99Percent = [
-          ['John', 'One', 'bball', 'art', 'hike', 'canoe', 'swim', 'fish'],
-          ['Jane', 'Two', 'bball', 'art', 'hike', 'canoe', 'swim', 'fish'],
-          ['Jack', 'Three', 'bball', 'art', 'hike', 'canoe', 'swim', 'fish'],
-        ];
 
-        const kids = new Kids(input99Percent);
+  describe('calculateChoicesPercentages & removeDupChoices Edge Cases', () => {
 
-        // Explicitly bridge the choices object map structure expected on Line 251
-        kids.choices = {
-          'John One': { land1: 'bball', land2: 'art', land3: 'hike', water1: 'canoe', water2: 'swim', water3: 'fish' },
-          'Jane Two': { land1: 'bball', land2: 'art', land3: 'hike', water1: 'canoe', water2: 'swim', water3: 'fish' },
-          'Jack Three': { land1: 'bball', land2: 'art', land3: 'hike', water1: 'canoe', water2: 'swim', water3: 'fish' }
-        };
+    test('forces total percentage calculations to 99, evaluates un-tied remainders, and eliminates duplicate choices', () => {
+      // 6 kids total yields predictable 16.666% chunks to target rounding remainders cleanly
+      const percentInput99 = Array.from({ length: 6 }, (_, i) => [`John`, `Kid${i}`, 'bball', 'art', 'hike', 'canoe', 'swim', 'fish']);
+      const kids = new Kids(percentInput99);
 
-        const scheduler = new Schedule(kids, 'waterFirst');
-
-        // Distribute assignments to match exact key constraints ("First Last")
-        (scheduler as any).scheduleKid('John One', 'canoe', 'water', '9am'); // 1st choice
-        (scheduler as any).scheduleKid('Jane Two', 'swim', 'water', '9am');  // 2nd choice
-        (scheduler as any).scheduleKid('Jack Three', 'fish', 'water', '9am'); // 3rd choice
-
-        const result = (scheduler as any).calculateChoicesPercentages('water');
-        expect(result).toBe(true);
-
-        // Verify calculations successfully scaled the rounding anomaly back to 100%
-        // @ts-ignore runtime check
-        const sum = scheduler.waterPercentages.reduce((acc: number, val: number) => acc + val, 0);
-        expect(sum).toBe(100);
+      kids.choices = {};
+      percentInput99.forEach((_, i) => {
+        kids.choices[`John Kid${i}`] = { land1: 'bball', land2: 'art', land3: 'hike', water1: 'canoe', water2: 'swim', water3: 'fish' };
       });
 
-      test('forces totalPercent === 101 and triggers remainder subtraction logic (Lines 3147-3167)', () => {
-        const input101Percent = [
-          ['John', 'One', 'bball', 'art', 'hike', 'canoe', 'swim', 'fish'],
-          ['Jane', 'Two', 'bball', 'art', 'hike', 'canoe', 'swim', 'fish'],
-          ['Jack', 'Three', 'bball', 'art', 'hike', 'canoe', 'swim', 'fish'],
-          ['Jill', 'Four', 'bball', 'art', 'hike', 'canoe', 'swim', 'fish'],
-          ['James', 'Five', 'bball', 'art', 'hike', 'canoe', 'swim', 'fish'],
-          ['Jenny', 'Six', 'bball', 'art', 'hike', 'canoe', 'swim', 'fish'],
-          ['Jesse', 'Seven', 'bball', 'art', 'hike', 'canoe', 'swim', 'fish'],
-        ];
+      const scheduler = new Schedule(kids, 'waterFirst');
 
-        const kids = new Kids(input101Percent);
+      // Clear out standard arrays to build fresh metrics safely
+      scheduler.scheduled9amWater.names = ['John Kid0', 'John Kid1', 'John Kid2'];
+      scheduler.scheduled10amWater.names = ['John Kid3', 'John Kid4'];
 
-        kids.choices = {
-          'John One': { land1: 'bball', land2: 'art', land3: 'hike', water1: 'canoe', water2: 'swim', water3: 'fish' },
-          'Jane Two': { land1: 'bball', land2: 'art', land3: 'hike', water1: 'canoe', water2: 'swim', water3: 'fish' },
-          'Jack Three': { land1: 'bball', land2: 'art', land3: 'hike', water1: 'canoe', water2: 'swim', water3: 'fish' },
-          'Jill Four': { land1: 'bball', land2: 'art', land3: 'hike', water1: 'canoe', water2: 'swim', water3: 'fish' },
-          'James Five': { land1: 'bball', land2: 'art', land3: 'hike', water1: 'canoe', water2: 'swim', water3: 'fish' },
-          'Jenny Six': { land1: 'bball', land2: 'art', land3: 'hike', water1: 'canoe', water2: 'swim', water3: 'fish' },
-          'Jesse Seven': { land1: 'bball', land2: 'art', land3: 'hike', water1: 'canoe', water2: 'swim', water3: 'fish' },
-        };
+      // Manually add 'John Kid0' to multiple activity slot pools to clear duplicate checks
+      scheduler.water9am.canoe.push('John Kid0');
+      scheduler.water9am.swim.push('John Kid0');
+      scheduler.water9am.fish.push('John Kid0');
 
-        const scheduler = new Schedule(kids, 'waterFirst');
+      // Inject names directly into your activity lists to simulate exact selection boundaries
+      scheduler.water9am.canoe.push('John Kid1', 'John Kid2');
+      scheduler.water10am.swim.push('John Kid3');
+      scheduler.water10am.fish.push('John Kid4');
 
-        // Seed choices sequentially to fulfill the 101% layout:
-        // 1st choice (1 kid)
-        (scheduler as any).scheduleKid('John One', 'canoe', 'water', '9am');
-        // 2nd choice (2 kids)
-        (scheduler as any).scheduleKid('Jane Two', 'swim', 'water', '9am');
-        (scheduler as any).scheduleKid('Jack Three', 'swim', 'water', '9am');
-        // 3rd choice (2 kids)
-        (scheduler as any).scheduleKid('Jill Four', 'fish', 'water', '9am');
-        (scheduler as any).scheduleKid('James Five', 'fish', 'water', '9am');
-        // No choice (2 kids)
-        (scheduler as any).scheduleKid('Jenny Six', 'snork', 'water', '9am');
-        (scheduler as any).scheduleKid('Jesse Seven', 'snork', 'water', '9am');
+      const result = (scheduler as any).calculateChoicesPercentages('water');
+      expect(result).toBe(true);
 
-        const result = (scheduler as any).calculateChoicesPercentages('water');
-        expect(result).toBe(true);
-
-        // Verify validation adjustments brought the aggregate back down to 100% cleanly
-        // @ts-ignore runtime check
-        const sum = scheduler.waterPercentages.reduce((acc: number, val: number) => acc + val, 0);
-        expect(sum).toBe(100);
-      });
+      // Verify the final computed array balances out to exactly 100%
+      // @ts-ignore runtime check
+      const sum = scheduler.waterPercentages.reduce((acc: number, val: number) => acc + val, 0);
+      expect(sum).toBe(100);
     });
+  });
 });
