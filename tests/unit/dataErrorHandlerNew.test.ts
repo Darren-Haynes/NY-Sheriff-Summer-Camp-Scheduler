@@ -1,7 +1,7 @@
 import path from 'path';
 import { describe, expect, test } from 'vitest';
 import extractKidsChoicesData from '../../src/main/excel-parser';
-import { DataErrorHandler } from '../../src/main/dataInput';
+import { DataErrorHandler, KidsChoices } from '../../src/main/dataInput';
 
 /**
  * These tests run DataErrorHandler's pre-check methods against real fixture
@@ -102,5 +102,73 @@ describe('DataErrorHandler (original spreadsheet format fixtures)', () => {
     expect(dataErrors.notEnoughKids()).toBe(false);
     expect(dataErrors.tooManyKids()).toBe(false);
     expect(dataErrors.duplicateName()).toBe(false);
+  });
+
+  describe('DataInput Execution Gap Target Cleanups', () => {
+
+    test('Exercises KidsChoices map creation (Lines 26-41)', () => {
+      // Requires a structured 8-element row array structure to prevent out-of-bounds mapping
+      const mockData = [
+        ['John', 'Doe', 'arch', 'hike', 'art', 'swim', 'sail', 'kayak']
+      ];
+
+      const choices = new KidsChoices(mockData);
+      expect(choices.kidsMap.has('Doe John')).toBe(true);
+      expect(choices.kidsMap.get('Doe John')?.land1).toBe('arch');
+    });
+
+    test('Exercises malformed row counts, duplicate names, and error lists', () => {
+      // Craft a highly malformed dataset array matrix to hit all remaining targets at once
+      const brokenCampData = [
+        // 1. Trigger too few kids error (< 50 kids overall)
+
+        // 2. Trigger numOfFields length error (Lines 103-111) -> Array length is 3 instead of 9
+        ['Short', 'Row', 'Invalid'],
+
+        // 3. Trigger wrongActivity & duplicate Choice
+        ['Alice', 'Smith', 'BadSport', 'BadSport', 'L3', 'W1', 'W2', 'W3', 'Extra'],
+
+        // 4. Trigger duplicateName error branches -> Twin instances
+        ['John', 'Doe', 'L1', 'L2', 'L3', 'W1', 'W2', 'W3', 'Extra'],
+        ['John', 'Doe', 'L1', 'L2', 'L3', 'W1', 'W2', 'W3', 'Extra']
+      ];
+
+      const handler = new DataErrorHandler(brokenCampData);
+
+      // Run evaluations down through the instance targets
+      expect(handler.notEnoughKids()).toBe(true);
+      expect(handler.tooManyKids()).toBe(false);
+      expect(handler.numOfFields()).toBe(true);
+      expect(handler.wrongActivity()).toBe(true);
+      expect(handler.duplicateChoice()).toBe(true);
+      expect(handler.duplicateName()).toBe(true);
+
+      // Force compilation execution down through lines 179-223 packaging blocks
+      const processedErrors = handler.getErrorList();
+
+      // Structural integrity validations
+      expect(processedErrors.length).toBeGreaterThan(0);
+
+      // Ensure specific sub-headers compiled and ran successfully
+      const headers = processedErrors.map(e => e.header);
+      expect(headers).toContain('THERE ARE NOT ENOUGH KIDS SCHEDULED FOR THE CAMP');
+      expect(headers).toContain('THE FOLLOWING ROWS HAVE TOO FEW OR TOO MANY COLUMNS');
+      expect(headers).toContain('THE FOLLOWING FIELDS CONTAIN INCORRECT ACTIVITY NAMES');
+      expect(headers).toContain('THE FOLLOWING KIDS HAVE CHOSEN THE SAME ACTIVITY TWICE');
+      expect(headers).toContain('THE FOLLOWING KIDS HAVE THE SAME NAME');
+    });
+
+    test('Exercises the upper boundary condition constraint loop', () => {
+      // Generate an oversized array containing 150 dummy records to force lines 93-98 coverage
+      const oversizedData = Array.from({ length: 150 }, () => [
+        'First', 'Last', 'L1', 'L2', 'L3', 'W1', 'W2', 'W3', 'Extra'
+      ]);
+
+      const handler = new DataErrorHandler(oversizedData);
+      expect(handler.tooManyKids()).toBe(true);
+
+      const errors = handler.getErrorList();
+      expect(errors[0].header).toBe('THERE ARE TOO MANY KIDS SCHEDULED FOR THE CAMP');
+    });
   });
 });
