@@ -2988,7 +2988,7 @@ export class Schedule {
     }
 
     // The kids names in the unscheduled list should never be found in the scheduled list
-    const scheduledKidsInUnscheduleKidsList = scheduledTimeNames.every(name =>
+    const scheduledKidsInUnscheduleKidsList = scheduledTimeNames.some(name =>
       notScheduledTimeNames.includes(name)
     );
     if (scheduledKidsInUnscheduleKidsList) {
