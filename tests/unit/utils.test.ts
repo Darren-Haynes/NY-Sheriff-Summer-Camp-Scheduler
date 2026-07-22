@@ -71,4 +71,15 @@ describe('scheduler-utils', () => {
     expect(getKidsChoice('water', 2)).toBe('water2');
     expect(getKidsChoice('water', 3)).toBe('water3');
   });
+
+  test('randomChoices returns empty array if requested items is zero or less', () => {
+    const arr = ['a', 'b', 'c'];
+
+    // Natively executes the early loop guard check on Line 3 of scheduler-utils.ts
+    const chosenZero = randomChoices(arr, 0);
+    const chosenNegative = randomChoices(arr, -5);
+
+    expect(chosenZero).toEqual([]);
+    expect(chosenNegative).toEqual([]);
+  });
 });
