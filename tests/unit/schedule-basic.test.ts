@@ -191,4 +191,47 @@ describe('Schedule mutator basics', () => {
       expect(sum).toBe(100);
     });
   });
+
+  describe('testUnscheduledToScheduledActivityTypeTime Validation Gaps', () => {
+
+    test('forces mismatch count errors to trigger water configuration early return false path', () => {
+      const basicInput = [['John', 'One', 'bball', 'art', 'hike', 'canoe', 'swim', 'fish']];
+      const kids = new Kids(basicInput);
+      const scheduler = new Schedule(kids, 'waterFirst');
+
+      // Force the first mathematical integrity check to fail
+      scheduler.scheduled9amWater.names = [];
+      scheduler.notScheduled9amWater.names = [];
+
+      const result = (scheduler as any).testUnscheduledToScheduledActivityTypeTime('water', '9am');
+      expect(result).toBe(false);
+    });
+
+    test('forces dual-state camper overlaps to execute warning triggers and return false paths', () => {
+      const binaryInput = [
+        ['John', 'One', 'bball', 'art', 'hike', 'canoe', 'swim', 'fish'],
+        ['Jane', 'Two', 'bball', 'art', 'hike', 'canoe', 'swim', 'fish']
+      ];
+      const kids = new Kids(binaryInput);
+      const scheduler = new Schedule(kids, 'waterFirst');
+
+      // 1. Maintain perfect count balance to pass the early 'water' length validation check:
+      // Scheduled Count (1) + Unscheduled Count (1) === kids.count (2)
+      vi.spyOn(scheduler as any, 'getScheduledKidsList').mockReturnValue(['John One']);
+      vi.spyOn(scheduler as any, 'getNotScheduledKidsList').mockReturnValue(['John One']); // Collision triggered!
+
+      // 2. Clear out activity lists to prevent any prior loop breaks
+      vi.spyOn(scheduler as any, 'getScheduledActivitiesList').mockReturnValue([]);
+      vi.spyOn(scheduler as any, 'getNotScheduledActivitiesList').mockReturnValue([]);
+
+      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+      const result = (scheduler as any).testUnscheduledToScheduledActivityTypeTime('water', '9am');
+
+      expect(logSpy).toHaveBeenCalled();
+      expect(result).toBe(false);
+
+      logSpy.mockRestore();
+    });
+  });
 });
