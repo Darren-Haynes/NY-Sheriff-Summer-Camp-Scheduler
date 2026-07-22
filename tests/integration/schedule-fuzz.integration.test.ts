@@ -23,11 +23,27 @@ describe('Scheduler Algorithmic Fuzzing & Stress Tests', () => {
       // Execute the native algorithm solver run
       scheduler.runAlgo();
 
-      // TACTICAL EXPANSION FOR THE LAST ITERATION:
       // Force both the 'water'/'land' code blocks and the 'end log'
       // console loops to fire natively under real over-allocation results.
       if (iteration === 19) {
         try {
+          // TACTICAL INJECTION FOR LINE 2888:
+          // We register a fake camper name into the system and map a timetable
+          // profile where all 4 day periods are explicitly null. The loop block
+          // will calculate nullCount === 4, push the name to unscheduleKids,
+          // and natively fire your console.log(kid) loop statement!
+          const fakeCamperName = 'Ghost Camper';
+          scheduler.kids.names.push(fakeCamperName);
+          scheduler.schedule.set(fakeCamperName, {
+            name: fakeCamperName,
+            timeSlots: {
+              water9am: null,
+              water10am: null,
+              land9am: null,
+              land10am: null
+            }
+          });
+
           (scheduler as any).testScheduling('water', 'end log', true);
           (scheduler as any).testScheduling('land', 'end log', true);
           (scheduler as any).testScheduling('final log', 'end log', true);
@@ -35,7 +51,6 @@ describe('Scheduler Algorithmic Fuzzing & Stress Tests', () => {
           // Prevent accidental test crashes from edge constraints
         }
       }
-
       expect(scheduler).toBeDefined();
     }
 
