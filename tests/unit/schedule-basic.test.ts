@@ -234,4 +234,27 @@ describe('Schedule mutator basics', () => {
       logSpy.mockRestore();
     });
   });
+
+  test('forces overlapping activity validations to trigger error warning paths natively', () => {
+    const basicInput = [['John', 'One', 'bball', 'art', 'hike', 'canoe', 'swim', 'fish']];
+    const kids = new Kids(basicInput);
+    const scheduler = new Schedule(kids, 'waterFirst');
+
+    // 1. Pass the early kid validations by keeping lists clean and balanced
+    vi.spyOn(scheduler as any, 'getScheduledKidsList').mockReturnValue(['John One']);
+    vi.spyOn(scheduler as any, 'getNotScheduledKidsList').mockReturnValue([]);
+
+    // 2. Trigger the activity collision check block
+    vi.spyOn(scheduler as any, 'getScheduledActivitiesList').mockReturnValue(['canoe']);
+    vi.spyOn(scheduler as any, 'getNotScheduledActivitiesList').mockReturnValue(['canoe']);
+
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    const result = (scheduler as any).testUnscheduledToScheduledActivityTypeTime('water', '9am');
+
+    expect(logSpy).toHaveBeenCalled();
+    expect(result).toBe(false);
+
+    logSpy.mockRestore();
+  });
 });
