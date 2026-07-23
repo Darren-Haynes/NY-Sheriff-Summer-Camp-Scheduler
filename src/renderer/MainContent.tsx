@@ -113,6 +113,7 @@ export default function MainContent() {
             <ErrorBox isVisible={showInputOptions} onToggle={handleToggle} errors={errorContent} />
 
             <ResultBox
+              key={showInputOptions === 'result-box' ? 'active-result' : 'reset-result'}
               isVisible={showInputOptions}
               onToggle={handleToggle}
               result={resultContent}
