@@ -16,7 +16,9 @@
     "test:vitest": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test": "run-s test:coverage test:e2e"
+    "test": "run-s test:coverage test:e2e",
+    "codecov:local": "curl -Os  https://cli.codecov.io/latest/macos/codecov && chmod +x codecov && ./codecov upload-process --disable-search -t $CODECOV_TOKEN -f ./coverage/vitest/lcov.info -F main-process && ./codecov upload-process --disable-search -t $CODECOV_TOKEN -f ./coverage/playwright/lcov.info -F renderer-process && rm codecov",
+    "test:upload": "run-s test codecov:local"
   },
   "keywords": [],
   "author": {
