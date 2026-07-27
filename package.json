@@ -5,6 +5,7 @@
   "description": "Schedule attendees to sports activity time-slots",
   "main": ".webpack/main",
   "scripts": {
+    "clean": "node -e \"fs.rmSync('coverage', { recursive: true, force: true })\"",
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
@@ -81,25 +82,6 @@
     "tmp": "^0.2.3",
     "webpack-dev-server": "^5.2.4",
     "js-yaml": "^4.1.2"
-  },
-  "nyc": {
-    "all": true,
-    "sourceMap": true,
-    "instrument": false,
-    "include": [
-      "src/renderer/**/*.{ts,tsx}"
-    ],
-    "exclude": [
-      "node_modules/**",
-      ".webpack/**",
-      "e2e/**",
-      "**/*.d.ts"
-    ],
-    "reporter": [
-      "html",
-      "lcov",
-      "text"
-    ]
   },
   "allowScripts": {
     "electron-winstaller@5.4.0": true,

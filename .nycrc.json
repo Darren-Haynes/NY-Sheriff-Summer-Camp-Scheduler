@@ -1,0 +1,21 @@
+{
+  "all": true,
+  "sourceMap": true,
+  "instrument": false,
+  "report-dir": "./coverage/playwright",
+  "include": [
+    "src/renderer/**/*.{ts,tsx}"
+  ],
+  "exclude": [
+    "node_modules/**",
+    ".webpack/**",
+    "test/e2e/**",
+    "**/*.d.ts",
+    "src/renderer/renderer.ts"
+  ],
+  "reporter": [
+    "html",
+    "lcov",
+    "text"
+  ]
+}

@@ -11,7 +11,7 @@ import { DataErrorHandler } from '../../src/main/dataInput';
  * confirms the fixture doesn't unexpectedly trip any of the other checks.
  */
 const originalFormatFixture = (name: string) =>
-  path.join(__dirname, '../../e2e/fixtures/original-format', name);
+  path.join(__dirname, '../../test/e2e/fixtures/original-format', name);
 
 describe('DataErrorHandler (original spreadsheet format fixtures)', () => {
   test('notEnoughKids() flags a roster with fewer than 50 kids (error-40-kids.xlsx)', async () => {
