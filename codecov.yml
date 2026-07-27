@@ -2,18 +2,23 @@
 coverage:
   status:
     project:
-      default:
+      # This creates separate status checks on your PRs for each flag
+      default: false
+      main-process:
         target: auto
-    patch:
-      default:
+        flags:
+          - main-process
+      renderer-process:
         target: auto
+        flags:
+          - renderer-process
 
 flags:
-  unit-tests:
+  main-process:
     carryforward: true
     paths:
-      - tests/ # Only track files in your unit tests folder
-  e2e-tests:
+      - src/main/          # STRICTLY track the main process here
+  renderer-process:
     carryforward: true
     paths:
-      - src/renderer/ # Only track files targeted by Playwright
+      - src/renderer/      # STRICTLY track the renderer here

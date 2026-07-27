@@ -8,10 +8,11 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    include: ['tests/**/*.test.ts'],
+    include: ['test/unit/**/*.test.ts', 'test/integration/**/*.test.ts'],
     coverage: {
       provider: 'v8', // use built-in v8 coverage provider (no extra deps)
       reporter: ['text', 'lcov'],
+     reportsDirectory: './coverage/vitest'
     },
   },
 });

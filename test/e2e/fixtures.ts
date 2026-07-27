@@ -14,22 +14,25 @@ export const test = base.extend<ElectronFixtures>({
   appContext: async ({}, use, testInfo) => {
     let electronExecutablePath = '';
 
+    // SAFE ROOT: Always resolves to your project workspace root
+    const projectRoot = process.cwd();
+
     // Resolve the correct prebuilt Electron executable per platform
     if (process.platform === 'darwin') {
       electronExecutablePath = path.join(
-        __dirname,
-        '../node_modules/electron/dist/Electron.app/Contents/MacOS/Electron'
+        projectRoot,
+        'node_modules/electron/dist/Electron.app/Contents/MacOS/Electron'
       );
     } else if (process.platform === 'win32') {
-      electronExecutablePath = path.join(__dirname, '../node_modules/electron/dist/electron.exe');
+      electronExecutablePath = path.join(projectRoot, 'node_modules/electron/dist/electron.exe');
     } else {
-      electronExecutablePath = path.join(__dirname, '../node_modules/electron/dist/electron');
+      electronExecutablePath = path.join(projectRoot, 'node_modules/electron/dist/electron');
     }
 
     // Dynamic directory scanning for Electron Forge's platform output
-    let webpackMainEntry = path.join(__dirname, '../.webpack/main/index.js');
-    const arm64Entry = path.join(__dirname, '../.webpack/arm64/main/index.js');
-    const x64Entry = path.join(__dirname, '../.webpack/x64/main/index.js');
+    let webpackMainEntry = path.join(projectRoot, '.webpack/main/index.js');
+    const arm64Entry = path.join(projectRoot, '.webpack/arm64/main/index.js');
+    const x64Entry = path.join(projectRoot, '.webpack/x64/main/index.js');
 
     if (fs.existsSync(arm64Entry)) {
       webpackMainEntry = arm64Entry; // Apple Silicon Mac
@@ -66,7 +69,7 @@ export const test = base.extend<ElectronFixtures>({
 
       if (coverage) {
         // Resolve .nyc_output relative to the workspace root directory
-        const dir = path.join(process.cwd(), '.nyc_output');
+        const dir = path.join(projectRoot, '.nyc_output');
         if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
         // Generate a safe unique name based on the executing test's structure
