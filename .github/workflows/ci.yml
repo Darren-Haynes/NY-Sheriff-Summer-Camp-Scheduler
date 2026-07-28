@@ -37,6 +37,9 @@ jobs:
           npx electron --version || echo "electron binary not installed"
           npx electron --eval "console.log('electron', process.versions.electron, 'node', process.versions.node, 'chrome', process.versions.chrome)" || true
 
+      - name: Clear coverage cache
+        run: npm run clean
+
       - name: Run Vitest & coverage
         run: npm run test:coverage
         env:
@@ -59,32 +62,32 @@ jobs:
         env:
           CI: true
 
-      # CHANGE HERE: Changed flag to 'main-process' to match codecov.yml
+      # NEW: Uploads the Playwright HTML Report directly to your build dashboard
+      # 'if: always()' ensures reports upload even if tests fail, helping you debug crashes!
+      - name: Upload Playwright HTML Report Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-html-report
+          path: coverage/playwright-report/
+          retention-days: 14
+
       - name: Upload Vitest coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           files: ./coverage/vitest/lcov.info
           flags: main-process
           disable_search: true
-          fail_ci_if_error: false
+          fail_ci_if_error: true
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-      # CHANGE HERE: Changed flag to 'renderer-process' to match codecov.yml
       - name: Upload Playwright coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           files: ./coverage/playwright/lcov.info
           flags: renderer-process
           disable_search: true
-          fail_ci_if_error: false
+          fail_ci_if_error: true
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Upload Playwright Report Artifact
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: playwright-report
-          path: coverage/playwright-report/
-          retention-days: 30
