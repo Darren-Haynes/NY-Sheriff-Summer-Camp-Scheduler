@@ -2,6 +2,7 @@
 sample_data/
 src/main/scheduler.js
 .notes.txt
+CSV/
 
 # Logs
 logs
