@@ -4,7 +4,7 @@
   "instrument": false,
   "report-dir": "./coverage/playwright",
   "include": [
-    "src/renderer/**/*.{ts,tsx}",
+    "src/renderer/**/*.{ts,tsx}"
   ],
   "exclude": [
     "node_modules/**",
