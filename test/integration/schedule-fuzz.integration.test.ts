@@ -1,7 +1,7 @@
 import { describe, expect, test, vi } from 'vitest';
 import { Kids } from '../../src/main/kids';
 import { Schedule } from '../../src/main/schedule';
-import { Activities } from '../../src/main/activities'; // Adjust path if needed
+import { Activities } from '../../src/main/activities';
 
 describe('Scheduler Algorithmic Fuzzing & Stress Tests', () => {
 
@@ -10,13 +10,13 @@ describe('Scheduler Algorithmic Fuzzing & Stress Tests', () => {
     vi.spyOn(console, 'log').mockImplementation(() => {});
 
     // Collect all valid choices to pick from dynamically
-    const landOptions = Activities.landActs || ['bball', 'art', 'hike', 'cheer', 'soc', 'vball', 'arch'];
-    const waterOptions = Activities.waterActs || ['canoe', 'swim', 'fish', 'pboard', 'sail', 'kayak', 'snork'];
+    const landOptions = Activities.landActs;
+    const waterOptions = Activities.waterActs;
 
     // 2. Run across multiple iterations using completely different roster sizes and layouts
     // Changing the roster count (e.g., 53, 71, 109 kids) forces fractional percentages
     // that naturally trigger the 99% and 101% remainder rounding engines.
-    const uniqueRosterSizes = [53, 67, 83, 109, 137];
+    const uniqueRosterSizes = Array.from({ length: 150 - 50 + 1 }, (_, i) => 50 + i);
 
     for (const size of uniqueRosterSizes) {
       const chaoticRoster = Array.from({ length: size }, (_, i) => {
