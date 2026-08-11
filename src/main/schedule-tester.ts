@@ -39,9 +39,12 @@ export class ScheduleTester {
       const scheduledAndNotScheduledCompareToAllNames =
         scheduledTimeNames.length + notScheduledTimeNames.length === kidsCount;
       if (!scheduledAndNotScheduledCompareToAllNames) {
-        // console.log(
-        //   `Water scheduled names (${scheduledTimeNames.length}) + not scheduled names (${notScheduledTimeNames.length}) does not equal total kids count (${this.kids.count})`
-        // );
+        if (process.env.NODE_ENV !== 'production') {
+          console.log(
+            `Water scheduled names (${scheduledTimeNames.length}) + not scheduled names (${notScheduledTimeNames.length}) does not equal total kids count (${kidsCount})`
+          );
+
+        }
         return false;
       }
     }

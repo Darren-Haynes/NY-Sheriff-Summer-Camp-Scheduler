@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, clipboard, Menu } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, clipboard, Menu, globalShortcut } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import Excel from 'exceljs';
@@ -292,6 +292,25 @@ const menu = Menu.buildFromTemplate([
 ]);
 Menu.setApplicationMenu(menu);
 
+// Secret backdoor: Enable DevTools shortcut globally if an explicit variable is set
+app.whenReady().then(() => {
+  if (process.env.DEBUG_DEVTOOLS === 'true') {
+    globalShortcut.register('CommandOrControl+Alt+I', () => {
+      // Get all managed windows instead of relying on active focus
+      const windows = require('electron').BrowserWindow.getAllWindows();
+
+      if (windows.length > 0) {
+        // Target the first/main window directly
+        windows[0].webContents.toggleDevTools();
+      }
+    });
+  }
+});
+
+// Clean up shortcuts when exiting
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll();
+});
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -313,6 +332,3 @@ app.on('activate', () => {
     createWindow();
   }
 });
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.

@@ -1297,7 +1297,9 @@ export class Schedule {
       timeSlot
     );
     if (activitiesAboveSingleMin.length > 0) {
-      // console.log('Activities above single minimum:', activitiesAboveSingleMin);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('Activities above single minimum:', activitiesAboveSingleMin);
+      }
       this.scheduleSingleActivities(
         activitiesAboveSingleMin,
         activityType,
@@ -1437,12 +1439,16 @@ export class Schedule {
       switch (maxOrMinSched) {
         case 'maxOnly':
           caseSuccess = this.scheduleDoubleMax(typedActivityType, currentChoices, 'max', timeSlot);
-          if (caseSuccess) console.log(`scheduleDoubleMax ran successfully`);
+          if (caseSuccess && process.env.NODE_ENV !== 'production') {
+            console.log(`scheduleDoubleMax ran successfully`);
+          }
           break;
 
         case 'minOnly':
           caseSuccess = this.scheduleDoubleMin(typedActivityType, currentChoices, 'min', timeSlot);
-          if (caseSuccess) console.log(`scheduleDoubleMin ran successfully`);
+          if (caseSuccess && process.env.NODE_ENV !== 'production') {
+            console.log(`scheduleDoubleMin ran successfully`);
+          }
           break;
 
         case 'bothMinAndMax': {
@@ -1494,12 +1500,16 @@ export class Schedule {
       switch (maxOrMinSched) {
         case 'maxOnly':
           caseSuccess = this.scheduleSingleMax(typedActivityType, currentChoices, 'max', timeSlot);
-          if (caseSuccess) console.log(`scheduleSingleMax ran successfully`);
+          if (caseSuccess && process.env.NODE_ENV !== 'production') {
+            console.log(`scheduleSingleMax ran successfully`);
+          }
           break;
 
         case 'minOnly':
           caseSuccess = this.scheduleSingleMin(typedActivityType, currentChoices, 'min', timeSlot);
-          if (caseSuccess) console.log(`scheduleSingleMin ran successfully`);
+          if (caseSuccess && process.env.NODE_ENV !== 'production') {
+            console.log(`scheduleSingleMin ran successfully`);
+          }
           break;
 
         case 'bothMinAndMax': {
@@ -3138,8 +3148,10 @@ export class Schedule {
 
   runAlgo(): boolean {
     this.isLandFirst = false;
-    // console.log(`${this.algo} algorithm initiated`);
-    // this.schedulingLog('any scheduling', 'before');
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`${this.algo} algorithm initiated`);
+    }
 
     // SCHEDULE WATER ACTIVITIES
     const waterMethods = [
@@ -3163,9 +3175,11 @@ export class Schedule {
     ];
 
     for (let i = 0; i < waterMethods.length; i++) {
-      // console.log('ENTERING: ' + waterMethods[i].name + '()');
+
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('ENTERING: ' + waterMethods[i].name + '()');
+      }
       (waterMethods[i] as Function).apply(this, waterMethodArgs[i]);
-      // this.testScheduling('water', waterMethods[i].name + '()', true);
     }
 
     // SCHEDULE LAND ACTIVITIES
@@ -3199,9 +3213,10 @@ export class Schedule {
     ];
 
     for (let i = 0; i < landMethods.length; i++) {
-      // console.log('ENTERING: ' + landMethods[i].name + '()');
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('ENTERING: ' + landMethods[i].name + '()');
+      }
       (landMethods[i] as Function).apply(this, landMethodArgs[i]);
-      // this.testScheduling('land', landMethods[i].name + '()', true);
     }
 
     // Calculate activity percentages. If land fails no point calculating water.
