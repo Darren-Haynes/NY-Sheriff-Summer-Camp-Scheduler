@@ -73,6 +73,13 @@ describe('Schedule integration (Dynamic Dataset Suites)', () => {
         expect(Object.prototype.hasOwnProperty.call(kd!.timeSlots, 'land9am')).toBe(true);
         expect(Object.prototype.hasOwnProperty.call(kd!.timeSlots, 'land10am')).toBe(true);
       }
+
+      expect(scheduler.landPercentages.length).toBe(4)
+      expect(scheduler.waterPercentages.length).toBe(4)
+      const landSum = scheduler.landPercentages.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+      const waterSum = scheduler.waterPercentages.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+      expect(landSum).toBe(100)
+      expect(waterSum).toBe(100)
     });
   });
 });

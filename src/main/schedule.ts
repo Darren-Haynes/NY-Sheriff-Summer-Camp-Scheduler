@@ -28,6 +28,7 @@ import {
   RescheduleMatches,
   RescheduleKidsData,
   WaterOnly,
+  ActivityPercentages
 } from '../types/schedule-types';
 import { Int } from '../types/num-types';
 import { KidsData } from '../types/kids-types';
@@ -40,6 +41,9 @@ import {
   WaterRanges,
   WaterKids,
 } from '../types/camp-types';
+
+const ZEROINT = 0 as Int;
+const MINUSONEINT = -1 as Int;
 
 /**
 Main class that schedules the kids to activities.
@@ -60,8 +64,8 @@ export class Schedule {
   scheduled9amLand: ScheduledLand9am;
   scheduled10amWater: ScheduledWater;
   scheduled10amLand: ScheduledLand10am;
-  landPercentages: number[];
-  waterPercentages: number[];
+  landPercentages: ActivityPercentages;
+  waterPercentages: ActivityPercentages;
   algo: string;
   water9am: WaterKids;
   water10am: WaterKids;
@@ -83,8 +87,8 @@ export class Schedule {
     this.notScheduled9amLand = this.notScheduledConstructorLand(true);
     this.notScheduled10amLand = this.notScheduledConstructorLand(false);
     this.notScheduledAllNamesLand = JSON.parse(JSON.stringify(this.kids.names));
-    this.landPercentages = [];
-    this.waterPercentages = [];
+    this.landPercentages = [ZEROINT, ZEROINT, ZEROINT, ZEROINT];
+    this.waterPercentages = [ZEROINT, ZEROINT, ZEROINT, ZEROINT];
     this.water9am = JSON.parse(JSON.stringify(Activities.water9am));
     this.water10am = JSON.parse(JSON.stringify(Activities.water10am));
     this.land9am = JSON.parse(JSON.stringify(Activities.land9am));
@@ -3015,19 +3019,19 @@ export class Schedule {
       ((thirdChoices9am.length + thirdChoices10am.length) / this.kids.count) * 100;
     const noChoicesPercentDecimal = (noChoices.length / this.kids.count) * 100;
 
-    const AllPercentages: number[] = [];
-    const firstChoicesPercent: number = Math.round(firstChoicesPercentDecimal);
-    const firstChoicesRemainder: number = Math.abs(firstChoicesPercentDecimal % 1);
-    AllPercentages.push(firstChoicesPercent);
-    const secondChoicesPercent: number = Math.round(secondChoicesPercentDecimal);
-    const secondChoicesRemainder: number = Math.abs(secondChoicesPercentDecimal % 1);
-    AllPercentages.push(secondChoicesPercent);
-    const thirdChoicesPercent: number = Math.round(thirdChoicesPercentDecimal);
-    const thirdChoicesRemainder: number = Math.abs(thirdChoicesPercentDecimal % 1);
-    AllPercentages.push(thirdChoicesPercent);
-    const noChoicesPercent: number = Math.round(noChoicesPercentDecimal);
-    const noChoicesRemainder: number = Math.abs(noChoicesPercentDecimal % 1);
-    AllPercentages.push(noChoicesPercent);
+    const AllPercentages: ActivityPercentages = [ZEROINT, ZEROINT, ZEROINT, ZEROINT];
+    const firstChoicesPercent: Int = Math.round(firstChoicesPercentDecimal) as Int;
+    const firstChoicesRemainder: Int = Math.abs(firstChoicesPercentDecimal % 1) as Int;
+    AllPercentages[0] = firstChoicesPercent as Int;
+    const secondChoicesPercent: Int = Math.round(secondChoicesPercentDecimal) as Int;
+    const secondChoicesRemainder: Int = Math.abs(secondChoicesPercentDecimal % 1) as Int;
+    AllPercentages[1] = secondChoicesPercent as Int;
+    const thirdChoicesPercent: Int = Math.round(thirdChoicesPercentDecimal) as Int;
+    const thirdChoicesRemainder: Int = Math.abs(thirdChoicesPercentDecimal % 1) as Int;
+    AllPercentages[2] = thirdChoicesPercent as Int;
+    const noChoicesPercent: Int = Math.round(noChoicesPercentDecimal) as Int;
+    const noChoicesRemainder: Int = Math.abs(noChoicesPercentDecimal % 1) as Int;
+    AllPercentages[3] = noChoicesPercent as Int;
 
     const totalPercent: number =
       firstChoicesPercent + secondChoicesPercent + thirdChoicesPercent + noChoicesPercent;
@@ -3036,7 +3040,7 @@ export class Schedule {
       let greatestRemainder = firstChoicesRemainder;
       let greatestRemainderIndex = 0;
       let index = 0;
-      const AllRemainders: number[] = [
+      const AllRemainders: ActivityPercentages = [
         firstChoicesRemainder,
         secondChoicesRemainder,
         thirdChoicesRemainder,
@@ -3050,7 +3054,9 @@ export class Schedule {
         }
         index++;
       }
-      AllPercentages[greatestRemainderIndex] += 1;
+      let currPercent = AllPercentages[greatestRemainder];
+      currPercent = currPercent + 1 as Int;
+      AllPercentages[greatestRemainderIndex] = currPercent;
     }
 
     if (totalPercent === 101) {
@@ -3065,15 +3071,19 @@ export class Schedule {
       ];
       for (const remainder of AllRemainders) {
         if (remainder > greatestRemainder) {
-          greatestRemainder = remainder;
+          greatestRemainder = remainder as Int;
           greatestRemainderIndex = index;
         }
         index++;
       }
-      AllPercentages[greatestRemainderIndex] -= 1;
+      let currPercent = AllPercentages[greatestRemainderIndex];
+      currPercent = currPercent - 1 as Int;
+      AllPercentages[greatestRemainderIndex] = currPercent;
       if (
         AllPercentages.reduce((accumulator, currentValue) => accumulator + currentValue, 0) !== 100
       ) {
+        this.landPercentages = [MINUSONEINT, MINUSONEINT, MINUSONEINT, MINUSONEINT];
+        this.waterPercentages = [MINUSONEINT, MINUSONEINT, MINUSONEINT, MINUSONEINT];
         return false;
       }
     }
@@ -3092,8 +3102,7 @@ export class Schedule {
    */
   private stats(): boolean {
     const scheduleTester = new ScheduleTester()
-    const landPercentagesTrue = this.calculateChoicesPercentages('land');
-    const waterPercentagesTrue = this.calculateChoicesPercentages('water');
+    const checkPercentage = scheduleTester.checkPercentages(this.landPercentages, this.waterPercentages)
 
     const notScheduledToScheduled = scheduleTester.testUnscheduledToScheduled(
       [
@@ -3113,8 +3122,7 @@ export class Schedule {
     const printUnderScheduledLand10am = this.printUnderScheduled('land', '10am');
 
     const allTrue = [
-      landPercentagesTrue,
-      waterPercentagesTrue,
+      checkPercentage,
       notScheduledToScheduled,
       testSchedulingWater,
       testSchedulingLand,
@@ -3194,6 +3202,11 @@ export class Schedule {
       // console.log('ENTERING: ' + landMethods[i].name + '()');
       (landMethods[i] as Function).apply(this, landMethodArgs[i]);
       // this.testScheduling('land', landMethods[i].name + '()', true);
+    }
+
+    // Calculate activity percentages. If land fails no point calculating water.
+    if (this.calculateChoicesPercentages('land')) {
+      this.calculateChoicesPercentages('water')
     }
 
     // this.testScheduling('final log', 'end log', true);

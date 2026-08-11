@@ -1,3 +1,5 @@
+import { Int } from "./num-types";
+
 export interface ActivityArgs {
   activityType?: string;
   numOfChoices?: number;
@@ -117,6 +119,8 @@ export interface ScheduledActivities {
   land9am: LandKids9am;
   land10am: LandKids10am;
 }
+
+export type ActivityPercentages = [Int, Int, Int, Int]
 
 const AllowedTimes = ['9am', '10am', 'both'] as const;
 export type AllowedTimes = (typeof AllowedTimes)[number];

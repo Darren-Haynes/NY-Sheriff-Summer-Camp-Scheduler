@@ -1,7 +1,22 @@
-import { AllowedActivityTypes, AllowedTimes } from '../types/schedule-types'
+import { ActivityPercentages, AllowedActivityTypes, AllowedTimes } from '../types/schedule-types'
 import type { SchedulerListMethods } from '@src/types/scheduler-tester';
 
 export class ScheduleTester {
+
+  /**
+   * Checks if kids choices percentages are invalid.
+   * If any of the  percentage have been set to -1 previously it means they are invalid.
+   * @returns {boolean}
+   */
+  checkPercentages(landPercentages: ActivityPercentages, waterPercentages: ActivityPercentages): boolean {;
+  if (landPercentages.some(x => x  === -1)) {
+    return false
+  }
+    if (waterPercentages.every(x => x === 0) || landPercentages.every(x => x === 0)) {
+      return false
+    }
+    return true
+    }
 
   /**
    * Tests that the number of unscheduled kids and activities matches the number of scheduled kids and activities for a given activity type and time slot.
