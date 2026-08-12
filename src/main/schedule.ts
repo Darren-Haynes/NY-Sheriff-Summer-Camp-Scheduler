@@ -1,5 +1,6 @@
 import { Activities } from './activities';
 import { Kids } from './kids';
+import { PrintLogs } from './print-logs'
 import { ScheduleChecker } from './schedule-checker';
 import {
   NotScheduledLand,
@@ -389,30 +390,6 @@ export class Schedule {
       }
     }
     return new Map([...fullActivities.entries()].sort((b, a) => a[1] - b[1]));
-  }
-
-  /**
-   * Get list of all not scheduled activities for a given activity type and time slot.
-   * @param {string} activityType - only 2 options: 'land' or 'water'.
-   * @param {string} timeSlot - only 2 options: '9am' or '10am'.
-   * @returns {Map<string, number>} - map of not scheduled activities and their remaining slots, e.g {'canoe', 10, 'pboard', 4}
-   */
-  private getNotScheduledActivities(
-    activityType: AllowedActivityTypes,
-    timeSlot: AllowedTimes
-  ): Map<string, number> {
-    const scheduledActivities = this.getActivityTypeTimeSlot(activityType, timeSlot);
-    const notScheduledActivities = new Map<string, number>();
-    const activityRange = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
-    for (const [activity, names] of Object.entries(scheduledActivities) as [
-      keyof typeof scheduledActivities,
-      string[],
-    ][]) {
-      if (names.length === 0) {
-        notScheduledActivities.set(activity, activityRange[activity][1]);
-      }
-    }
-    return new Map([...notScheduledActivities.entries()].sort((b, a) => a[1] - b[1]));
   }
 
   private removeNotChosenActivitiesFromScheduledNotFull(
@@ -2481,46 +2458,10 @@ export class Schedule {
     }
   }
 
-  /**
-   * Print unscheduled names and activities.
-   * @param {string} activityType - only 2 options: 'land' or 'water'.
-   * @param {string} timeSlot - only 2 options -'9am' or '10am'
-   * @returns {void}
-   */
-  private printUnscheduledData(activityType: AllowedActivityTypes): void {
-    const notScheduledAllNames =
-      activityType === 'land' ? this.notScheduledAllNamesLand : this.notScheduledAllNamesWater;
-    const notScheduledNames9am = this.getNotScheduledKidsList(activityType, '9am', false);
-    const notScheduledNames10am = this.getNotScheduledKidsList(activityType, '10am', false);
-    const notScheduledActivities9am = this.getNotScheduledActivities(activityType, '9am');
-    const notScheduledActivities10am = this.getNotScheduledActivities(activityType, '10am');
-    console.log(`NOT SCHEDULED ${activityType.toUpperCase()}:`);
-    console.log('-------------------');
-    console.log(
-      `NOT SCHEDULED COUNT ALL NAMES ${activityType.toUpperCase()}: `,
-      notScheduledAllNames.length
-    );
-    console.log(
-      `NOT SCHEDULED 9AM ${activityType.toUpperCase()} NAMES: `,
-      notScheduledNames9am.length
-    );
-    console.log(`NOT SCHEDULED 9AM ${activityType.toUpperCase()} ACTIVITIES: `, [
-      ...notScheduledActivities9am.keys(),
-    ]);
-    console.log(
-      `NOT SCHEDULED 10AM ${activityType.toUpperCase()} NAMES: `,
-      notScheduledNames10am.length
-    );
-    console.log(`NOT SCHEDULED 10AM ${activityType.toUpperCase()} ACTIVITIES: `, [
-      ...notScheduledActivities10am.keys(),
-    ]);
-    console.log('\n');
-  }
-
   schedulingLog(func_name: string, when: string): void {
     console.log(`\n${when} ${func_name}`);
-    this.printUnscheduledData('water');
-    this.printUnscheduledData('land');
+    PrintLogs.unscheduledData('water', this);
+    PrintLogs.unscheduledData('land', this);
   }
 
   private testScheduling(
@@ -2529,21 +2470,11 @@ export class Schedule {
     logging: boolean = true
   ): boolean {
     if (logging) {
-      console.log('\n');
-      console.log('______________________________________');
-      console.log(`\tENTERING LOGS -- ${activityType}`);
-      console.log('--------------------------------------');
-      console.log('\tAfter calling', func_name, '\n');
+      PrintLogs.initialStatement(activityType, func_name)
     }
 
     if (logging) {
-      if (activityType === 'water' || activityType === 'final log') {
-        this.printUnscheduledData('water');
-      }
-
-      if (activityType === 'land' || activityType === 'final log') {
-        this.printUnscheduledData('land');
-      }
+      PrintLogs.unscheduledDataSwitch(activityType, this)
     }
 
     const totalKidsCountWater = this.kids.count - this.notScheduledAllNamesWater.length;
@@ -3190,7 +3121,7 @@ export class Schedule {
       this.calculateChoicesPercentages('water')
     }
 
-    // this.testScheduling('final log', 'end log', true);
+    this.testScheduling('final log', 'end log', true);
     return this.checkScheduling();
   }
 }
