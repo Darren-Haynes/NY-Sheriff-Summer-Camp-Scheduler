@@ -281,15 +281,20 @@ export class PrintLogs {
     const activityTypeTimeSlot = schedule.getActivityTypeTimeSlot(activityType, timeSlot);
     const typedActivityTypeTimeSlot = activityTypeTimeSlot as Record<string, string[]>;
     const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
-    console.log(`${activityType.toUpperCase()} ${timeSlot.toUpperCase()} UNDERSCHEDULED`);
+    let resultText = "NONE"
 
+    let underscheduledActivities: string[] = [];
     for (const activity of Object.keys(typedActivityTypeTimeSlot)) {
       const activityCount = typedActivityTypeTimeSlot[activity].length;
       const minRange = ranges[activity as AllActivities][0];
       if (activityCount < minRange && activityCount > 0) {
-        console.log(activity, 'has', activityCount, 'kids scheduled, min is', minRange);
+        `${activity}, 'has', ${activityCount}, 'kids scheduled, min is', ${minRange}`;
       }
     }
+    if (underscheduledActivities.length > 0) {
+      resultText = underscheduledActivities.join('\n')
+    }
+    console.log(`${activityType.toUpperCase()} ${timeSlot.toUpperCase()} UNDERSCHEDULED:\n ${resultText}`);
   }
 
   /**
@@ -301,6 +306,9 @@ export class PrintLogs {
     activityType: AllowedActivityTypes | 'final log',
     schedule: Schedule
   ): void {
+    console.log("\n=========================")
+    console.log("UNDERSCHEDULED ACTIVITIES")
+    console.log("=========================")
     if (activityType === 'water' || activityType === 'final log') {
       this.underScheduledByActivityAndTimeSlot('water', '9am', schedule);
       this.underScheduledByActivityAndTimeSlot('water', '10am', schedule);
