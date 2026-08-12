@@ -583,7 +583,7 @@ export class Schedule {
    * @param {string} timeSlot - only 2 options: '9am' or '10am'.
    * @returns {Map} - e.g {'swim': 39, 'fish': 9, ...} how many unscheduled kids chose each activity
    */
-  private getNotScheduledKidsList(
+  getNotScheduledKidsList(
     activityType: AllowedActivityTypes,
     timeSlot: Allowed9and10Only,
     algoFirst = true
@@ -616,7 +616,7 @@ export class Schedule {
     }
   }
 
-  private getNotScheduledActivitiesList(
+  getNotScheduledActivitiesList(
     activityType: AllowedActivityTypes,
     timeSlot: Allowed9and10Only
   ): string[] {
@@ -631,7 +631,7 @@ export class Schedule {
     }
   }
 
-  private getScheduledActivitiesList(
+  getScheduledActivitiesList(
     activityType: AllowedActivityTypes,
     timeSlot: Allowed9and10Only
   ): string[] {
@@ -646,7 +646,7 @@ export class Schedule {
     }
   }
 
-  private getScheduledKidsList(
+  getScheduledKidsList(
     activityType: AllowedActivityTypes,
     timeSlot: Allowed9and10Only
   ): string[] {
@@ -3111,18 +3111,10 @@ export class Schedule {
    * @returns {object}
    */
   private stats(): boolean {
-    const scheduleTester = new ScheduleTester()
-    const checkPercentage = scheduleTester.checkPercentages(this.landPercentages, this.waterPercentages)
+    const scheduleTester = new ScheduleTester(this)
+    const checkPercentage = scheduleTester.checkPercentages()
 
-    const notScheduledToScheduled = scheduleTester.testUnscheduledToScheduled(
-      [
-        this.getScheduledKidsList.bind(this),
-        this.getScheduledActivitiesList.bind(this),
-        this.getNotScheduledKidsList.bind(this),
-        this.getNotScheduledActivitiesList.bind(this),
-      ],
-      this.kids.count
-    );
+    const notScheduledToScheduled = scheduleTester.testUnscheduledToScheduled();
 
     const testSchedulingWater = this.testScheduling('water', 'no func', false);
     const testSchedulingLand = this.testScheduling('land', 'no func', false);

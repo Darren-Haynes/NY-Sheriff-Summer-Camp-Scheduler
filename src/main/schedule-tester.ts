@@ -1,18 +1,22 @@
-import { ActivityPercentages, AllowedActivityTypes, AllowedTimes } from '../types/schedule-types'
-import type { SchedulerListMethods } from '@src/types/scheduler-tester';
+import { AllowedActivityTypes, AllowedTimes } from '../types/schedule-types'
+import type { Schedule } from './schedule'
 
 export class ScheduleTester {
+  schedule: Schedule
 
+  constructor(schedule: Schedule) {
+    this.schedule = schedule
+  }
   /**
    * Checks if kids choices percentages are invalid.
    * If any of the  percentage have been set to -1 previously it means they are invalid.
    * @returns {boolean}
    */
-  checkPercentages(landPercentages: ActivityPercentages, waterPercentages: ActivityPercentages): boolean {;
-  if (landPercentages.some(x => x  === -1)) {
+  checkPercentages(): boolean {;
+  if (this.schedule.landPercentages.some(x => x  === -1)) {
     return false
   }
-    if (waterPercentages.every(x => x === 0) || landPercentages.every(x => x === 0)) {
+    if (this.schedule.waterPercentages.every(x => x === 0) || this.schedule.landPercentages.every(x => x === 0)) {
       return false
     }
     return true
@@ -25,23 +29,21 @@ export class ScheduleTester {
    * @returns {boolean} - true if the number of unscheduled kids and activities matches the number of scheduled kids and activities, false otherwise.
    */
   private testUnscheduledToScheduledActivityTypeTime(
-    schedulerListMethods: SchedulerListMethods,
     activityType: AllowedActivityTypes,
     timeSlot: AllowedTimes,
-    kidsCount: number
   ): boolean {
-    const scheduledTimeNames = schedulerListMethods[0](activityType, timeSlot);
-    const scheduledActivities = schedulerListMethods[1](activityType, timeSlot);
-    const notScheduledTimeNames = schedulerListMethods[2](activityType, timeSlot, false);
-    const notScheduledActivities = schedulerListMethods[3](activityType, timeSlot);
+    const scheduledTimeNames = this.schedule.getScheduledKidsList(activityType, timeSlot);
+    const scheduledActivities = this.schedule.getScheduledActivitiesList(activityType, timeSlot);
+    const notScheduledTimeNames = this.schedule.getNotScheduledKidsList(activityType, timeSlot, false);
+    const notScheduledActivities = this.schedule.getNotScheduledActivitiesList(activityType, timeSlot);
     if (activityType === 'water') {
       // Unscheduled kids list length and scheduled kids list length should add up to total amount of kids that need to be scheduled
       const scheduledAndNotScheduledCompareToAllNames =
-        scheduledTimeNames.length + notScheduledTimeNames.length === kidsCount;
+        scheduledTimeNames.length + notScheduledTimeNames.length === this.schedule.kids.count;
       if (!scheduledAndNotScheduledCompareToAllNames) {
         if (process.env.NODE_ENV !== 'production') {
           console.log(
-            `Water scheduled names (${scheduledTimeNames.length}) + not scheduled names (${notScheduledTimeNames.length}) does not equal total kids count (${kidsCount})`
+            `Water scheduled names (${scheduledTimeNames.length}) + not scheduled names (${notScheduledTimeNames.length}) does not equal total kids count (${this.schedule.kids.count})`
           );
 
         }
@@ -73,12 +75,12 @@ export class ScheduleTester {
     return true;
   }
 
-  testUnscheduledToScheduled(schedulerListMethods: SchedulerListMethods, kidsCount: number): boolean {
+  testUnscheduledToScheduled(): boolean {
     const allScheduleTests: boolean[] = [
-      this.testUnscheduledToScheduledActivityTypeTime(schedulerListMethods, 'water', '9am', kidsCount),
-      this.testUnscheduledToScheduledActivityTypeTime(schedulerListMethods, 'water', '10am', kidsCount),
-      this.testUnscheduledToScheduledActivityTypeTime(schedulerListMethods, 'land', '9am', kidsCount),
-      this.testUnscheduledToScheduledActivityTypeTime(schedulerListMethods, 'land', '10am', kidsCount),
+      this.testUnscheduledToScheduledActivityTypeTime('water', '9am'),
+      this.testUnscheduledToScheduledActivityTypeTime('water', '10am'),
+      this.testUnscheduledToScheduledActivityTypeTime('land', '9am'),
+      this.testUnscheduledToScheduledActivityTypeTime('land', '10am'),
     ];
 
     const result = allScheduleTests.every(test => test === true);
