@@ -2800,45 +2800,24 @@ export class Schedule {
     const notFullyScheduledLand9am = this.getInsufficientlyScheduledActivites('land', '9am');
     const notFullyScheduledLand10am = this.getInsufficientlyScheduledActivites('land', '10am');
 
-    const oppositesEqualWaterString =
+    const oppositesEqualWater9amTo10am =
       JSON.stringify(this.notScheduled9amWater.names.sort()) ===
       JSON.stringify(this.scheduled10amWater.names.sort());
-    const oppositesEqualWaterString2 =
+    const oppositiesEqualWater10amTo9am =
       JSON.stringify(this.notScheduled9amWater.names.sort()) ===
       JSON.stringify(this.scheduled10amWater.names.sort());
 
-    const EqualWaterString =
+    const equalWater9amToLand10am =
       JSON.stringify(this.scheduled9amWater.names.sort()) ===
       JSON.stringify(this.scheduled10amLand.names.sort());
-    const EqualWaterString2 =
+    const equalWater10amToLand9am =
       JSON.stringify(this.scheduled10amWater.names.sort()) ===
       JSON.stringify(this.scheduled9amLand.names.sort());
 
     if (func_name == 'end log') {
-      console.log('NOT FULLY SCHEDULED ACTIVITIES');
-      console.log('Water 9am:', notFullyScheduledWater9am);
-      console.log('Water 10am:', notFullyScheduledWater10am);
-      console.log('Land 9am:', notFullyScheduledLand9am);
-      console.log('Land 10am:', notFullyScheduledLand10am);
-      console.log('\n\nSCHEDULED LISTS -- FINAL REPORT');
-      console.log(
-        'STRINGIFY COMPARE WATER notScheduled9amWater.names == scheduled10amWater.names:',
-        oppositesEqualWaterString
-      );
-      console.log(
-        'STRINGIFY COMPARE WATER notScheduled10amWater.names == scheduled9amWater.names:',
-        oppositesEqualWaterString2
-      );
-
-      console.log('\nWater and Land opposite times should equal');
-      console.log(
-        'STRINGIFY COMPARE WATER to LAND this.scheduled9amWater.names == this.scheduled10amLand.names:',
-        EqualWaterString
-      );
-      console.log(
-        'STRINGIFY COMPARE WATER to Land this.scheduled10amWater.names == this.scheduled9amLand.names:',
-        EqualWaterString2
-      );
+      PrintLogs.notFullyScheduledActivities(notFullyScheduledWater9am, notFullyScheduledWater10am, notFullyScheduledLand9am, notFullyScheduledLand10am)
+      PrintLogs.namesComparisonWater9amTo10am(oppositesEqualWater9amTo10am, oppositiesEqualWater10amTo9am)
+      PrintLogs.namesComparisonWater9amTo10am(equalWater9amToLand10am, equalWater10amToLand9am)
     }
 
     const allTrue = [
@@ -2850,10 +2829,10 @@ export class Schedule {
       !landToKidsCount,
       allNotInTarget,
       allNamesEmpty,
-      oppositesEqualWaterString,
-      oppositesEqualWaterString2,
-      EqualWaterString,
-      EqualWaterString2,
+      oppositesEqualWater9amTo10am,
+      oppositiesEqualWater10amTo9am,
+      equalWater9amToLand10am,
+      equalWater10amToLand9am,
     ].every(element => element === true);
 
     return allTrue;

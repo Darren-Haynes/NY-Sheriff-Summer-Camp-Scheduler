@@ -1,5 +1,5 @@
 import { Activities } from './activities';
-import { AllowedActivityTypes, AllowedTimes } from "../types/schedule-types";
+import { AllActivities, AllowedActivityTypes, AllowedTimes } from "../types/schedule-types";
 import { KidsData, UnscheduledKids } from "../types/kids-types"
 import type { Schedule } from "./schedule"
 
@@ -134,5 +134,64 @@ export class PrintLogs {
         );
         console.log('this.notScheduledAllNamesWater.length === 0:', allNamesEmpty);
       }
+  }
+  /**
+   *
+   * @param notFullyScheduledWater9am - list of water activities, if any
+   * @param notFullyScheduledWater10am  - list of water activities, if any
+   * @param notFullyScheduledLand9am  - list of 9am land activities, if any
+   * @param notFullyScheduledLand10am  - list of 10 land activitivies, if any
+   */
+  static notFullyScheduledActivities(
+    notFullyScheduledWater9am: AllActivities[],
+    notFullyScheduledWater10am: AllActivities[],
+    notFullyScheduledLand9am: AllActivities[],
+    notFullyScheduledLand10am: AllActivities[]
+  ): void {
+    console.log('NOT FULLY SCHEDULED ACTIVITIES');
+    console.log('Water 9am:', notFullyScheduledWater9am);
+    console.log('Water 10am:', notFullyScheduledWater10am);
+    console.log('Land 9am:', notFullyScheduledLand9am);
+    console.log('Land 10am:', notFullyScheduledLand10am);
+    console.log('\n\nSCHEDULED LISTS -- FINAL REPORT');
+  }
+
+  /**
+   * Log if all the names in 9am are equal to the 10am names (which they should)
+   * @param oppositesEqualWater9amTo10am - true if all the names in 9am equal those in 10am
+   * @param oppositesEqualWater10amTo9am - true if all the names in 10am equal those in 9am
+   */
+  static namesComparisonWater9amTo10am(
+    oppositesEqualWater9amTo10am: boolean,
+    oppositesEqualWater10amTo9am: boolean,
+  ): void {
+    console.log(
+      'STRINGIFY COMPARE WATER notScheduled9amWater.names == scheduled10amWater.names:',
+      oppositesEqualWater9amTo10am
+    );
+    console.log(
+      'STRINGIFY COMPARE WATER notScheduled10amWater.names == scheduled9amWater.names:',
+      oppositesEqualWater10amTo9am
+    );
+  }
+
+  /**
+   * Log if all 9am water names match 10am land and vice versa (which they should)
+   * @param equalWater9amToLand10am - true if all 9am water names match 10am water names
+   * @param equalWater10amToLand9am - ture if all 10am water names match 9am water names
+   */
+  static namesComparisonWaterToLand(
+    equalWater9amToLand10am: boolean,
+    equalWater10amToLand9am: boolean,
+  ): void {
+    console.log('\nWater and Land opposite times should equal');
+    console.log(
+      'STRINGIFY COMPARE WATER to LAND this.scheduled9amWater.names == this.scheduled10amLand.names:',
+      equalWater9amToLand10am
+    );
+    console.log(
+      'STRINGIFY COMPARE WATER to Land this.scheduled10amWater.names == this.scheduled9amLand.names:',
+      equalWater10amToLand9am
+    );
   }
 }
