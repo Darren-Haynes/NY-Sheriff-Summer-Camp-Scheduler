@@ -277,7 +277,7 @@ export class PrintLogs {
     activityType: AllowedActivityTypes,
     timeSlot: AllowedTimes,
     schedule: Schedule
-    ): void {
+  ): void {
     const activityTypeTimeSlot = schedule.getActivityTypeTimeSlot(activityType, timeSlot);
     const typedActivityTypeTimeSlot = activityTypeTimeSlot as Record<string, string[]>;
     const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
@@ -357,6 +357,72 @@ export class PrintLogs {
     if (activityType === 'land' || activityType === 'final log') {
       this.overScheduledByActivityAndTimeSlot('land', '9am', schedule);
       this.overScheduledByActivityAndTimeSlot('land', '10am', schedule);
+    }
+  }
+
+  /**
+   * Print count matches (or mismatches) between timeSlot.timeSlot scheduling objects and kids names
+   * in names arrays (such as notScheduledAllNamesWater.length)
+   * @param activityType - 'land', 'water' or 'final log'
+   * @param kidsCountMatch - bool that checks if there's mismatch between schdeule counts
+   * @param activityTotalCount - count of how many kids are scheduled to activities in timeSlots.
+   * @param kidsActivityTotalCount - count of kids in an activity type by their names Array.
+   */
+  static kidsTimeSlotsToTotalKidsCountMatchByActivityType(
+    activityType: AllowedActivityTypes | 'final log',
+    kidsCount: boolean,
+    activityTotalCount: number,
+    kidsActivityTotalCount: number
+  ): void {
+    if (activityType === 'water' || activityType === 'final log') {
+      console.log(`\n${activityType} totals:`);
+      if (kidsCount) {
+        console.log(
+          `${activityType} Scheduled # mismatch. this.Kids.timeSlots != this.kids.totalKidsCount: `
+        );
+        console.log(activityTotalCount, '!==', kidsActivityTotalCount);
+      } else {
+        console.log(
+          `${activityType} Scheduled # MATCHES: this.Kids.timeSlots == this.kids.totalKidsCount: `
+        );
+        console.log(activityTotalCount, '==', kidsActivityTotalCount);
+      }
+    }
+  }
+
+  /**
+   * Wrapper for kidsTimeSlotsToTotalKidsCountMatchByActivityType()
+   * @param activityType - 'land', 'water' or 'final log'
+   * @param kidsCountMatch - bool that checks if there's mismatch between schdeule counts
+   * @param activityTotalCount - count of how many kids are scheduled to activities in timeSlots.
+   * @param kidsActivityTotalCount - count of kids in an activity type by their names Array.
+   */
+  static kidsTimeSlotsToTotalKids(
+    activityType: AllowedActivityTypes | 'final log',
+    waterToKidsCount: boolean,
+    landToKidsCount: boolean,
+    waterTotalCount: number,
+    landTotalCount: number,
+    totalKidsCountWater: number,
+    totalKidsCountLand: number
+    ): void {
+    if (activityType === 'final log') {
+      this.kidsTimeSlotsToTotalKidsCountMatchByActivityType(
+        'water', waterToKidsCount, waterTotalCount, totalKidsCountWater
+      )
+      this.kidsTimeSlotsToTotalKidsCountMatchByActivityType(
+        'land', landToKidsCount, landTotalCount, totalKidsCountLand
+      )
+    }
+    if (activityType === 'water') {
+      this.kidsTimeSlotsToTotalKidsCountMatchByActivityType(
+        'water', waterToKidsCount, waterTotalCount, totalKidsCountWater
+      )
+    }
+    if (activityType === 'land') {
+      this.kidsTimeSlotsToTotalKidsCountMatchByActivityType(
+        'land', landToKidsCount, landTotalCount, totalKidsCountLand
+      )
     }
   }
 }

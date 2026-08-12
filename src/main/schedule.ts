@@ -2642,35 +2642,7 @@ export class Schedule {
     const waterToKidsCount = waterTotalCount !== totalKidsCountWater;
     const landToKidsCount = landTotalCount !== totalKidsCountLand;
     if (logging) {
-      if (activityType === 'water' || activityType === 'final log') {
-        console.log('\nWater totals:');
-        if (waterToKidsCount) {
-          console.log(
-            'Water Scheduled # mismatch. this.Kids.timeSlots != this.kids.totalKidsCount: '
-          );
-          console.log(waterTotalCount, '!==', totalKidsCountWater);
-        } else {
-          console.log(
-            'Land Scheduled # MATCHES: this.Kids.timeSlots == this.kids.totalKidsCount: '
-          );
-          console.log(waterTotalCount, '==', totalKidsCountWater);
-        }
-      }
-
-      if (activityType === 'land' || activityType === 'final log') {
-        console.log('\nLand totals:');
-        if (landToKidsCount) {
-          console.log(
-            '\n\nLand Scheduled # mismatch. this.Kids.timeSlots != this.kids.totalKidsCount: '
-          );
-          console.log(landTotalCount, '!==', totalKidsCountLand);
-        } else {
-          console.log(
-            'Land Scheduled # MATCHES:  this.Kids.timeSlots == this.kids.totalKidsCount: '
-          );
-          console.log(landTotalCount, '==', totalKidsCountLand);
-        }
-      }
+      PrintLogs.kidsTimeSlotsToTotalKids(activityType, waterToKidsCount, landToKidsCount, waterTotalCount, landTotalCount, totalKidsCountWater, totalKidsCountLand)
     }
 
     const allNotInTarget = this.notScheduled9amWater.names.every(
