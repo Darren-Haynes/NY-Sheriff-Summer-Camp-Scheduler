@@ -1,4 +1,5 @@
-import { AllowedActivityTypes, AllowedTimes } from '../types/schedule-types'
+import { Activities } from './activities';
+import { AllActivities, AllowedActivityTypes, AllowedTimes } from '../types/schedule-types'
 import type { Schedule } from './schedule'
 
 export class ScheduleTester {
@@ -7,6 +8,37 @@ export class ScheduleTester {
   constructor(schedule: Schedule) {
     this.schedule = schedule
   }
+
+    /**
+     * Print activities that have less kids scheduled than the min allowed for that activity, if any.
+     * @param {string} activityType - only 2 options: 'land' or 'water'.
+     * @param {string} timeSlot - only 2 options -'9am' or '10am'
+     * @returns {void}
+     */
+    checkUnderScheduled(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): boolean {
+      const activityTypeTimeSlot = this.schedule.getActivityTypeTimeSlot(activityType, timeSlot);
+      const typedActivityTypeTimeSlot = activityTypeTimeSlot as Record<string, string[]>;
+      const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`${activityType.toUpperCase()} ${timeSlot.toUpperCase()} UNDERSCHEDULED`);
+      }
+      let underScheduled = false;
+      for (const activity of Object.keys(typedActivityTypeTimeSlot)) {
+        const activityCount = typedActivityTypeTimeSlot[activity].length;
+        const minRange = ranges[activity as AllActivities][0];
+        if (activityCount < minRange && activityCount > 0) {
+          underScheduled = true;
+          if (process.env.NODE_ENV !== 'production') {
+            console.log(activity, 'has', activityCount, 'kids scheduled, min is', minRange);
+          }
+        }
+      }
+      if (!underScheduled) {
+        return true;
+      }
+      return false;
+    }
+
   /**
    * Checks if kids choices percentages are invalid.
    * If any of the  percentage have been set to -1 previously it means they are invalid.
