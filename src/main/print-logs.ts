@@ -1,5 +1,6 @@
 import { Activities } from './activities';
 import { AllowedActivityTypes, AllowedTimes } from "../types/schedule-types";
+import { KidsData, UnscheduledKids } from "../types/kids-types"
 import type { Schedule } from "./schedule"
 
 /**
@@ -100,5 +101,38 @@ export class PrintLogs {
     if (activityType === 'land' || activityType === 'final log') {
       PrintLogs.unscheduledData('land', schedule);
     }
+  }
+
+  /**
+   * Print info about kids that are not scheduled (or scheduled incorrectly)
+   * @param kidsCount - total number of kids attending camp
+   * @param totalKidsCountWater  - total number of kids assigned to water activities
+   * @param totalKidsCountLand  - total number of kids assigned to land activities
+   * @param logging - if true print additional logging info
+   * @param unscheduledKids - list of kids that are unscheduled and their timeslots
+   * @param allNotInTarget - false if a name is in both 9am and 10am water
+   * @param allNamesEmpty - true if there are no kids left to schedule
+   */
+  static kidsNotScheduled(
+    kidsCount: number,
+    totalKidsCountWater: number,
+    totalKidsCountLand: number,
+    logging: boolean,
+    unscheduledKids: UnscheduledKids[],
+    allNotInTarget: boolean,
+    allNamesEmpty: boolean): void {
+      console.log('\nTOTAL KIDS NOT SCHEDULED Water:', kidsCount - totalKidsCountWater);
+      console.log('\nTOTAL KIDS NOT SCHEDULED Land:', kidsCount - totalKidsCountLand);
+      for (const kid of unscheduledKids) {
+        console.log(kid);
+      }
+
+      if (logging) {
+        console.log(
+          'this.notScheduled9amWater.names !== this.notScheduled10amWater.names:',
+          allNotInTarget
+        );
+        console.log('this.notScheduledAllNamesWater.length === 0:', allNamesEmpty);
+      }
   }
 }

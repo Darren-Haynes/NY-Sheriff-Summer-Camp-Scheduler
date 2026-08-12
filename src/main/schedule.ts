@@ -32,7 +32,7 @@ import {
   ActivityPercentages
 } from '../types/schedule-types';
 import { Int } from '../types/num-types';
-import { KidsData } from '../types/kids-types';
+import { KidsData, UnscheduledKids } from '../types/kids-types';
 import {
   AllLandWaterKids9am10am,
   LandKids9am,
@@ -2483,7 +2483,7 @@ export class Schedule {
     let waterTotalCount = 0;
     let water9amTotalCount = 0;
     let water10amTotalCount = 0;
-    const unscheduleKids = [];
+    const unscheduleKids: UnscheduledKids[] = [];
     const water9amActivityCount = {
       fish: 0,
       pboard: 0,
@@ -2792,19 +2792,7 @@ export class Schedule {
     const allNamesEmpty = this.notScheduledAllNamesWater.length === 0;
 
     if (func_name == 'end log') {
-      console.log('\nTOTAL KIDS NOT SCHEDULED Water:', this.kids.count - totalKidsCountWater);
-      console.log('\nTOTAL KIDS NOT SCHEDULED Land:', this.kids.count - totalKidsCountLand);
-      for (const kid of unscheduleKids) {
-        console.log(kid);
-      }
-
-      if (logging) {
-        console.log(
-          'this.notScheduled9amWater.names !== this.notScheduled10amWater.names:',
-          allNotInTarget
-        );
-        console.log('this.notScheduledAllNamesWater.length === 0:', allNamesEmpty);
-      }
+      PrintLogs.kidsNotScheduled(this.kids.count, totalKidsCountWater, totalKidsCountLand, logging, unscheduleKids, allNotInTarget, allNamesEmpty)
     }
 
     const notFullyScheduledWater9am = this.getInsufficientlyScheduledActivites('water', '9am');
