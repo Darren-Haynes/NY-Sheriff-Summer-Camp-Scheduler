@@ -2949,6 +2949,9 @@ export class Schedule {
     }
 
     this.testScheduling('final log', 'end log', true);
+    if (process.env.NODE_ENV !== 'production') {
+      PrintLogs.endStatement('final log', 'end log');
+    }
     return this.checkScheduling();
   }
 }

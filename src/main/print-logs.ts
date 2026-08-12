@@ -27,6 +27,16 @@ export class PrintLogs {
     console.log('\tAfter calling', func_name, '\n');
   }
 
+  static endStatement(
+    activityType: AllowedActivityTypes | 'final log',
+    func_name: string,
+  ): void {
+    console.log('______________________________________');
+    console.log(`\tEXITING LOGS -- ${activityType}`);
+    console.log('\tAfter calling', func_name, '\n');
+    console.log('--------------------------------------');
+  }
+
   /**
     * Get list of all not scheduled activities for a given activity type and time slot.
     * @param {string} activityType - only 2 options: 'land' or 'water'.
@@ -38,6 +48,9 @@ export class PrintLogs {
     timeSlot: AllowedTimes,
     schedule: Schedule
   ): Map<string, number> {
+    console.log("\n=======================")
+    console.log('NOT SCHEDULED ACTIVITIES');
+    console.log("=========================")
     const scheduledActivities = schedule.getActivityTypeTimeSlot(activityType, timeSlot);
     const notScheduledActivities = new Map<string, number>();
     const activityRange = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
@@ -65,8 +78,9 @@ export class PrintLogs {
     const notScheduledNames10am = schedule.getNotScheduledKidsList(activityType, '10am', false);
     const notScheduledActivities9am = this.getNotScheduledActivities(activityType, '9am', schedule);
     const notScheduledActivities10am = this.getNotScheduledActivities(activityType, '10am', schedule);
+    console.log("\n=========================")
     console.log(`NOT SCHEDULED ${activityType.toUpperCase()}:`);
-    console.log('-------------------');
+    console.log("=========================")
     console.log(
       `NOT SCHEDULED COUNT ALL NAMES ${activityType.toUpperCase()}: `,
       notScheduledAllNames.length
@@ -121,8 +135,11 @@ export class PrintLogs {
     unscheduledKids: UnscheduledKids[],
     allNotInTarget: boolean,
     allNamesEmpty: boolean): void {
-    console.log('\nTOTAL KIDS NOT SCHEDULED Water:', kidsCount - totalKidsCountWater);
-    console.log('\nTOTAL KIDS NOT SCHEDULED Land:', kidsCount - totalKidsCountLand);
+    console.log("\n=================")
+    console.log('KIDS NOT SCHEDULED');
+    console.log("===================")
+    console.log('TOTAL KIDS NOT SCHEDULED Water:', kidsCount - totalKidsCountWater);
+    console.log('TOTAL KIDS NOT SCHEDULED Land:', kidsCount - totalKidsCountLand);
     for (const kid of unscheduledKids) {
       console.log(kid);
     }
@@ -148,7 +165,9 @@ export class PrintLogs {
     notFullyScheduledLand9am: AllActivities[],
     notFullyScheduledLand10am: AllActivities[]
   ): void {
+    console.log("\n=============================")
     console.log('NOT FULLY SCHEDULED ACTIVITIES');
+    console.log("===============================")
     console.log('Water 9am:', notFullyScheduledWater9am);
     console.log('Water 10am:', notFullyScheduledWater10am);
     console.log('Land 9am:', notFullyScheduledLand9am);
@@ -165,6 +184,9 @@ export class PrintLogs {
     oppositesEqualWater9amTo10am: boolean,
     oppositesEqualWater10amTo9am: boolean,
   ): void {
+    console.log("\n========================================")
+    console.log("NAME COMPARISONS WATER 9AM TO WATER 10AM")
+    console.log("========================================")
     console.log(
       'STRINGIFY COMPARE WATER notScheduled9amWater.names == scheduled10amWater.names:',
       oppositesEqualWater9amTo10am
@@ -184,7 +206,10 @@ export class PrintLogs {
     equalWater9amToLand10am: boolean,
     equalWater10amToLand9am: boolean,
   ): void {
-    console.log('\nWater and Land opposite times should equal');
+    console.log("\n=========================")
+    console.log("NAME COMPARISONS WATER TO LAND")
+    console.log("=========================")
+    console.log('Water and Land opposite times should equal');
     console.log(
       'STRINGIFY COMPARE WATER to LAND this.scheduled9amWater.names == this.scheduled10amLand.names:',
       equalWater9amToLand10am
@@ -204,7 +229,7 @@ export class PrintLogs {
     * @returns {void}
     */
   static nameCountsByActivity(activityType: AllowedActivityTypes, schedule: Schedule): void {
-    console.log(`\n${activityType.toUpperCase()} LENGTHS TOTALS`);
+    console.log(`${activityType.toUpperCase()} LENGTHS TOTALS`);
     console.log('Kids total count / 2 = ', schedule.kids.count / 2);
     const notScheduledNames9am = schedule.getNotScheduledKidsList(activityType, '9am', false);
     const scheduledNames9am = schedule.getScheduledKidsList(activityType, '9am');
@@ -258,6 +283,9 @@ export class PrintLogs {
    * @param schedule
    */
   static nameCounts(activityType: AllowedActivityTypes | 'final log', schedule: Schedule): void {
+    console.log("\n=========================")
+    console.log(`NAME COUNTS - ${activityType.toUpperCase()}`)
+    console.log("=========================")
     if (activityType === 'water' || activityType === 'final log') {
       this.nameCountsByActivity('water', schedule);
     }
@@ -358,6 +386,10 @@ export class PrintLogs {
     activityType: AllowedActivityTypes | 'final log',
     schedule: Schedule
   ): void {
+    console.log("\n=========================")
+    console.log("OVERSCHEDULED ACTIVITIES")
+    console.log("=========================")
+
     if (activityType === 'water' || activityType === 'final log') {
       this.overScheduledByActivityAndTimeSlot('water', '9am', schedule);
       this.overScheduledByActivityAndTimeSlot('water', '10am', schedule);
@@ -414,6 +446,10 @@ export class PrintLogs {
     totalKidsCountWater: number,
     totalKidsCountLand: number
     ): void {
+      console.log("\n====================================")
+      console.log('KIDS TIMESLOT TO TOTAL KIDS COMPARISON');
+      console.log("======================================")
+
     if (activityType === 'final log') {
       this.kidsTimeSlotsToTotalKidsCountMatchByActivityType(
         'water', waterToKidsCount, waterTotalCount, totalKidsCountWater
