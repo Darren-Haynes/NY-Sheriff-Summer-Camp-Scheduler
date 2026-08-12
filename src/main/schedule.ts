@@ -2677,7 +2677,7 @@ export class Schedule {
     if (func_name == 'end log') {
       PrintLogs.notFullyScheduledActivities(notFullyScheduledWater9am, notFullyScheduledWater10am, notFullyScheduledLand9am, notFullyScheduledLand10am)
       PrintLogs.namesComparisonWater9amTo10am(oppositesEqualWater9amTo10am, oppositiesEqualWater10amTo9am)
-      PrintLogs.namesComparisonWater9amTo10am(equalWater9amToLand10am, equalWater10amToLand9am)
+      PrintLogs.namesComparisonWaterToLand(equalWater9amToLand10am, equalWater10amToLand9am)
     }
 
     const allTrue = [
