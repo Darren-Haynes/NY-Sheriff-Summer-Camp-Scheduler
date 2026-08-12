@@ -121,19 +121,19 @@ export class PrintLogs {
     unscheduledKids: UnscheduledKids[],
     allNotInTarget: boolean,
     allNamesEmpty: boolean): void {
-      console.log('\nTOTAL KIDS NOT SCHEDULED Water:', kidsCount - totalKidsCountWater);
-      console.log('\nTOTAL KIDS NOT SCHEDULED Land:', kidsCount - totalKidsCountLand);
-      for (const kid of unscheduledKids) {
-        console.log(kid);
-      }
+    console.log('\nTOTAL KIDS NOT SCHEDULED Water:', kidsCount - totalKidsCountWater);
+    console.log('\nTOTAL KIDS NOT SCHEDULED Land:', kidsCount - totalKidsCountLand);
+    for (const kid of unscheduledKids) {
+      console.log(kid);
+    }
 
-      if (logging) {
-        console.log(
-          'this.notScheduled9amWater.names !== this.notScheduled10amWater.names:',
-          allNotInTarget
-        );
-        console.log('this.notScheduledAllNamesWater.length === 0:', allNamesEmpty);
-      }
+    if (logging) {
+      console.log(
+        'this.notScheduled9amWater.names !== this.notScheduled10amWater.names:',
+        allNotInTarget
+      );
+      console.log('this.notScheduledAllNamesWater.length === 0:', allNamesEmpty);
+    }
   }
   /**
    *
@@ -193,5 +193,170 @@ export class PrintLogs {
       'STRINGIFY COMPARE WATER to Land this.scheduled10amWater.names == this.scheduled9amLand.names:',
       equalWater10amToLand9am
     );
+  }
+
+  /**
+    * Print the count of scheduled and not scheduled kids for a given activity type.
+    * This reveals if there was correct scheduling for list of names. E.g the number of
+    * kids scheduled for 9am water activities should match those scheduled for 10am land activities.
+    * @param {string} activityType - only 2 options: 'land' or 'water'.
+    * @param {Schedule} schedule - the schedule class object instance.
+    * @returns {void}
+    */
+  static nameCountsByActivity(activityType: AllowedActivityTypes, schedule: Schedule): void {
+    console.log(`\n${activityType.toUpperCase()} LENGTHS TOTALS`);
+    console.log('Kids total count / 2 = ', schedule.kids.count / 2);
+    const notScheduledNames9am = schedule.getNotScheduledKidsList(activityType, '9am', false);
+    const scheduledNames9am = schedule.getScheduledKidsList(activityType, '9am');
+    const notScheduledNames10am = schedule.getNotScheduledKidsList(activityType, '10am', false);
+    const scheduledNames10am = schedule.getScheduledKidsList(activityType, '10am');
+    const kidsCount9am =
+      activityType === 'water' ? schedule.kids.count : schedule.getScheduledKidsList('water', '9am').length;
+    const kidsCount10am =
+      activityType === 'water'
+        ? schedule.kids.count
+        : schedule.getScheduledKidsList('water', '10am').length;
+    const totalNamesLength9am =
+      notScheduledNames9am.length + scheduledNames9am.length == kidsCount10am;
+    const totalNamesLength10am =
+      notScheduledNames10am.length + scheduledNames10am.length == kidsCount9am;
+    console.log(
+      `${activityType} 9amTotalLength:`,
+      totalNamesLength9am,
+      '\n${activityType} 10amTotalLength:',
+      totalNamesLength10am
+    );
+    console.log(
+      `${activityType} 9am Unscheduled Names Length=`,
+      notScheduledNames9am.length,
+      `\n${activityType} 9am SCHEDULED Names Length=`,
+      scheduledNames9am.length
+    );
+    console.log(`${activityType} 9am unscheduled plus scheduled = `, totalNamesLength9am);
+    console.log(
+      `${activityType} 10am Unscheduled Names Length=`,
+      notScheduledNames10am.length,
+      `\n${activityType} 10am SCHEDULED Names Length=`,
+      scheduledNames10am.length
+    );
+    console.log(`${activityType} 10am unscheduled plus scheduled = `, totalNamesLength10am);
+    let totalScheduleCount =
+      notScheduledNames9am.length +
+      scheduledNames9am.length +
+      notScheduledNames10am.length +
+      scheduledNames10am.length;
+    if (activityType === 'water') totalScheduleCount /= 2;
+    console.log(
+      `total ${activityType} should be ${schedule.kids.count}; actual count = `,
+      totalScheduleCount
+    );
+  }
+
+  /**
+   * Wrapper for printNameCountsByActivity()
+   * @param activityType
+   * @param schedule
+   */
+  static nameCounts(activityType: AllowedActivityTypes | 'final log', schedule: Schedule): void {
+    if (activityType === 'water' || activityType === 'final log') {
+      this.nameCountsByActivity('water', schedule);
+    }
+    if (activityType === 'land' || activityType === 'final log') {
+      this.nameCountsByActivity('land', schedule);
+    }
+  }
+
+  /**
+   * Print activities that have less kids scheduled than the min allowed for that activity, if any.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {string} timeSlot - only 2 options -'9am' or '10am'
+   * @param {Schedule} schedule - instance of the Schedule class object
+   * @returns {void}
+   */
+  static underScheduledByActivityAndTimeSlot(
+    activityType: AllowedActivityTypes,
+    timeSlot: AllowedTimes,
+    schedule: Schedule
+    ): void {
+    const activityTypeTimeSlot = schedule.getActivityTypeTimeSlot(activityType, timeSlot);
+    const typedActivityTypeTimeSlot = activityTypeTimeSlot as Record<string, string[]>;
+    const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
+    console.log(`${activityType.toUpperCase()} ${timeSlot.toUpperCase()} UNDERSCHEDULED`);
+
+    for (const activity of Object.keys(typedActivityTypeTimeSlot)) {
+      const activityCount = typedActivityTypeTimeSlot[activity].length;
+      const minRange = ranges[activity as AllActivities][0];
+      if (activityCount < minRange && activityCount > 0) {
+        console.log(activity, 'has', activityCount, 'kids scheduled, min is', minRange);
+      }
+    }
+  }
+
+  /**
+   * Wrapper for printUnderScheduledByActivityAndTimeSlot()
+   * @param activityType
+   * @param schedule
+   */
+  static underScheduled(
+    activityType: AllowedActivityTypes | 'final log',
+    schedule: Schedule
+  ): void {
+    if (activityType === 'water' || activityType === 'final log') {
+      this.underScheduledByActivityAndTimeSlot('water', '9am', schedule);
+      this.underScheduledByActivityAndTimeSlot('water', '10am', schedule);
+    }
+    if (activityType === 'land' || activityType === 'final log') {
+      this.underScheduledByActivityAndTimeSlot('land', '9am', schedule);
+      this.underScheduledByActivityAndTimeSlot('land', '10am', schedule);
+    }
+  }
+
+  /**
+  * Print activities that have more kids scheduled than the max allowed for that activity, if any.
+  * @param {string} activityType - only 2 options: 'land' or 'water'.
+  * @param {string} timeSlot - only 2 options -'9am' or '10am'
+  * @param {Schedule} schedule - instance of the Schedule class object
+  * @returns {void}
+  */
+  static overScheduledByActivityAndTimeSlot(
+    activityType: AllowedActivityTypes,
+    timeSlot: AllowedTimes,
+    schedule: Schedule
+  ): void {
+    const activityTypeTimeSlot = schedule.getActivityTypeTimeSlot(activityType, timeSlot);
+    const typedActivityTypeTimeSlot = activityTypeTimeSlot as Record<string, string[]>;
+    const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
+    console.log(`${activityType.toUpperCase()} ${timeSlot.toUpperCase()} OVERSCHEDULED`);
+    let overScheduled = false;
+    for (const activity of Object.keys(typedActivityTypeTimeSlot)) {
+      const activityCount = typedActivityTypeTimeSlot[activity].length;
+      const maxRange = ranges[activity as AllActivities][1];
+      if (activityCount > maxRange) {
+        overScheduled = true;
+        console.log(activity, 'has', activityCount, 'kids scheduled, max is', maxRange);
+      }
+    }
+    if (!overScheduled) {
+      console.log('No activities over scheduled');
+    }
+  }
+
+  /**
+   * Wrapper for printOverScheduledByActivityAndTimeSlot()
+   * @param activityType
+   * @param schedule
+   */
+  static overScheduled(
+    activityType: AllowedActivityTypes | 'final log',
+    schedule: Schedule
+  ): void {
+    if (activityType === 'water' || activityType === 'final log') {
+      this.overScheduledByActivityAndTimeSlot('water', '9am', schedule);
+      this.overScheduledByActivityAndTimeSlot('water', '10am', schedule);
+    }
+    if (activityType === 'land' || activityType === 'final log') {
+      this.overScheduledByActivityAndTimeSlot('land', '9am', schedule);
+      this.overScheduledByActivityAndTimeSlot('land', '10am', schedule);
+    }
   }
 }
