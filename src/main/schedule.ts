@@ -1,6 +1,6 @@
 import { Activities } from './activities';
 import { Kids } from './kids';
-import { ScheduleTester } from './schedule-tester';
+import { ScheduleChecker } from './schedule-checker';
 import {
   NotScheduledLand,
   NotScheduledWater,
@@ -3084,18 +3084,18 @@ export class Schedule {
    * Get the land and water percentages of scheduled kids.
    * @returns {object}
    */
-  private stats(): boolean {
-    const scheduleTester = new ScheduleTester(this)
-    const checkPercentage = scheduleTester.checkPercentages()
+  private checkScheduling(): boolean {
+    const scheduleChecker = new ScheduleChecker(this)
+    const checkPercentage = scheduleChecker.checkPercentages()
 
-    const notScheduledToScheduled = scheduleTester.testUnscheduledToScheduled();
+    const notScheduledToScheduled = scheduleChecker.checkUnscheduledToScheduled();
 
     const testSchedulingWater = this.testScheduling('water', 'no func', false);
     const testSchedulingLand = this.testScheduling('land', 'no func', false);
-    const printUnderScheduledWater9am = scheduleTester.checkUnderScheduled('water', '9am');
-    const printUnderScheduledLand9am = scheduleTester.checkUnderScheduled('land', '9am');
-    const printUnderScheduledWater10am = scheduleTester.checkUnderScheduled('water', '10am');
-    const printUnderScheduledLand10am = scheduleTester.checkUnderScheduled('land', '10am');
+    const printUnderScheduledWater9am = scheduleChecker.checkUnderScheduled('water', '9am');
+    const printUnderScheduledLand9am = scheduleChecker.checkUnderScheduled('land', '9am');
+    const printUnderScheduledWater10am = scheduleChecker.checkUnderScheduled('water', '10am');
+    const printUnderScheduledLand10am = scheduleChecker.checkUnderScheduled('land', '10am');
 
     const allTrue = [
       checkPercentage,
@@ -3191,6 +3191,6 @@ export class Schedule {
     }
 
     // this.testScheduling('final log', 'end log', true);
-    return this.stats();
+    return this.checkScheduling();
   }
 }

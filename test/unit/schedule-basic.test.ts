@@ -1,7 +1,6 @@
 import { describe, expect, test, vi, beforeAll, afterAll } from 'vitest';
 import { Kids } from '../../src/main/kids';
 import { Schedule } from '../../src/main/schedule';
-import { ScheduleTester } from '../../src/main/schedule-tester';
 
 const HEADER =
   ['First', 'Last', 'X', 'Land1', 'Land2', 'Land3', 'Water1', 'Water2', 'Water3'].join('\t') + '\n';
@@ -205,7 +204,7 @@ describe('Schedule mutator basics', () => {
       scheduler.scheduled9amWater.names = [];
       scheduler.notScheduled9amWater.names = [];
 
-      const result = (scheduler as any).stats();
+      const result = (scheduler as any).checkScheduling();
       expect(result).toBe(false);
     });
 
@@ -228,7 +227,7 @@ describe('Schedule mutator basics', () => {
 
       const logSpy = vi.spyOn(console, 'log').mockImplementation(() => { });
 
-      const result = (scheduler as any).stats();
+      const result = (scheduler as any).checkScheduling();
 
       expect(logSpy).toHaveBeenCalled();
       expect(result).toBe(false);
@@ -252,7 +251,7 @@ describe('Schedule mutator basics', () => {
 
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => { });
 
-    const result = (scheduler as any).stats();
+    const result = (scheduler as any).checkScheduling();
 
     expect(logSpy).toHaveBeenCalled();
     expect(result).toBe(false);
@@ -267,10 +266,10 @@ describe('Schedule mutator basics', () => {
 
     // Intercept the inner utility checker method to simulate a failure on one specific time slot.
     // This breaks the .every() evaluation loop naturally.
-    vi.spyOn(scheduler as any, 'stats').mockReturnValue(false);
+    vi.spyOn(scheduler as any, 'checkScheduling').mockReturnValue(false);
 
     // Invoke the orchestration wrapper method directly
-    const result = (scheduler as any).stats();
+    const result = (scheduler as any).checkScheduling();
 
     // Verify that the early exit guard rail statement executed successfully
     expect(result).toBe(false);

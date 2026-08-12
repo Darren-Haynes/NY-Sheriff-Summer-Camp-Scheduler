@@ -2,7 +2,7 @@ import { Activities } from './activities';
 import { AllActivities, AllowedActivityTypes, AllowedTimes } from '../types/schedule-types'
 import type { Schedule } from './schedule'
 
-export class ScheduleTester {
+export class ScheduleChecker {
   schedule: Schedule
 
   constructor(schedule: Schedule) {
@@ -55,12 +55,12 @@ export class ScheduleTester {
     }
 
   /**
-   * Tests that the number of unscheduled kids and activities matches the number of scheduled kids and activities for a given activity type and time slot.
+   * Checks that the number of unscheduled kids and activities matches the number of scheduled kids and activities for a given activity type and time slot.
    * @param {AllowedActivityTypes} activityType - only 2 options: 'land' or 'water'.
    * @param {AllowedTimes} timeSlot - only 2 options: '9am' or '10am'.
    * @returns {boolean} - true if the number of unscheduled kids and activities matches the number of scheduled kids and activities, false otherwise.
    */
-  private testUnscheduledToScheduledActivityTypeTime(
+  private checkUnscheduledToScheduledActivityTypeTime(
     activityType: AllowedActivityTypes,
     timeSlot: AllowedTimes,
   ): boolean {
@@ -107,15 +107,15 @@ export class ScheduleTester {
     return true;
   }
 
-  testUnscheduledToScheduled(): boolean {
-    const allScheduleTests: boolean[] = [
-      this.testUnscheduledToScheduledActivityTypeTime('water', '9am'),
-      this.testUnscheduledToScheduledActivityTypeTime('water', '10am'),
-      this.testUnscheduledToScheduledActivityTypeTime('land', '9am'),
-      this.testUnscheduledToScheduledActivityTypeTime('land', '10am'),
+  checkUnscheduledToScheduled(): boolean {
+    const allScheduleChecks: boolean[] = [
+      this.checkUnscheduledToScheduledActivityTypeTime('water', '9am'),
+      this.checkUnscheduledToScheduledActivityTypeTime('water', '10am'),
+      this.checkUnscheduledToScheduledActivityTypeTime('land', '9am'),
+      this.checkUnscheduledToScheduledActivityTypeTime('land', '10am'),
     ];
 
-    const result = allScheduleTests.every(test => test === true);
+    const result = allScheduleChecks.every(check => check === true);
 
     if (!result && process.env.NODE_ENV !== 'production') {
       console.log('Unscheduled kids & activities count to scheduled kids & activities mismatch.');
