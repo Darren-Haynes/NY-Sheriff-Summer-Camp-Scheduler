@@ -2390,9 +2390,6 @@ export class Schedule {
   ): boolean {
     if (logging) {
       PrintLogs.initialStatement(activityType, func_name)
-    }
-
-    if (logging) {
       PrintLogs.unscheduledDataSwitch(activityType, this)
     }
 
@@ -2400,8 +2397,6 @@ export class Schedule {
     const totalKidsCountLand = this.kids.count - this.notScheduledAllNamesLand.length;
 
     let waterTotalCount = 0;
-    let water9amTotalCount = 0;
-    let water10amTotalCount = 0;
     const unscheduleKids: UnscheduledKids[] = [];
     const water9amActivityCount = {
       fish: 0,
@@ -2426,11 +2421,11 @@ export class Schedule {
       if (timeSlots !== undefined) {
         if (timeSlots.timeSlots.water9am) {
           water9amActivityCount[timeSlots.timeSlots.water9am] += 1;
-          water9amTotalCount += 1;
+          waterTotalCount += 1;
         }
         if (timeSlots.timeSlots.water10am) {
           water10amActivityCount[timeSlots.timeSlots.water10am] += 1;
-          water10amTotalCount += 1;
+          waterTotalCount += 1;
         }
         let nullCount = 0;
         if (timeSlots.timeSlots.water9am === null) {
@@ -2450,8 +2445,6 @@ export class Schedule {
         }
       }
     }
-
-    waterTotalCount = water9amTotalCount + water10amTotalCount;
 
     const water9amActivityCountAlt = {
       fish: 0,
@@ -2482,45 +2475,23 @@ export class Schedule {
 
     const keys1 = Object.keys(water9amActivityCountAlt).sort();
     const keys2 = Object.keys(water9amActivityCount).sort();
-    const equalObjects9am = keys1.every(
+    const equalObjects9amWater = keys1.every(
       (key, index) =>
         key === keys2[index] &&
         water9amActivityCountAlt[key as WaterActivities] ===
         water9amActivityCount[key as WaterActivities]
     );
 
-    if (logging) {
-      if (activityType === 'water' || activityType === 'final log') {
-        if (equalObjects9am) {
-          console.log('WATER 9AM objects ARE EQUAL');
-        } else {
-          console.log('WATER 9AM objects ARE not EQUAL!');
-        }
-      }
-    }
-
     const keys1a = Object.keys(water10amActivityCountAlt).sort();
     const keys2a = Object.keys(water10amActivityCount).sort();
-    const equalObjects10am = keys1a.every(
+    const equalObjects10amWater = keys1a.every(
       (key, index) =>
         key === keys2a[index] &&
         water10amActivityCountAlt[key as WaterActivities] ===
         water10amActivityCount[key as WaterActivities]
     );
 
-    if (logging) {
-      if (activityType === 'water' || activityType === 'final log') {
-        if (equalObjects10am) {
-          console.log('WATER 10AM objects ARE EQUAL');
-        } else {
-          console.log('WATER 10AM objects ARE not EQUAL!');
-        }
-      }
-    }
-
     let landTotalCount = 0;
-    let land9amTotalCount = 0;
-    let land10amTotalCount = 0;
     const land9amActivityCount: LandCount9am = {
       art: 0,
       hike: 0,
@@ -2546,11 +2517,11 @@ export class Schedule {
       if (timeSlots !== undefined) {
         if (timeSlots.timeSlots.land9am) {
           land9amActivityCount[timeSlots.timeSlots.land9am] += 1;
-          land9amTotalCount += 1;
+          landTotalCount += 1;
         }
         if (timeSlots.timeSlots.land10am) {
           land10amActivityCount[timeSlots.timeSlots.land10am] += 1;
-          land10amTotalCount += 1;
+          landTotalCount += 1;
         }
         let nullCount = 0;
         if (timeSlots.timeSlots.water9am === null) {
@@ -2570,8 +2541,6 @@ export class Schedule {
         }
       }
     }
-
-    landTotalCount = land9amTotalCount + land10amTotalCount;
 
     const land9amActivityCountAlt: LandCount9am = {
       art: 0,
@@ -2607,16 +2576,6 @@ export class Schedule {
         key === keys2Land[index] && land9amActivityCountAlt[key] === land9amActivityCount[key]
     );
 
-    if (logging) {
-      if (activityType === 'land' || activityType === 'final log') {
-        if (equalObjects9amLand) {
-          console.log('LAND 9AM objects ARE EQUAL');
-        } else {
-          console.log('LAND 9AM objects ARE not EQUAL!');
-        }
-      }
-    }
-
     const keys1aLand = Object.keys(land10amActivityCountAlt).sort();
     const keys2aLand = Object.keys(land10amActivityCount).sort();
     const equalObjects10amLand = keys1aLand.every(
@@ -2625,14 +2584,9 @@ export class Schedule {
     );
 
     if (logging) {
-      if (activityType === 'land' || activityType === 'final log') {
-        if (equalObjects10amLand) {
-          console.log('LAND 10AM objects ARE EQUAL');
-        } else {
-          console.log('LAND 10AM objects ARE not EQUAL!');
-        }
-      }
+      PrintLogs.equalObjects(activityType, equalObjects9amWater, equalObjects10amWater, equalObjects9amLand, equalObjects10amLand)
     }
+
     if (logging) {
       PrintLogs.nameCounts(activityType, this)
       PrintLogs.overScheduled(activityType, this)
@@ -2681,8 +2635,8 @@ export class Schedule {
     }
 
     const allTrue = [
-      equalObjects9am,
-      equalObjects10am,
+      equalObjects9amWater,
+      equalObjects10amWater,
       equalObjects9amLand,
       equalObjects10amLand,
       !waterToKidsCount,
@@ -2848,8 +2802,13 @@ export class Schedule {
 
     const notScheduledToScheduled = scheduleChecker.checkUnscheduledToScheduled();
 
-    const testSchedulingWater = this.testScheduling('water', 'no func', false);
-    const testSchedulingLand = this.testScheduling('land', 'no func', false);
+    // Only print testscheduling logs during development.
+    let printLogs = false;
+    if (process.env.NODE_ENV !== 'production') {
+      printLogs = true
+    }
+    const testSchedulingWater = this.testScheduling('water', 'no func', printLogs);
+    const testSchedulingLand = this.testScheduling('land', 'no func', printLogs);
     const printUnderScheduledWater9am = scheduleChecker.checkUnderScheduled('water', '9am');
     const printUnderScheduledLand9am = scheduleChecker.checkUnderScheduled('land', '9am');
     const printUnderScheduledWater10am = scheduleChecker.checkUnderScheduled('water', '10am');
@@ -2860,7 +2819,6 @@ export class Schedule {
       notScheduledToScheduled,
       testSchedulingWater,
       testSchedulingLand,
-      // uncomment the logging in the 4 methods below for debugging
       printUnderScheduledWater9am,
       printUnderScheduledLand9am,
       printUnderScheduledWater10am,
@@ -2948,10 +2906,13 @@ export class Schedule {
       this.calculateChoicesPercentages('water')
     }
 
-    this.testScheduling('final log', 'end log', true);
+    const scheduleCheckResult = this.checkScheduling();
+
     if (process.env.NODE_ENV !== 'production') {
+      this.testScheduling('final log', 'end log', true);
       PrintLogs.endStatement('final log', 'end log');
     }
-    return this.checkScheduling();
+
+    return scheduleCheckResult;
   }
 }

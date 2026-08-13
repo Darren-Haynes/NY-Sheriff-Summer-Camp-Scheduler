@@ -12,7 +12,7 @@ import type { Schedule } from "./schedule"
 export class PrintLogs {
 
   /**
-   *
+   * Cleary show start of print logs
    * @param activityType - only 2 options 'land' or 'water'.
    * @param func_name  - name of scheduling function being called.
    */
@@ -29,6 +29,11 @@ export class PrintLogs {
     console.log('--------------------------------------\n');
   }
 
+  /**
+   * Cleary show end of print logs
+   * @param activityType - only 2 options 'land' or 'water'.
+   * @param func_name  - name of scheduling function being called.
+   */
   static endStatement(
     activityType: AllowedActivityTypes | 'final log',
     func_name: string,
@@ -248,7 +253,7 @@ export class PrintLogs {
     console.log(
       `${activityType} 9amTotalLength:`,
       totalNamesLength9am,
-      '\n${activityType} 10amTotalLength:',
+      `\n${activityType} 10amTotalLength:`,
       totalNamesLength10am
     );
     console.log(
@@ -414,7 +419,6 @@ export class PrintLogs {
     activityTotalCount: number,
     kidsActivityTotalCount: number
   ): void {
-    if (activityType === 'water' || activityType === 'final log') {
       console.log(`${activityType} totals:`);
       if (kidsCount) {
         console.log(
@@ -426,7 +430,6 @@ export class PrintLogs {
           `${activityType} Scheduled # MATCHES: this.Kids.timeSlots == this.kids.totalKidsCount: `
         );
         console.log(activityTotalCount, '==', kidsActivityTotalCount);
-      }
     }
   }
 
@@ -467,6 +470,60 @@ export class PrintLogs {
       this.kidsTimeSlotsToTotalKidsCountMatchByActivityType(
         'land', landToKidsCount, landTotalCount, totalKidsCountLand
       )
+    }
+  }
+
+  /**
+   * Prints if the equal objects match. Equal meaning that there are 2 diff ways that kids
+   * schedule info are stored and they need to match.
+   * @param objectsEqual9am - boolean result of previous test of the 2 objects
+   * @param objectsEqual10am - boolean result of previous test of the 2 objects
+   * @param activityTypeWaterLandOnly - 'water' or 'land' only options
+   */
+  static equalObjectsByActivityType(
+    objectsEqual9am: boolean,
+    objectsEqual10am: boolean,
+    activityTypeWaterLandOnly: AllowedActivityTypes
+    ): void {
+    console.log("\n========================================")
+    console.log(`EQUAL OBJECTS ${activityTypeWaterLandOnly.toUpperCase()}`);
+    console.log("========================================")
+    if (objectsEqual9am) {
+      console.log(`${activityTypeWaterLandOnly} 9AM objects ARE EQUAL`);
+    } else {
+      console.log(`${activityTypeWaterLandOnly} 9AM objects ARE NOT EQUAL!`);
+    }
+    if (objectsEqual10am) {
+      console.log(`${activityTypeWaterLandOnly} 10AM objects ARE EQUAL`);
+    } else {
+      console.log(`${activityTypeWaterLandOnly} 10AM objects ARE NOT EQUAL!`);
+    }
+  }
+
+  /**
+   * Wrapper for equalObjectsByActivityType()
+   * @param activityType - 'water' of 'land' only
+   * @param objectsEqual9amWater - boolean result of previous test of the 2 objects
+   * @param objectsEqual10amWater - boolean result of previous test of the 2 objects
+   * @param objectsEqual9amLand - boolean result of previous test of the 2 objects
+   * @param objectsEqual10amLand - boolean result of previous test of the 2 objects
+   */
+  static equalObjects(
+    activityType: AllowedActivityTypes | 'final log',
+    objectsEqual9amWater: boolean,
+    objectsEqual10amWater: boolean,
+    objectsEqual9amLand: boolean,
+    objectsEqual10amLand: boolean,
+    ): void {
+    if (activityType === 'water') {
+      this.equalObjectsByActivityType(objectsEqual9amWater, objectsEqual10amWater, 'water')
+    }
+    if (activityType === 'land') {
+      this.equalObjectsByActivityType(objectsEqual9amLand, objectsEqual10amLand, 'land')
+    }
+    if (activityType === 'final log') {
+      this.equalObjectsByActivityType(objectsEqual9amWater, objectsEqual10amWater, 'water')
+      this.equalObjectsByActivityType(objectsEqual9amLand, objectsEqual10amLand, 'land')
     }
   }
 }
