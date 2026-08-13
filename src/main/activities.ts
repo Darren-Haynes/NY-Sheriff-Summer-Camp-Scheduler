@@ -145,5 +145,26 @@ export const Activities: CampActivities = Object.freeze({
     kayak: 0,
     sail: 0,
     swim: 0,
+  },
+
+  land9amActivities0Count: {
+    art: 0,
+    hike: 0,
+    bball: 0,
+    cheer: 0,
+    soc: 0,
+    vball: 0,
+    arch: 0,
+  },
+
+  land10amActivities0Count: {
+    fris: 0,
+    art: 0,
+    hike: 0,
+    pball: 0,
+    fball: 0,
+    lax: 0,
+    yoga: 0,
+    arch: 0,
   }
 });
