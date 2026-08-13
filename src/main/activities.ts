@@ -136,4 +136,14 @@ export const Activities: CampActivities = Object.freeze({
     yoga: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
     fris: { total: 0, choice1: 0, choice2: 0, choice3: 0 },
   },
+
+  waterActivities0Count: {
+    fish: 0,
+    pboard: 0,
+    snork: 0,
+    canoe: 0,
+    kayak: 0,
+    sail: 0,
+    swim: 0,
+  }
 });

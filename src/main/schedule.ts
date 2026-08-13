@@ -2397,35 +2397,20 @@ export class Schedule {
     const totalKidsCountLand = this.kids.count - this.notScheduledAllNamesLand.length;
 
     let waterTotalCount = 0;
-    const unscheduleKids: UnscheduledKids[] = [];
-    const water9amActivityCount = {
-      fish: 0,
-      pboard: 0,
-      snork: 0,
-      canoe: 0,
-      kayak: 0,
-      sail: 0,
-      swim: 0,
-    };
-    const water10amActivityCount = {
-      fish: 0,
-      pboard: 0,
-      snork: 0,
-      canoe: 0,
-      kayak: 0,
-      sail: 0,
-      swim: 0,
-    };
+    const unscheduledKids: UnscheduledKids[] = [];
+    const water9amActivityTimeSlotsCount = structuredClone(Activities.waterActivities0Count);
+    const water10amActivityTimeSlotsCount = structuredClone(Activities.waterActivities0Count);
+
     for (const name of this.kids.names) {
       const timeSlots = this.schedule.get(name);
       if (timeSlots !== undefined) {
         if (timeSlots.timeSlots.water9am) {
-          water9amActivityCount[timeSlots.timeSlots.water9am] += 1;
+          water9amActivityTimeSlotsCount[timeSlots.timeSlots.water9am] += 1;
           waterTotalCount += 1;
         }
         if (timeSlots.timeSlots.water10am) {
-          water10amActivityCount[timeSlots.timeSlots.water10am] += 1;
-          waterTotalCount += 1;
+          water10amActivityTimeSlotsCount
+            [timeSlots.timeSlots.water10am] += 1; waterTotalCount += 1;
         }
         let nullCount = 0;
         if (timeSlots.timeSlots.water9am === null) {
@@ -2441,55 +2426,39 @@ export class Schedule {
           nullCount += 1;
         }
         if (nullCount === 4) {
-          unscheduleKids.push({ name: name, timeSlot: timeSlots.timeSlots });
+          unscheduledKids.push({ name: name, timeSlot: timeSlots.timeSlots });
         }
       }
     }
 
-    const water9amActivityCountAlt = {
-      fish: 0,
-      pboard: 0,
-      snork: 0,
-      canoe: 0,
-      kayak: 0,
-      sail: 0,
-      swim: 0,
-    };
-    const water10amActivityCountAlt = {
-      fish: 0,
-      pboard: 0,
-      snork: 0,
-      canoe: 0,
-      kayak: 0,
-      sail: 0,
-      swim: 0,
-    };
+    const water9amActivityWaterActivityCount = structuredClone(Activities.waterActivities0Count);
+    const water10amActivityWaterActivityCount = structuredClone(Activities.waterActivities0Count);
     for (const activity in this.water9am) {
       const typedActivity = activity as WaterActivities;
-      water9amActivityCountAlt[typedActivity] = this.water9am[typedActivity].length;
+      water9amActivityWaterActivityCount[typedActivity] = this.water9am[typedActivity].length;
     }
     for (const activity in this.water10am) {
       const typedActivity = activity as WaterActivities;
-      water10amActivityCountAlt[typedActivity] = this.water10am[typedActivity].length;
+      water10amActivityWaterActivityCount[typedActivity] = this.water10am[typedActivity].length;
     }
 
-    const keys1 = Object.keys(water9amActivityCountAlt).sort();
-    const keys2 = Object.keys(water9amActivityCount).sort();
+    const keys1 = Object.keys(water9amActivityWaterActivityCount).sort();
+    const keys2 = Object.keys(water9amActivityTimeSlotsCount).sort();
     const equalObjects9amWater = keys1.every(
       (key, index) =>
         key === keys2[index] &&
-        water9amActivityCountAlt[key as WaterActivities] ===
-        water9amActivityCount[key as WaterActivities]
+        water9amActivityWaterActivityCount[key as WaterActivities] ===
+        water9amActivityTimeSlotsCount[key as WaterActivities]
     );
 
-    const keys1a = Object.keys(water10amActivityCountAlt).sort();
-    const keys2a = Object.keys(water10amActivityCount).sort();
-    const equalObjects10amWater = keys1a.every(
+    const keys1a = Object.keys(water10amActivityWaterActivityCount).sort();
+    const keys2a = Object.keys(water10amActivityTimeSlotsCount
+    ).sort(); const equalObjects10amWater = keys1a.every(
       (key, index) =>
         key === keys2a[index] &&
-        water10amActivityCountAlt[key as WaterActivities] ===
-        water10amActivityCount[key as WaterActivities]
-    );
+        water10amActivityWaterActivityCount[key as WaterActivities] ===
+        water10amActivityTimeSlotsCount
+        [key as WaterActivities] );
 
     let landTotalCount = 0;
     const land9amActivityCount: LandCount9am = {
@@ -2537,7 +2506,7 @@ export class Schedule {
           nullCount += 1;
         }
         if (nullCount === 4) {
-          unscheduleKids.push({ name: name, timeSlot: timeSlots.timeSlots });
+          unscheduledKids.push({ name: name, timeSlot: timeSlots.timeSlots });
         }
       }
     }
@@ -2606,7 +2575,7 @@ export class Schedule {
     const allNamesEmpty = this.notScheduledAllNamesWater.length === 0;
 
     if (func_name == 'end log') {
-      PrintLogs.kidsNotScheduled(this.kids.count, totalKidsCountWater, totalKidsCountLand, logging, unscheduleKids, allNotInTarget, allNamesEmpty)
+      PrintLogs.kidsNotScheduled(this.kids.count, totalKidsCountWater, totalKidsCountLand, logging, unscheduledKids, allNotInTarget, allNamesEmpty)
     }
 
     const notFullyScheduledWater9am = this.getInsufficientlyScheduledActivites('water', '9am');

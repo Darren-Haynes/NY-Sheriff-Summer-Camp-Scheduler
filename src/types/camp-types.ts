@@ -15,6 +15,7 @@ export type CampActivities = {
   waterRanges: WaterRanges;
   waterActivitiesChoiceCount: WaterActivityCounts;
   landActivitiesChoiceCount: LandActivityCounts;
+  waterActivities0Count: WaterActivities0Count;
 };
 
 type LandRangeType = [number, number, number];
@@ -123,3 +124,13 @@ export type AllLandWaterKids9am10am = {
   lax?: Array<string>;
   yoga?: Array<string>;
 };
+
+export type WaterActivities0Count = {
+  fish: number;
+  pboard: number;
+  snork: number;
+  canoe: number;
+  kayak: number;
+  sail: number;
+  swim: number;
+}
