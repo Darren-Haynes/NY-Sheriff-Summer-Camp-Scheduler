@@ -1,14 +1,60 @@
 import { Activities } from './activities';
 import { AllActivities, AllowedActivityTypes, AllowedTimes } from '../types/schedule-types'
+import { WaterActivities0Count } from '../types/camp-types';
 import type { Schedule } from './schedule'
+import { UnscheduledKids } from '../types/kids-types';
 
 export class ScheduleChecker {
   schedule: Schedule
+  waterTotalCount: number
+  unscheduledKids: UnscheduledKids[]
+  water9amActivityTimeSlotsCount: WaterActivities0Count;
+  water10amActivityTimeSlotsCount: WaterActivities0Count;
 
   constructor(schedule: Schedule) {
     this.schedule = schedule
+    this.waterTotalCount = 0;
+    this.unscheduledKids = []; // all kids should be schedule - so this should remain empty for a valid run
+    this.water9amActivityTimeSlotsCount = structuredClone(Activities.waterActivities0Count);
+    this.water10amActivityTimeSlotsCount = structuredClone(Activities.waterActivities0Count);
   }
 
+  /**
+   * Count how many kids are assigned to each water activity bia timeSlots data.
+   * Count how many kids total are assigned to water activities.
+   * Add kids to unscheduled list if someone hasn't been scheduled.
+   */
+  createWaterTimeSlotsData(): void {
+    for (const name of this.schedule.kids.names) {
+      const timeSlots = this.schedule.schedule.get(name);
+      if (timeSlots !== undefined) {
+        if (timeSlots.timeSlots.water9am) {
+          this.water9amActivityTimeSlotsCount[timeSlots.timeSlots.water9am] += 1;
+          this.waterTotalCount += 1;
+        }
+        if (timeSlots.timeSlots.water10am) {
+          this.water10amActivityTimeSlotsCount
+            [timeSlots.timeSlots.water10am] += 1; this.waterTotalCount += 1;
+        }
+        let nullCount = 0;
+        if (timeSlots.timeSlots.water9am === null) {
+          nullCount += 1;
+        }
+        if (timeSlots.timeSlots.water10am === null) {
+          nullCount += 1;
+        }
+        if (timeSlots.timeSlots.land9am === null) {
+          nullCount += 1;
+        }
+        if (timeSlots.timeSlots.land10am === null) {
+          nullCount += 1;
+        }
+        if (nullCount === 4) {
+          this.unscheduledKids.push({ name: name, timeSlot: timeSlots.timeSlots });
+        }
+      }
+    }
+  }
     /**
      * Print activities that have less kids scheduled than the min allowed for that activity, if any.
      * @param {string} activityType - only 2 options: 'land' or 'water'.
