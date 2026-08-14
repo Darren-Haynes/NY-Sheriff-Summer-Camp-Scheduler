@@ -1,5 +1,5 @@
 import { Activities } from './activities';
-import { AllActivities, AllowedActivityTypes, AllowedTimes } from '../types/schedule-types'
+import { AllActivities, AllowedActivityTypes, AllowedTimes, WaterActivities } from '../types/schedule-types'
 import { WaterActivities0Count } from '../types/camp-types';
 import type { Schedule } from './schedule'
 import { UnscheduledKids } from '../types/kids-types';
@@ -10,6 +10,8 @@ export class ScheduleChecker {
   unscheduledKids: UnscheduledKids[]
   water9amActivityTimeSlotsCount: WaterActivities0Count;
   water10amActivityTimeSlotsCount: WaterActivities0Count;
+  water9amWaterActivityCount: WaterActivities0Count;
+  water10amWaterActivityCount: WaterActivities0Count;
 
   constructor(schedule: Schedule) {
     this.schedule = schedule
@@ -17,10 +19,28 @@ export class ScheduleChecker {
     this.unscheduledKids = []; // all kids should be schedule - so this should remain empty for a valid run
     this.water9amActivityTimeSlotsCount = structuredClone(Activities.waterActivities0Count);
     this.water10amActivityTimeSlotsCount = structuredClone(Activities.waterActivities0Count);
+    this.water9amWaterActivityCount = structuredClone(Activities.waterActivities0Count);
+    this.water10amWaterActivityCount = structuredClone(Activities.waterActivities0Count);
   }
 
   /**
-   * Count how many kids are assigned to each water activity bia timeSlots data.
+   * Count how many kids are assigned to each water activity via WaterActivities data.
+   * Count how many kids total are assigned to water activities.
+   * Add kids to unscheduled list if someone hasn't been scheduled.
+   */
+  createWaterActivityData(): void {
+    for (const activity in this.schedule.water9am) {
+      const typedActivity = activity as WaterActivities;
+      this.water9amWaterActivityCount[typedActivity] = this.schedule.water9am[typedActivity].length;
+    }
+    for (const activity in this.schedule.water10am) {
+      const typedActivity = activity as WaterActivities;
+      this.water10amWaterActivityCount[typedActivity] = this.schedule.water10am[typedActivity].length;
+    }
+  }
+
+  /**
+   * Count how many kids are assigned to each water activity via timeSlots data.
    * Count how many kids total are assigned to water activities.
    * Add kids to unscheduled list if someone hasn't been scheduled.
    */

@@ -2397,34 +2397,24 @@ export class Schedule {
     const totalKidsCountWater = this.kids.count - this.notScheduledAllNamesWater.length;
     const totalKidsCountLand = this.kids.count - this.notScheduledAllNamesLand.length;
 
-    scheduleChecker.createWaterTimeSlotsData()
+    scheduleChecker.createWaterTimeSlotsData();
+    scheduleChecker.createWaterActivityData();
 
-    const water9amActivityWaterActivityCount = structuredClone(Activities.waterActivities0Count);
-    const water10amActivityWaterActivityCount = structuredClone(Activities.waterActivities0Count);
-    for (const activity in this.water9am) {
-      const typedActivity = activity as WaterActivities;
-      water9amActivityWaterActivityCount[typedActivity] = this.water9am[typedActivity].length;
-    }
-    for (const activity in this.water10am) {
-      const typedActivity = activity as WaterActivities;
-      water10amActivityWaterActivityCount[typedActivity] = this.water10am[typedActivity].length;
-    }
-
-    const keys1 = Object.keys(water9amActivityWaterActivityCount).sort();
+    const keys1 = Object.keys(scheduleChecker.water9amWaterActivityCount).sort();
     const keys2 = Object.keys(scheduleChecker.water9amActivityTimeSlotsCount).sort();
     const equalObjects9amWater = keys1.every(
       (key, index) =>
         key === keys2[index] &&
-        water9amActivityWaterActivityCount[key as WaterActivities] ===
+        scheduleChecker.water9amWaterActivityCount[key as WaterActivities] ===
         scheduleChecker.water9amActivityTimeSlotsCount[key as WaterActivities]
     );
 
-    const keys1a = Object.keys(water10amActivityWaterActivityCount).sort();
+    const keys1a = Object.keys(scheduleChecker.water10amWaterActivityCount).sort();
     const keys2a = Object.keys(scheduleChecker.water10amActivityTimeSlotsCount
     ).sort(); const equalObjects10amWater = keys1a.every(
       (key, index) =>
         key === keys2a[index] &&
-        water10amActivityWaterActivityCount[key as WaterActivities] ===
+        scheduleChecker.water10amWaterActivityCount[key as WaterActivities] ===
         scheduleChecker.water10amActivityTimeSlotsCount
         [key as WaterActivities] );
 
