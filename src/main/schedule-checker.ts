@@ -1,5 +1,5 @@
 import { Activities } from './activities';
-import { AllActivities, AllowedActivityTypes, AllowedTimes, WaterActivities } from '../types/schedule-types'
+import { AllActivities, AllowedActivityTimes, AllowedActivityTypes, AllowedTimes, Allowed9and10Only, WaterActivities } from '../types/schedule-types'
 import { WaterActivities0Count } from '../types/camp-types';
 import type { Schedule } from './schedule'
 import { UnscheduledKids } from '../types/kids-types';
@@ -75,6 +75,67 @@ export class ScheduleChecker {
       }
     }
   }
+
+  /**
+   * Get the right activityCount object. This function stops us having to create
+   * compareEqualObjects() function 4 different times.
+   * @param activityType 'water' or 'land'
+   * @param activityTime '9am' or '10am'
+   * @param objectType 'activityCount' or 'timeSlotsCount'
+   * @returns activityCount object
+   */
+  private getActivityCountObject(
+    activityType: AllowedActivityTypes,
+    activityTime: Allowed9and10Only,
+    objectType: any
+    ): any {
+    if (activityTime === '9am') {
+      if (activityType === 'water') {
+        if (objectType === 'activityCount') {
+          return this.water9amWaterActivityCount
+        } else {
+          return this.water9amActivityTimeSlotsCount
+        }
+      } else {
+        if (objectType === 'activityCount') {
+          return "tbd"
+        }
+      }
+    }
+
+    if (activityTime === '10am') {
+      if (activityType === 'water') {
+        if (objectType === 'activityCount') {
+          return this.water10amWaterActivityCount
+        } else {
+          return this.water10amActivityTimeSlotsCount
+        }
+      } else {
+        if (objectType === 'activityCount') {
+          return "tbd"
+        }
+      }
+    }
+  }
+
+  /**
+   * Compare activities counts from the 2 different ways of counting them.
+   * @returns {boolean} equalObjects9amWater
+   */
+  compareEqualObjects(activityType: AllowedActivityTypes, activityTime: Allowed9and10Only): boolean {
+    const activityCount = this.getActivityCountObject(activityType, activityTime, 'activityCount')
+    const timeSlotsCount = this.getActivityCountObject(activityType, activityTime, 'timeSlotsCount')
+    const keys1 = Object.keys(activityCount).sort();
+    const keys2 = Object.keys(timeSlotsCount).sort();
+    const equalObjects = keys1.every(
+      (key, index) =>
+        key === keys2[index] &&
+        activityCount[key as WaterActivities] ===
+        timeSlotsCount[key as WaterActivities]
+    );
+    return equalObjects
+  }
+
     /**
      * Print activities that have less kids scheduled than the min allowed for that activity, if any.
      * @param {string} activityType - only 2 options: 'land' or 'water'.

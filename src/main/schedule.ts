@@ -2399,24 +2399,9 @@ export class Schedule {
 
     scheduleChecker.createWaterTimeSlotsData();
     scheduleChecker.createWaterActivityData();
+    const equalObjects9amWater = scheduleChecker.compareEqualObjects('water', '9am');
+    const equalObjects10amWater = scheduleChecker.compareEqualObjects('water', '10am');
 
-    const keys1 = Object.keys(scheduleChecker.water9amWaterActivityCount).sort();
-    const keys2 = Object.keys(scheduleChecker.water9amActivityTimeSlotsCount).sort();
-    const equalObjects9amWater = keys1.every(
-      (key, index) =>
-        key === keys2[index] &&
-        scheduleChecker.water9amWaterActivityCount[key as WaterActivities] ===
-        scheduleChecker.water9amActivityTimeSlotsCount[key as WaterActivities]
-    );
-
-    const keys1a = Object.keys(scheduleChecker.water10amWaterActivityCount).sort();
-    const keys2a = Object.keys(scheduleChecker.water10amActivityTimeSlotsCount
-    ).sort(); const equalObjects10amWater = keys1a.every(
-      (key, index) =>
-        key === keys2a[index] &&
-        scheduleChecker.water10amWaterActivityCount[key as WaterActivities] ===
-        scheduleChecker.water10amActivityTimeSlotsCount
-        [key as WaterActivities] );
 
     let landTotalCount = 0;
     const land9amActivityTimeSlotsCount = structuredClone(Activities.land9amActivities0Count);
