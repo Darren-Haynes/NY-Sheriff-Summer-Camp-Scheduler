@@ -1,26 +1,36 @@
 import { Activities } from './activities';
-import { AllActivities, AllowedActivityTimes, AllowedActivityTypes, AllowedTimes, Allowed9and10Only, WaterActivities } from '../types/schedule-types'
-import { WaterActivities0Count } from '../types/camp-types';
+import { AllActivities, AllowedActivityTimes, AllowedActivityTypes, AllowedTimes, Allowed9and10Only, WaterActivities, LandActivities9am, LandActivities10am } from '../types/schedule-types'
+import { WaterActivities0Count, LandActivities9am0Count, LandActivities10am0Count } from '../types/camp-types';
 import type { Schedule } from './schedule'
 import { UnscheduledKids } from '../types/kids-types';
 
 export class ScheduleChecker {
   schedule: Schedule
   waterTotalCount: number
+  landTotalCount: number
   unscheduledKids: UnscheduledKids[]
   water9amActivityTimeSlotsCount: WaterActivities0Count;
   water10amActivityTimeSlotsCount: WaterActivities0Count;
   water9amWaterActivityCount: WaterActivities0Count;
   water10amWaterActivityCount: WaterActivities0Count;
+  land9amActivityTimeSlotsCount: LandActivities9am0Count
+  land10amActivityTimeSlotsCount: LandActivities10am0Count
+  land9amLandActivityCount: LandActivities9am0Count
+  land10amLandActivityCount:LandActivities10am0Count
 
   constructor(schedule: Schedule) {
     this.schedule = schedule
     this.waterTotalCount = 0;
+    this.landTotalCount = 0;
     this.unscheduledKids = []; // all kids should be schedule - so this should remain empty for a valid run
     this.water9amActivityTimeSlotsCount = structuredClone(Activities.waterActivities0Count);
     this.water10amActivityTimeSlotsCount = structuredClone(Activities.waterActivities0Count);
     this.water9amWaterActivityCount = structuredClone(Activities.waterActivities0Count);
     this.water10amWaterActivityCount = structuredClone(Activities.waterActivities0Count);
+    this.land9amActivityTimeSlotsCount = structuredClone(Activities.land9amActivities0Count);
+    this.land10amActivityTimeSlotsCount = structuredClone(Activities.land10amActivities0Count);
+    this.land9amLandActivityCount = structuredClone(Activities.land9amActivities0Count);
+    this.land10amLandActivityCount = structuredClone(Activities.land10amActivities0Count);
   }
 
   /**
@@ -40,21 +50,42 @@ export class ScheduleChecker {
   }
 
   /**
-   * Count how many kids are assigned to each water activity via timeSlots data.
+   * Count how many kids are assigned to each land activity via WaterActivities data.
+   * Count how many kids total are assigned to land activities.
+   * Add kids to unscheduled list if someone hasn't been scheduled.
+   */
+  createLandActivityData(): void {
+    for (const activity in this.schedule.land9am) {
+      const typedActivity = activity as LandActivities9am;
+      this.land9amLandActivityCount[typedActivity] = this.schedule.land9am[typedActivity].length;
+    }
+    for (const activity in this.schedule.land10am) {
+      const typedActivity = activity as LandActivities10am;
+      this.land10amLandActivityCount[activity] = this.schedule.land10am[typedActivity].length;
+    }
+  }
+
+  /**
+   * Count how many kids are assigned to each water or land activity via timeSlots data.
    * Count how many kids total are assigned to water activities.
    * Add kids to unscheduled list if someone hasn't been scheduled.
    */
-  createWaterTimeSlotsData(): void {
+  createTimeSlotsData(activityType: AllowedActivityTypes): void {
     for (const name of this.schedule.kids.names) {
       const timeSlots = this.schedule.schedule.get(name);
       if (timeSlots !== undefined) {
-        if (timeSlots.timeSlots.water9am) {
-          this.water9amActivityTimeSlotsCount[timeSlots.timeSlots.water9am] += 1;
-          this.waterTotalCount += 1;
+        const timeSlotActivityType9am = activityType === 'water' ? timeSlots.timeSlots.water9am : timeSlots.timeSlots.land9am;
+        const timeSlotActivityType10am = activityType === 'water' ? timeSlots.timeSlots.water10am : timeSlots.timeSlots.land10am;
+        let totalCount = activityType === 'water' ? this.waterTotalCount : this.landTotalCount;
+        const timeSlotsCount9am = activityType === 'water' ? this.water9amActivityTimeSlotsCount as WaterActivities0Count : this.land9amActivityTimeSlotsCount as LandActivities9am0Count
+        const timeSlotsCount10am = activityType === 'water' ? this.water10amActivityTimeSlotsCount as WaterActivities0Count : this.land10amActivityTimeSlotsCount as LandActivities10am0Count
+        if (timeSlotActivityType9am) {
+          timeSlotsCount9am[timeSlotActivityType9am] += 1;
+          totalCount += 1;
         }
-        if (timeSlots.timeSlots.water10am) {
-          this.water10amActivityTimeSlotsCount
-            [timeSlots.timeSlots.water10am] += 1; this.waterTotalCount += 1;
+        if (timeSlotActivityType10am) {
+          timeSlotsCount10am
+            [timeSlotActivityType10am] += 1; totalCount += 1;
         }
         let nullCount = 0;
         if (timeSlots.timeSlots.water9am === null) {

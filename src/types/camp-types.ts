@@ -128,7 +128,8 @@ export type AllLandWaterKids9am10am = {
   yoga?: Array<string>;
 };
 
-export type WaterActivities0Count = {
+export interface WaterActivities0Count {
+  [key: string]: number;
   fish: number;
   pboard: number;
   snork: number;
@@ -136,4 +137,27 @@ export type WaterActivities0Count = {
   kayak: number;
   sail: number;
   swim: number;
+}
+
+export interface LandActivities9am0Count {
+  [key: string]: number;
+  art: number;
+  hike: number;
+  bball: number;
+  cheer: number;
+  soc: number;
+  vball: number;
+  arch: number;
+}
+
+export interface LandActivities10am0Count {
+  [key: string]: number;
+  fris: number;
+  art: number;
+  hike: number;
+  pball: number;
+  fball: number;
+  lax: number;
+  yoga: number;
+  arch: number;
 }

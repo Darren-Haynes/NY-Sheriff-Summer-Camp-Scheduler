@@ -2393,71 +2393,29 @@ export class Schedule {
       PrintLogs.initialStatement(activityType, func_name)
       PrintLogs.unscheduledDataSwitch(activityType, this)
     }
-
+    scheduleChecker.createTimeSlotsData('water');
+    scheduleChecker.createTimeSlotsData('land');
+    scheduleChecker.createWaterActivityData();
+    scheduleChecker.createLandActivityData();
     const totalKidsCountWater = this.kids.count - this.notScheduledAllNamesWater.length;
     const totalKidsCountLand = this.kids.count - this.notScheduledAllNamesLand.length;
-
-    scheduleChecker.createWaterTimeSlotsData();
-    scheduleChecker.createWaterActivityData();
     const equalObjects9amWater = scheduleChecker.compareEqualObjects('water', '9am');
     const equalObjects10amWater = scheduleChecker.compareEqualObjects('water', '10am');
-
-
-    let landTotalCount = 0;
-    const land9amActivityTimeSlotsCount = structuredClone(Activities.land9amActivities0Count);
-    const land10amActivityTimeSlotsCount = structuredClone(Activities.land10amActivities0Count);
-    for (const name of this.kids.names) {
-      const timeSlots = this.schedule.get(name);
-      if (timeSlots !== undefined) {
-        if (timeSlots.timeSlots.land9am) {
-          land9amActivityTimeSlotsCount[timeSlots.timeSlots.land9am] += 1;
-          landTotalCount += 1;
-        }
-        if (timeSlots.timeSlots.land10am) {
-          land10amActivityTimeSlotsCount[timeSlots.timeSlots.land10am] += 1;
-          landTotalCount += 1;
-        }
-        let nullCount = 0;
-        if (timeSlots.timeSlots.water9am === null) {
-          nullCount += 1;
-        }
-        if (timeSlots.timeSlots.water10am === null) {
-          nullCount += 1;
-        }
-        if (timeSlots.timeSlots.land9am === null) {
-          nullCount += 1;
-        }
-        if (timeSlots.timeSlots.land10am === null) {
-          nullCount += 1;
-        }
-        if (nullCount === 4) {
-          scheduleChecker.unscheduledKids.push({ name: name, timeSlot: timeSlots.timeSlots });
-        }
-      }
-    }
-
     const land9amActivityLandActivityCount = structuredClone(Activities.land9amActivities0Count);
     const land10amActivityLandActivityCount = structuredClone(Activities.land10amActivities0Count);
 
-    for (const activity in this.land9am) {
-      land9amActivityLandActivityCount[activity] = this.land9am[activity as LandActivities9am].length;
-    }
-    for (const activity in this.land10am) {
-      land10amActivityLandActivityCount[activity] = this.land10am[activity as LandActivities10am].length;
-    }
-
     const keys1Land = Object.keys(land9amActivityLandActivityCount).sort();
-    const keys2Land = Object.keys(land9amActivityTimeSlotsCount).sort();
+    const keys2Land = Object.keys(scheduleChecker.land9amActivityTimeSlotsCount).sort();
     const equalObjects9amLand = keys1Land.every(
       (key, index) =>
-        key === keys2Land[index] && land9amActivityLandActivityCount[key] === land9amActivityTimeSlotsCount[key]
+        key === keys2Land[index] && land9amActivityLandActivityCount[key] === scheduleChecker.land9amActivityTimeSlotsCount[key]
     );
 
     const keys1aLand = Object.keys(land10amActivityLandActivityCount).sort();
-    const keys2aLand = Object.keys(land10amActivityTimeSlotsCount).sort();
+    const keys2aLand = Object.keys(scheduleChecker.land10amActivityTimeSlotsCount).sort();
     const equalObjects10amLand = keys1aLand.every(
       (key, index) =>
-        key === keys2aLand[index] && land10amActivityLandActivityCount[key] === land10amActivityTimeSlotsCount[key]
+        key === keys2aLand[index] && land10amActivityLandActivityCount[key] === scheduleChecker.land10amActivityTimeSlotsCount[key]
     );
 
     if (logging) {
@@ -2471,9 +2429,9 @@ export class Schedule {
     }
 
     const waterToKidsCount = scheduleChecker.waterTotalCount !== totalKidsCountWater;
-    const landToKidsCount = landTotalCount !== totalKidsCountLand;
+    const landToKidsCount = scheduleChecker.landTotalCount !== totalKidsCountLand;
     if (logging) {
-      PrintLogs.kidsTimeSlotsToTotalKids(activityType, waterToKidsCount, landToKidsCount, scheduleChecker.waterTotalCount, landTotalCount, totalKidsCountWater, totalKidsCountLand)
+      PrintLogs.kidsTimeSlotsToTotalKids(activityType, waterToKidsCount, landToKidsCount, scheduleChecker.waterTotalCount, scheduleChecker.landTotalCount, totalKidsCountWater, totalKidsCountLand)
     }
 
     const allNotInTarget = this.notScheduled9amWater.names.every(
