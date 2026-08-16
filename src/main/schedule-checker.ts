@@ -81,11 +81,22 @@ export class ScheduleChecker {
         const timeSlotsCount10am = activityType === 'water' ? this.water10amActivityTimeSlotsCount as WaterActivities0Count : this.land10amActivityTimeSlotsCount as LandActivities10am0Count
         if (timeSlotActivityType9am) {
           timeSlotsCount9am[timeSlotActivityType9am] += 1;
-          totalCount += 1;
+          if (activityType === 'water') {
+            this.waterTotalCount += 1;
+          }
+          if (activityType === 'land') {
+            this.landTotalCount += 1;
+          }
         }
         if (timeSlotActivityType10am) {
           timeSlotsCount10am
-            [timeSlotActivityType10am] += 1; totalCount += 1;
+            [timeSlotActivityType10am] += 1;
+          if (activityType === 'water') {
+            this.waterTotalCount += 1;
+          }
+          if (activityType === 'land') {
+            this.landTotalCount += 1;
+          }
         }
         let nullCount = 0;
         if (timeSlots.timeSlots.water9am === null) {
@@ -167,6 +178,17 @@ export class ScheduleChecker {
     return equalObjects
   }
 
+  compareEqualObjectsKeys(activityTime: Allowed9and10Only): boolean {
+    const activityCount = activityTime === '9am' ? this.land9amLandActivityCount : this.land10amLandActivityCount;
+    const timeSlotCount = activityTime === '9am' ? this.land9amActivityTimeSlotsCount : this.land10amActivityTimeSlotsCount;
+    const keys1 = Object.keys(activityCount).sort();
+    const keys2 = Object.keys(timeSlotCount).sort();
+    const equalObjectsKeys = keys1.every(
+      (key, index) =>
+        key === keys2[index] && activityCount[key] === timeSlotCount[key]
+    );
+    return equalObjectsKeys
+  }
     /**
      * Print activities that have less kids scheduled than the min allowed for that activity, if any.
      * @param {string} activityType - only 2 options: 'land' or 'water'.

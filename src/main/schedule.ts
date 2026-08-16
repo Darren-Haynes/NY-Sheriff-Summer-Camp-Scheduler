@@ -2401,22 +2401,8 @@ export class Schedule {
     const totalKidsCountLand = this.kids.count - this.notScheduledAllNamesLand.length;
     const equalObjects9amWater = scheduleChecker.compareEqualObjects('water', '9am');
     const equalObjects10amWater = scheduleChecker.compareEqualObjects('water', '10am');
-    const land9amActivityLandActivityCount = structuredClone(Activities.land9amActivities0Count);
-    const land10amActivityLandActivityCount = structuredClone(Activities.land10amActivities0Count);
-
-    const keys1Land = Object.keys(land9amActivityLandActivityCount).sort();
-    const keys2Land = Object.keys(scheduleChecker.land9amActivityTimeSlotsCount).sort();
-    const equalObjects9amLand = keys1Land.every(
-      (key, index) =>
-        key === keys2Land[index] && land9amActivityLandActivityCount[key] === scheduleChecker.land9amActivityTimeSlotsCount[key]
-    );
-
-    const keys1aLand = Object.keys(land10amActivityLandActivityCount).sort();
-    const keys2aLand = Object.keys(scheduleChecker.land10amActivityTimeSlotsCount).sort();
-    const equalObjects10amLand = keys1aLand.every(
-      (key, index) =>
-        key === keys2aLand[index] && land10amActivityLandActivityCount[key] === scheduleChecker.land10amActivityTimeSlotsCount[key]
-    );
+    const equalObjects9amLand = scheduleChecker.compareEqualObjectsKeys('9am')
+    const equalObjects10amLand = scheduleChecker.compareEqualObjectsKeys('10am')
 
     if (logging) {
       PrintLogs.equalObjects(activityType, equalObjects9amWater, equalObjects10amWater, equalObjects9amLand, equalObjects10amLand)
