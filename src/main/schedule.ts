@@ -304,7 +304,7 @@ export class Schedule {
     return Activities.waterRanges;
   }
 
-  private getInsufficientlyScheduledActivites(
+  getInsufficientlyScheduledActivites(
     activityType: AllowedActivityTypes,
     timeSlot: AllowedTimes
   ): AllActivities[] {
@@ -2629,21 +2629,13 @@ export class Schedule {
       printLogs = true
     }
     const testSchedulingWater = this.testScheduling('final log', 'no func', printLogs, scheduleChecker);
-    // const testSchedulingLand = this.testScheduling('land', 'no func', printLogs, scheduleChecker);
-    const underScheduledWater9am = scheduleChecker.checkUnderScheduled('water', '9am');
-    const underScheduledLand9am = scheduleChecker.checkUnderScheduled('land', '9am');
-    const underScheduledWater10am = scheduleChecker.checkUnderScheduled('water', '10am');
-    const underScheduledLand10am = scheduleChecker.checkUnderScheduled('land', '10am');
+    const underScheduled = scheduleChecker.checkUnderScheduled()
 
     const allTrue = [
       checkPercentage,
       notScheduledToScheduled,
       testSchedulingWater,
-      // testSchedulingLand,
-      underScheduledWater9am,
-      underScheduledLand9am,
-      underScheduledWater10am,
-      underScheduledLand10am,
+      underScheduled
     ].every(element => element === true);
 
     return allTrue;

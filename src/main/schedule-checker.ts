@@ -76,7 +76,6 @@ export class ScheduleChecker {
       if (timeSlots !== undefined) {
         const timeSlotActivityType9am = activityType === 'water' ? timeSlots.timeSlots.water9am : timeSlots.timeSlots.land9am;
         const timeSlotActivityType10am = activityType === 'water' ? timeSlots.timeSlots.water10am : timeSlots.timeSlots.land10am;
-        let totalCount = activityType === 'water' ? this.waterTotalCount : this.landTotalCount;
         const timeSlotsCount9am = activityType === 'water' ? this.water9amActivityTimeSlotsCount as WaterActivities0Count : this.land9amActivityTimeSlotsCount as LandActivities9am0Count
         const timeSlotsCount10am = activityType === 'water' ? this.water10amActivityTimeSlotsCount as WaterActivities0Count : this.land10amActivityTimeSlotsCount as LandActivities10am0Count
         if (timeSlotActivityType9am) {
@@ -190,12 +189,13 @@ export class ScheduleChecker {
     return equalObjectsKeys
   }
     /**
-     * Print activities that have less kids scheduled than the min allowed for that activity, if any.
+     * Check if any activities have an insufficient amount of kids scheduled to them.
+     * E.g if "hike" requires a minumum of 4 kids, and only 1-3 are scheduled, this is a false result.
      * @param {string} activityType - only 2 options: 'land' or 'water'.
      * @param {string} timeSlot - only 2 options -'9am' or '10am'
-     * @returns {void}
+     * @returns {boolean}
      */
-    checkUnderScheduled(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): boolean {
+    checkUnderScheduledByActivityTypeAndTime(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): boolean {
       const activityTypeTimeSlot = this.schedule.getActivityTypeTimeSlot(activityType, timeSlot);
       const typedActivityTypeTimeSlot = activityTypeTimeSlot as Record<string, string[]>;
       const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
@@ -212,6 +212,25 @@ export class ScheduleChecker {
       }
       return false;
     }
+
+    /**
+     * Checks if all activities for land and water and both at 9am and 10am has
+     * enough kids scheduled to them to meet the bare minumum numbers requirement.
+     * @returns {boolean}
+     */
+  checkUnderScheduled(): boolean {
+    const underScheduledWater9am = this.checkUnderScheduledByActivityTypeAndTime('water', '9am');
+    const underScheduledLand9am = this.checkUnderScheduledByActivityTypeAndTime('land', '9am');
+    const underScheduledWater10am = this.checkUnderScheduledByActivityTypeAndTime('water', '10am');
+    const underScheduledLand10am = this.checkUnderScheduledByActivityTypeAndTime('land', '10am');
+
+    return [
+      underScheduledWater9am,
+      underScheduledLand9am,
+      underScheduledWater10am,
+      underScheduledLand10am,
+    ].every(element => element === true);
+  }
 
   /**
    * Checks if kids choices percentages are invalid.
