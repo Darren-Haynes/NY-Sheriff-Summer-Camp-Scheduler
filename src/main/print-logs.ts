@@ -17,14 +17,13 @@ export class PrintLogs {
    * @param func_name  - name of scheduling function being called.
    */
   static initialStatement(
-    activityType: AllowedActivityTypes | 'final log',
     func_name: string,
   ): void {
     console.log('\n');
     console.log('______________________________________');
     console.log('______________________________________');
     console.log('______________________________________');
-    console.log(`\tENTERING LOGS -- ${activityType}`);
+    console.log(`\tSTARTING LOGGING`);
     console.log('\tAfter calling', func_name,);
     console.log('--------------------------------------\n');
   }
@@ -525,5 +524,9 @@ export class PrintLogs {
       this.equalObjectsByActivityType(objectsEqual9amWater, objectsEqual10amWater, 'water')
       this.equalObjectsByActivityType(objectsEqual9amLand, objectsEqual10amLand, 'land')
     }
+  }
+
+  static runAll(func_name: string): void {
+    PrintLogs.initialStatement(func_name)
   }
 }

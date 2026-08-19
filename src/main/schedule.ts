@@ -2390,7 +2390,7 @@ export class Schedule {
     scheduleChecker: ScheduleChecker
   ): boolean {
     if (logging) {
-      PrintLogs.initialStatement(activityType, func_name)
+      PrintLogs.initialStatement(func_name)
       PrintLogs.unscheduledDataSwitch(activityType, this)
     }
     scheduleChecker.createTimeSlotsData('water');
@@ -2631,6 +2631,10 @@ export class Schedule {
     const testSchedulingWater = this.testScheduling('final log', 'no func', printLogs, scheduleChecker);
     const underScheduled = scheduleChecker.checkUnderScheduled()
 
+    if (process.env.NODE_ENV !== 'production') {
+      PrintLogs.runAll('FINAL LOG');
+    }
+
     const allTrue = [
       checkPercentage,
       notScheduledToScheduled,
@@ -2718,12 +2722,6 @@ export class Schedule {
     if (this.calculateChoicesPercentages('land')) {
       this.calculateChoicesPercentages('water')
     }
-
-
-    // if (process.env.NODE_ENV !== 'production') {
-    //   this.testScheduling('final log', 'end log', true, scheduleChecker);
-    //   PrintLogs.endStatement('final log', 'end log');
-    // }
 
     return this.checkScheduling();
   }
