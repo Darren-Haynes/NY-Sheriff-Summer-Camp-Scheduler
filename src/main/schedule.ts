@@ -1311,7 +1311,9 @@ export class Schedule {
       timeSlot
     );
     if (activitiesAboveDoubleMin.length > 0) {
-      // console.log('Activities above double minimum:', activitiesAboveDoubleMin);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('Activities above double minimum:', activitiesAboveDoubleMin);
+      }
       this.scheduleDoubleActivities(
         activitiesAboveDoubleMin,
         activityType,
@@ -1346,7 +1348,9 @@ export class Schedule {
       timeSlot
     );
     if (activitiesAboveSingleMax.length > 0) {
-      // console.log('Activities above single maximum:', activitiesAboveSingleMax);
+      if (process.env.NODE_ENV !== 'production') {
+      console.log('Activities above single maximum:', activitiesAboveSingleMax);
+      }
       this.scheduleSingleActivities(
         activitiesAboveSingleMax,
         activityType,
@@ -1380,7 +1384,9 @@ export class Schedule {
       timeSlot
     );
     if (activitiesAboveDoubleMax.length > 0) {
-      // console.log('Activities above doulbe maximum:', activitiesAboveDoubleMax);
+      if (process.env.NODE_ENV !== 'production') {
+      console.log('Activities above doulbe maximum:', activitiesAboveDoubleMax);
+      }
       this.scheduleDoubleActivities(
         activitiesAboveDoubleMax,
         activityType,
@@ -2549,7 +2555,7 @@ export class Schedule {
       equalWater10amToLand9am,
     ].every(element => element === true);
 
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV !== 'production' && !allTrue) {
       PrintLogs.printAll(
         'FINAL LOG',
         this,
@@ -2660,7 +2666,8 @@ export class Schedule {
     this.isLandFirst = false;
 
     if (process.env.NODE_ENV !== 'production') {
-      console.log(`${this.algo} algorithm initiated`);
+      console.log("\n-----------------------------------------------");
+      console.log(`***${this.algo.toUpperCase()} ALGORITHM INITIATED***`);
     }
 
     this.scheduleWater();

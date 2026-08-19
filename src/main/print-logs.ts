@@ -34,7 +34,7 @@ export class PrintLogs {
   static endStatement(
     func_name: string,
   ): void {
-    console.log('______________________________________');
+    console.log('\n______________________________________');
     console.log(`\tEXITING LOGGING`);
     console.log('\tAfter calling', func_name);
     console.log('______________________________________');
@@ -100,8 +100,7 @@ export class PrintLogs {
     );
     console.log(`NOT SCHEDULED 10AM ${activityType.toUpperCase()} ACTIVITIES: `, [
       ...notScheduledActivities10am.keys(),
-    ]);
-    console.log('\n');
+    ], '\n');
   }
 
   /**
@@ -499,7 +498,7 @@ export class PrintLogs {
     console.log("================================================")
     const activityTypeTimeSlot = schedule.getActivityTypeTimeSlot(activityType, timeSlot);
     const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
-    console.log(`\nINCORRECT ${activityType.toUpperCase()} ${timeSlot.toUpperCase()} ACTIVITIES:`);
+    console.log(`INCORRECT ${activityType.toUpperCase()} ${timeSlot.toUpperCase()} ACTIVITIES:`);
     const incorrectActivities: AllActivities[] = [];
     for (const activity of Object.keys(activityTypeTimeSlot)) {
       if (!Object.keys(ranges).includes(activity))

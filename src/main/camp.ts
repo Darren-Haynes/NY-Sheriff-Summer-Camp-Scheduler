@@ -69,6 +69,7 @@ export class Camp {
    * @returns {void}
    */
   public scheduleTheKids(numOfRuns: number): void {
+
     if (numOfRuns < 1 || numOfRuns > 1000) {
       throw new RangeError('Value must be between 1 and 1000');
     }
@@ -80,9 +81,17 @@ export class Camp {
       const validResult = this.run.runAlgo();
       if (validResult) {
         validCount++;
+        if (process.env.NODE_ENV !== 'production') {
+          const totalCount = validCount + invalidCount;
+          console.log(`RUN #${totalCount} SUCCESSFULL`)
+        }
         this.allRuns.push(this.run);
       } else {
         invalidCount++;
+        if (process.env.NODE_ENV !== 'production') {
+          const totalCount = validCount + invalidCount;
+          console.log(`RUN #${totalCount} FAILED`)
+        }
       }
       if (invalidCount > numOfRuns) {
         validResults = false;
