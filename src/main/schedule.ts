@@ -2389,10 +2389,6 @@ export class Schedule {
     logging: boolean = true,
     scheduleChecker: ScheduleChecker
   ): boolean {
-    if (logging) {
-      PrintLogs.initialStatement(func_name)
-      PrintLogs.unscheduledDataSwitch(activityType, this)
-    }
     scheduleChecker.createTimeSlotsData('water');
     scheduleChecker.createTimeSlotsData('land');
     scheduleChecker.createWaterActivityData();
@@ -2639,7 +2635,7 @@ export class Schedule {
     ].every(element => element === true);
 
     if (process.env.NODE_ENV !== 'production') {
-      PrintLogs.runAll('FINAL LOG');
+      PrintLogs.runAll('FINAL LOG', this);
     }
 
     return allTrue;

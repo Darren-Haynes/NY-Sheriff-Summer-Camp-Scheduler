@@ -111,14 +111,9 @@ export class PrintLogs {
    * @param activityType - 'land', 'water' or 'final log' that prints all final data.
    * @param schedule - the Schedule class object
    */
-  static unscheduledDataSwitch(activityType: AllowedActivityTypes | 'final log', schedule: Schedule): void {
-    if (activityType === 'water' || activityType === 'final log') {
+  static unscheduledDataSwitch(schedule: Schedule): void {
       PrintLogs.unscheduledData('water', schedule);
-    }
-
-    if (activityType === 'land' || activityType === 'final log') {
       PrintLogs.unscheduledData('land', schedule);
-    }
   }
 
   /**
@@ -528,8 +523,9 @@ export class PrintLogs {
    * Catch all the runs all the other logs in this method
    * @param func_name - can be the func printlogs are called from of "Final log"
    */
-  static runAll(func_name: string): void {
+  static runAll(func_name: string, schedule: Schedule): void {
     PrintLogs.initialStatement(func_name);
+    PrintLogs.unscheduledDataSwitch(schedule)
     PrintLogs.endStatement(func_name)
   }
 }
