@@ -107,5 +107,11 @@ export class Camp {
     } else {
       this.bestSchedule = this.bestPercentagesSchedule();
     }
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`\n=======RUN COUNTS=======`);
+      console.log(`TOTAL RUNS COUNT: ${validCount + invalidCount}`);
+      console.log(`VALID RUNS COUNT: ${validCount}`);
+      console.log(`INVALID RUNS COUNT: ${invalidCount}`);
+    }
   }
 }
