@@ -2576,42 +2576,44 @@ export class Schedule {
     return allTrue;
   }
 
-  runAlgo(): boolean {
-    this.isLandFirst = false;
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(`${this.algo} algorithm initiated`);
-    }
-
+  /**
+   * Run the water scheduling algo
+   */
+  private scheduleWater(): void {
     // SCHEDULE WATER ACTIVITIES
-    const waterMethods = [
-      this.scheduleDoubles.bind(this), // only water activities can be scheduled as doubles
-      this.scheduleSingles.bind(this),
-      this.scheduleBelowMin.bind(this),
-      this.scheduleUniques.bind(this),
-      this.scheduleLeastFull.bind(this),
-      this.scheduleNoChoicesMatch.bind(this),
-      this.scheduleSorryNoChoices.bind(this),
-    ];
+      const waterMethods = [
+        this.scheduleDoubles.bind(this), // only water activities can be scheduled as doubles
+        this.scheduleSingles.bind(this),
+        this.scheduleBelowMin.bind(this),
+        this.scheduleUniques.bind(this),
+        this.scheduleLeastFull.bind(this),
+        this.scheduleNoChoicesMatch.bind(this),
+        this.scheduleSorryNoChoices.bind(this),
+      ];
 
-    const waterMethodArgs = [
-      ['water', [1, 2, 3], 'maxOnly', 'both'],
-      ['water', [1, 2, 3], 'bothMinAndMax', 'both'],
-      ['water', 'both'],
-      ['water'],
-      ['water'],
-      ['water'],
-      ['water'],
-    ];
+      const waterMethodArgs = [
+        ['water', [1, 2, 3], 'maxOnly', 'both'],
+        ['water', [1, 2, 3], 'bothMinAndMax', 'both'],
+        ['water', 'both'],
+        ['water'],
+        ['water'],
+        ['water'],
+        ['water'],
+      ];
 
-    for (let i = 0; i < waterMethods.length; i++) {
+      for (let i = 0; i < waterMethods.length; i++) {
 
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('ENTERING: ' + waterMethods[i].name + '()');
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('ENTERING: ' + waterMethods[i].name + '()');
+        }
+        (waterMethods[i] as Function).apply(this, waterMethodArgs[i]);
       }
-      (waterMethods[i] as Function).apply(this, waterMethodArgs[i]);
-    }
+  }
 
+  /**
+   * Run the land scheduling algo
+   */
+  private scheduleLand(): void {
     // SCHEDULE LAND ACTIVITIES
     this.notScheduled9amLand.names = [...this.scheduled10amWater.names];
     this.notScheduled10amLand.names = [...this.scheduled9amWater.names];
@@ -2648,6 +2650,21 @@ export class Schedule {
       }
       (landMethods[i] as Function).apply(this, landMethodArgs[i]);
     }
+  }
+
+  /**
+   * Main algo running entry point for scheduling kids
+   * @returns {boolean} if scheduling checks pass
+   */
+  runAlgo(): boolean {
+    this.isLandFirst = false;
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`${this.algo} algorithm initiated`);
+    }
+
+    this.scheduleWater();
+    this.scheduleLand();
 
     // Calculate activity percentages. If land fails no point calculating water.
     if (this.calculateChoicesPercentages('land')) {
