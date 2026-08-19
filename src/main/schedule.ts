@@ -2389,26 +2389,6 @@ export class Schedule {
     logging: boolean = true,
     scheduleChecker: ScheduleChecker
   ): boolean {
-    scheduleChecker.createActivityAndTimeData();
-    const totalKidsCountWater = this.kids.count - this.notScheduledAllNamesWater.length;
-    const totalKidsCountLand = this.kids.count - this.notScheduledAllNamesLand.length;
-
-    const waterToKidsCount = scheduleChecker.waterTotalCount !== totalKidsCountWater;
-    const landToKidsCount = scheduleChecker.landTotalCount !== totalKidsCountLand;
-    if (logging) {
-      PrintLogs.kidsTimeSlotsToTotalKids(activityType, waterToKidsCount, landToKidsCount, scheduleChecker.waterTotalCount, scheduleChecker.landTotalCount, totalKidsCountWater, totalKidsCountLand)
-    }
-
-    const allNotInTarget = this.notScheduled9amWater.names.every(
-      element => !this.notScheduled10amWater.names.includes(element)
-    );
-
-    const allNamesEmpty = this.notScheduledAllNamesWater.length === 0;
-
-    if (func_name == 'end log') {
-      PrintLogs.kidsNotScheduled(this.kids.count, totalKidsCountWater, totalKidsCountLand, logging, scheduleChecker.unscheduledKids, allNotInTarget, allNamesEmpty)
-    }
-
     const notFullyScheduledWater9am = this.getInsufficientlyScheduledActivites('water', '9am');
     const notFullyScheduledWater10am = this.getInsufficientlyScheduledActivites('water', '10am');
     const notFullyScheduledLand9am = this.getInsufficientlyScheduledActivites('land', '9am');
@@ -2435,10 +2415,6 @@ export class Schedule {
     }
 
     const allTrue = [
-      !waterToKidsCount,
-      !landToKidsCount,
-      allNotInTarget,
-      allNamesEmpty,
       oppositesEqualWater9amTo10am,
       oppositiesEqualWater10amTo9am,
       equalWater9amToLand10am,
@@ -2594,13 +2570,21 @@ export class Schedule {
    */
   private checkScheduling(): boolean {
     const scheduleChecker = new ScheduleChecker(this)
+    scheduleChecker.createActivityAndTimeData();
     const checkPercentage = scheduleChecker.checkPercentages()
     const notScheduledToScheduled = scheduleChecker.checkUnscheduledToScheduled();
     const equalObjects9amWater = scheduleChecker.compareEqualObjects('water', '9am');
     const equalObjects10amWater = scheduleChecker.compareEqualObjects('water', '10am');
     const equalObjects9amLand = scheduleChecker.compareEqualObjectsKeys('9am')
     const equalObjects10amLand = scheduleChecker.compareEqualObjectsKeys('10am')
-
+    const totalKidsCountWater = this.kids.count - this.notScheduledAllNamesWater.length;
+    const totalKidsCountLand = this.kids.count - this.notScheduledAllNamesLand.length;
+    const waterToKidsCount = scheduleChecker.waterTotalCount !== totalKidsCountWater;
+    const landToKidsCount = scheduleChecker.landTotalCount !== totalKidsCountLand;
+    const allNotInTarget = this.notScheduled9amWater.names.every(
+      element => !this.notScheduled10amWater.names.includes(element)
+    );
+    const allNamesEmpty = this.notScheduledAllNamesWater.length === 0;
     // Only print testscheduling logs during development.
     let printLogs = false;
     if (process.env.NODE_ENV !== 'production') {
@@ -2617,17 +2601,30 @@ export class Schedule {
       checkPercentage,
       notScheduledToScheduled,
       testSchedulingWater,
-      underScheduled
+      underScheduled,
+      !waterToKidsCount,
+      !landToKidsCount,
+      allNotInTarget,
+      allNamesEmpty,
     ].every(element => element === true);
 
     if (process.env.NODE_ENV !== 'production') {
-      PrintLogs.runAll(
+      PrintLogs.printAll(
         'FINAL LOG',
         this,
         equalObjects9amWater,
         equalObjects10amWater,
         equalObjects9amLand,
-        equalObjects10amLand
+        equalObjects10amLand,
+        waterToKidsCount,
+        landToKidsCount,
+        totalKidsCountWater,
+        totalKidsCountLand,
+        scheduleChecker.waterTotalCount,
+        scheduleChecker.landTotalCount,
+        scheduleChecker.unscheduledKids,
+        allNotInTarget,
+        allNamesEmpty
       );
     }
 

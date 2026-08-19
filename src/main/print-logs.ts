@@ -13,7 +13,6 @@ export class PrintLogs {
 
   /**
    * Cleary show start of print logs
-   * @param activityType - only 2 options 'land' or 'water'.
    * @param func_name  - name of scheduling function being called.
    */
   static initialStatement(
@@ -30,7 +29,6 @@ export class PrintLogs {
 
   /**
    * Cleary show end of print logs
-   * @param activityType - only 2 options 'land' or 'water'.
    * @param func_name  - name of scheduling function being called.
    */
   static endStatement(
@@ -108,7 +106,6 @@ export class PrintLogs {
 
   /**
    * Switch for sending 'water' or 'land' data to unscheduledData() method.
-   * @param activityType - 'land', 'water' or 'final log' that prints all final data.
    * @param schedule - the Schedule class object
    */
   static unscheduledDataSwitch(schedule: Schedule): void {
@@ -121,7 +118,6 @@ export class PrintLogs {
    * @param kidsCount - total number of kids attending camp
    * @param totalKidsCountWater  - total number of kids assigned to water activities
    * @param totalKidsCountLand  - total number of kids assigned to land activities
-   * @param logging - if true print additional logging info
    * @param unscheduledKids - list of kids that are unscheduled and their timeslots
    * @param allNotInTarget - false if a name is in both 9am and 10am water
    * @param allNamesEmpty - true if there are no kids left to schedule
@@ -130,7 +126,6 @@ export class PrintLogs {
     kidsCount: number,
     totalKidsCountWater: number,
     totalKidsCountLand: number,
-    logging: boolean,
     unscheduledKids: UnscheduledKids[],
     allNotInTarget: boolean,
     allNamesEmpty: boolean): void {
@@ -143,14 +138,13 @@ export class PrintLogs {
       console.log(kid);
     }
 
-    if (logging) {
-      console.log(
-        'this.notScheduled9amWater.names !== this.notScheduled10amWater.names:',
-        allNotInTarget
-      );
-      console.log('this.notScheduledAllNamesWater.length === 0:', allNamesEmpty);
-    }
+    console.log(
+      'this.notScheduled9amWater.names !== this.notScheduled10amWater.names:',
+      allNotInTarget
+    );
+    console.log('this.notScheduledAllNamesWater.length === 0:', allNamesEmpty);
   }
+
   /**
    *
    * @param notFullyScheduledWater9am - list of water activities, if any
@@ -277,7 +271,6 @@ export class PrintLogs {
 
   /**
    * Wrapper for printNameCountsByActivity()
-   * @param activityType
    * @param schedule
    */
   static nameCounts(schedule: Schedule): void {
@@ -321,7 +314,6 @@ export class PrintLogs {
 
   /**
    * Wrapper for printUnderScheduledByActivityAndTimeSlot()
-   * @param activityType
    * @param schedule
    */
   static underScheduled(
@@ -368,7 +360,6 @@ export class PrintLogs {
 
   /**
    * Wrapper for printOverScheduledByActivityAndTimeSlot()
-   * @param activityType
    * @param schedule
    */
   static overScheduled(
@@ -419,7 +410,6 @@ export class PrintLogs {
    * @param kidsActivityTotalCount - count of kids in an activity type by their names Array.
    */
   static kidsTimeSlotsToTotalKids(
-    activityType: AllowedActivityTypes | 'final log',
     waterToKidsCount: boolean,
     landToKidsCount: boolean,
     waterTotalCount: number,
@@ -431,24 +421,12 @@ export class PrintLogs {
       console.log('KIDS TIMESLOT TO TOTAL KIDS COMPARISON');
       console.log("========================================")
 
-    if (activityType === 'final log') {
       this.kidsTimeSlotsToTotalKidsCountMatchByActivityType(
         'water', waterToKidsCount, waterTotalCount, totalKidsCountWater
       )
       this.kidsTimeSlotsToTotalKidsCountMatchByActivityType(
         'land', landToKidsCount, landTotalCount, totalKidsCountLand
       )
-    }
-    if (activityType === 'water') {
-      this.kidsTimeSlotsToTotalKidsCountMatchByActivityType(
-        'water', waterToKidsCount, waterTotalCount, totalKidsCountWater
-      )
-    }
-    if (activityType === 'land') {
-      this.kidsTimeSlotsToTotalKidsCountMatchByActivityType(
-        'land', landToKidsCount, landTotalCount, totalKidsCountLand
-      )
-    }
   }
 
   /**
@@ -508,13 +486,23 @@ export class PrintLogs {
    * Catch all the runs all the other logs in this method
    * @param func_name - can be the func printlogs are called from of "Final log"
    */
-  static runAll(
+  static printAll(
     func_name: string,
     schedule: Schedule,
     equalObjects9amWater: boolean,
     equalObjects10amWater: boolean,
     equalObjects9amLand: boolean,
-    equalObjects10amLand: boolean
+    equalObjects10amLand: boolean,
+    waterToKidsCount: boolean,
+    landToKidsCount: boolean,
+    totalKidsCountWater: number,
+    totalKidsCountLand: number,
+    waterTotalCount: number,
+    landTotalCount: number,
+    unscheduledKids: UnscheduledKids[],
+    allNotInTarget: boolean,
+    allNamesEmpty: boolean
+
   ): void {
     PrintLogs.initialStatement(func_name);
     PrintLogs.unscheduledDataSwitch(schedule)
@@ -523,6 +511,8 @@ export class PrintLogs {
     PrintLogs.nameCounts(schedule)
     PrintLogs.overScheduled(schedule)
     PrintLogs.underScheduled(schedule)
+    PrintLogs.kidsTimeSlotsToTotalKids(waterToKidsCount, landToKidsCount, waterTotalCount, landTotalCount, totalKidsCountWater, totalKidsCountLand)
+    PrintLogs.kidsNotScheduled(schedule.kids.count, totalKidsCountWater, totalKidsCountLand, unscheduledKids, allNotInTarget, allNamesEmpty)
     PrintLogs.endStatement(func_name)
   }
 }
