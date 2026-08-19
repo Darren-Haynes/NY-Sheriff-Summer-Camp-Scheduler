@@ -146,18 +146,17 @@ export class PrintLogs {
   }
 
   /**
-   *
-   * @param notFullyScheduledWater9am - list of water activities, if any
-   * @param notFullyScheduledWater10am  - list of water activities, if any
-   * @param notFullyScheduledLand9am  - list of 9am land activities, if any
-   * @param notFullyScheduledLand10am  - list of 10 land activitivies, if any
+   * Prints the activities that have the required minumum amount of kids but
+   * not the maximum amount of kids that can be scheduled to that activity.
+   * @param {Schedule} schedule - the schedule class object instance.
    */
   static notFullyScheduledActivities(
-    notFullyScheduledWater9am: AllActivities[],
-    notFullyScheduledWater10am: AllActivities[],
-    notFullyScheduledLand9am: AllActivities[],
-    notFullyScheduledLand10am: AllActivities[]
+    schedule: Schedule
   ): void {
+    const notFullyScheduledWater9am = schedule.getInsufficientlyScheduledActivites('water', '9am');
+    const notFullyScheduledWater10am = schedule.getInsufficientlyScheduledActivites('water', '10am');
+    const notFullyScheduledLand9am = schedule.getInsufficientlyScheduledActivites('land', '9am');
+    const notFullyScheduledLand10am = schedule.getInsufficientlyScheduledActivites('land', '10am');
     console.log("\n===============================");
     console.log('NOT FULLY SCHEDULED ACTIVITIES');
     console.log("===============================");
@@ -501,7 +500,12 @@ export class PrintLogs {
     landTotalCount: number,
     unscheduledKids: UnscheduledKids[],
     allNotInTarget: boolean,
-    allNamesEmpty: boolean
+    allNamesEmpty: boolean,
+    oppositesEqualWater9amTo10am: boolean,
+    oppositiesEqualWater10amTo9am: boolean,
+    equalWater9amToLand10am: boolean,
+    equalWater10amToLand9am: boolean,
+
 
   ): void {
     PrintLogs.initialStatement(func_name);
@@ -513,6 +517,9 @@ export class PrintLogs {
     PrintLogs.underScheduled(schedule)
     PrintLogs.kidsTimeSlotsToTotalKids(waterToKidsCount, landToKidsCount, waterTotalCount, landTotalCount, totalKidsCountWater, totalKidsCountLand)
     PrintLogs.kidsNotScheduled(schedule.kids.count, totalKidsCountWater, totalKidsCountLand, unscheduledKids, allNotInTarget, allNamesEmpty)
+    PrintLogs.notFullyScheduledActivities(schedule)
+    PrintLogs.namesComparisonWater9amTo10am(oppositesEqualWater9amTo10am, oppositiesEqualWater10amTo9am)
+    PrintLogs.namesComparisonWaterToLand(equalWater9amToLand10am, equalWater10amToLand9am)
     PrintLogs.endStatement(func_name)
   }
 }

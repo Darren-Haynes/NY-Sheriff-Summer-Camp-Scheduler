@@ -2383,47 +2383,6 @@ export class Schedule {
     PrintLogs.unscheduledData('land', this);
   }
 
-  private testScheduling(
-    activityType: AllowedActivityTypes | 'final log',
-    func_name: string,
-    logging: boolean = true,
-    scheduleChecker: ScheduleChecker
-  ): boolean {
-    const notFullyScheduledWater9am = this.getInsufficientlyScheduledActivites('water', '9am');
-    const notFullyScheduledWater10am = this.getInsufficientlyScheduledActivites('water', '10am');
-    const notFullyScheduledLand9am = this.getInsufficientlyScheduledActivites('land', '9am');
-    const notFullyScheduledLand10am = this.getInsufficientlyScheduledActivites('land', '10am');
-
-    const oppositesEqualWater9amTo10am =
-      JSON.stringify(this.notScheduled9amWater.names.sort()) ===
-      JSON.stringify(this.scheduled10amWater.names.sort());
-    const oppositiesEqualWater10amTo9am =
-      JSON.stringify(this.notScheduled9amWater.names.sort()) ===
-      JSON.stringify(this.scheduled10amWater.names.sort());
-
-    const equalWater9amToLand10am =
-      JSON.stringify(this.scheduled9amWater.names.sort()) ===
-      JSON.stringify(this.scheduled10amLand.names.sort());
-    const equalWater10amToLand9am =
-      JSON.stringify(this.scheduled10amWater.names.sort()) ===
-      JSON.stringify(this.scheduled9amLand.names.sort());
-
-    if (func_name == 'end log') {
-      PrintLogs.notFullyScheduledActivities(notFullyScheduledWater9am, notFullyScheduledWater10am, notFullyScheduledLand9am, notFullyScheduledLand10am)
-      PrintLogs.namesComparisonWater9amTo10am(oppositesEqualWater9amTo10am, oppositiesEqualWater10amTo9am)
-      PrintLogs.namesComparisonWaterToLand(equalWater9amToLand10am, equalWater10amToLand9am)
-    }
-
-    const allTrue = [
-      oppositesEqualWater9amTo10am,
-      oppositiesEqualWater10amTo9am,
-      equalWater9amToLand10am,
-      equalWater10amToLand9am,
-    ].every(element => element === true);
-
-    return allTrue;
-  }
-
   /**
    * Remove duplicate choices from the second and third choices arrays, based on the first choices array.
    * Why? This is only necessary when a kid makes the same choice more than once.
@@ -2565,8 +2524,8 @@ export class Schedule {
   }
 
   /**
-   * Get the land and water percentages of scheduled kids.
-   * @returns {object}
+   * Checks multiple data to ensure there are no scheduling errors.
+   * @returns {boolean}
    */
   private checkScheduling(): boolean {
     const scheduleChecker = new ScheduleChecker(this)
@@ -2585,12 +2544,19 @@ export class Schedule {
       element => !this.notScheduled10amWater.names.includes(element)
     );
     const allNamesEmpty = this.notScheduledAllNamesWater.length === 0;
-    // Only print testscheduling logs during development.
-    let printLogs = false;
-    if (process.env.NODE_ENV !== 'production') {
-      printLogs = true
-    }
-    const testSchedulingWater = this.testScheduling('final log', 'no func', printLogs, scheduleChecker);
+    const oppositesEqualWater9amTo10am =
+      JSON.stringify(this.notScheduled9amWater.names.sort()) ===
+      JSON.stringify(this.scheduled10amWater.names.sort());
+    const oppositiesEqualWater10amTo9am =
+      JSON.stringify(this.notScheduled9amWater.names.sort()) ===
+      JSON.stringify(this.scheduled10amWater.names.sort());
+    const equalWater9amToLand10am =
+      JSON.stringify(this.scheduled9amWater.names.sort()) ===
+      JSON.stringify(this.scheduled10amLand.names.sort());
+    const equalWater10amToLand9am =
+      JSON.stringify(this.scheduled10amWater.names.sort()) ===
+      JSON.stringify(this.scheduled9amLand.names.sort());
+
     const underScheduled = scheduleChecker.checkUnderScheduled()
 
     const allTrue = [
@@ -2600,12 +2566,15 @@ export class Schedule {
       equalObjects10amLand,
       checkPercentage,
       notScheduledToScheduled,
-      testSchedulingWater,
       underScheduled,
       !waterToKidsCount,
       !landToKidsCount,
       allNotInTarget,
       allNamesEmpty,
+      oppositesEqualWater9amTo10am,
+      oppositiesEqualWater10amTo9am,
+      equalWater9amToLand10am,
+      equalWater10amToLand9am,
     ].every(element => element === true);
 
     if (process.env.NODE_ENV !== 'production') {
@@ -2624,7 +2593,11 @@ export class Schedule {
         scheduleChecker.landTotalCount,
         scheduleChecker.unscheduledKids,
         allNotInTarget,
-        allNamesEmpty
+        allNamesEmpty,
+        oppositesEqualWater9amTo10am,
+        oppositiesEqualWater10amTo9am,
+        equalWater9amToLand10am,
+        equalWater10amToLand9am,
       );
     }
 
