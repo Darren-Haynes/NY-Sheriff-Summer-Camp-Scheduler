@@ -316,4 +316,14 @@ export class ScheduleChecker {
 
     return result;
   }
+
+  /**
+   * Wrapper for create time slots and activity Data
+   */
+  createActivityAndTimeData(): void {
+    this.createTimeSlotsData('water');
+    this.createTimeSlotsData('land');
+    this.createWaterActivityData();
+    this.createLandActivityData();
+  }
 }

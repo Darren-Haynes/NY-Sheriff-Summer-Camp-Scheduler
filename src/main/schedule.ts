@@ -2389,10 +2389,7 @@ export class Schedule {
     logging: boolean = true,
     scheduleChecker: ScheduleChecker
   ): boolean {
-    scheduleChecker.createTimeSlotsData('water');
-    scheduleChecker.createTimeSlotsData('land');
-    scheduleChecker.createWaterActivityData();
-    scheduleChecker.createLandActivityData();
+    scheduleChecker.createActivityAndTimeData();
     const totalKidsCountWater = this.kids.count - this.notScheduledAllNamesWater.length;
     const totalKidsCountLand = this.kids.count - this.notScheduledAllNamesLand.length;
     const equalObjects9amWater = scheduleChecker.compareEqualObjects('water', '9am');
@@ -2616,7 +2613,6 @@ export class Schedule {
   private checkScheduling(): boolean {
     const scheduleChecker = new ScheduleChecker(this)
     const checkPercentage = scheduleChecker.checkPercentages()
-
     const notScheduledToScheduled = scheduleChecker.checkUnscheduledToScheduled();
 
     // Only print testscheduling logs during development.
