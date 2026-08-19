@@ -2393,12 +2393,6 @@ export class Schedule {
     const totalKidsCountWater = this.kids.count - this.notScheduledAllNamesWater.length;
     const totalKidsCountLand = this.kids.count - this.notScheduledAllNamesLand.length;
 
-    if (logging) {
-      PrintLogs.nameCounts(activityType, this)
-      PrintLogs.overScheduled(activityType, this)
-      PrintLogs.underScheduled(activityType, this)
-    }
-
     const waterToKidsCount = scheduleChecker.waterTotalCount !== totalKidsCountWater;
     const landToKidsCount = scheduleChecker.landTotalCount !== totalKidsCountLand;
     if (logging) {

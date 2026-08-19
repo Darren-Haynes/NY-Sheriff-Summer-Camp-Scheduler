@@ -280,16 +280,12 @@ export class PrintLogs {
    * @param activityType
    * @param schedule
    */
-  static nameCounts(activityType: AllowedActivityTypes | 'final log', schedule: Schedule): void {
+  static nameCounts(schedule: Schedule): void {
     console.log("\n=========================")
-    console.log(`NAME COUNTS - ${activityType.toUpperCase()}`)
+    console.log(`NAME COUNTS`)
     console.log("=========================")
-    if (activityType === 'water' || activityType === 'final log') {
-      this.nameCountsByActivity('water', schedule);
-    }
-    if (activityType === 'land' || activityType === 'final log') {
-      this.nameCountsByActivity('land', schedule);
-    }
+    this.nameCountsByActivity('water', schedule);
+    this.nameCountsByActivity('land', schedule);
   }
 
   /**
@@ -329,20 +325,15 @@ export class PrintLogs {
    * @param schedule
    */
   static underScheduled(
-    activityType: AllowedActivityTypes | 'final log',
     schedule: Schedule
   ): void {
     console.log("\n=========================")
     console.log("UNDERSCHEDULED ACTIVITIES")
     console.log("=========================")
-    if (activityType === 'water' || activityType === 'final log') {
-      this.underScheduledByActivityAndTimeSlot('water', '9am', schedule);
-      this.underScheduledByActivityAndTimeSlot('water', '10am', schedule);
-    }
-    if (activityType === 'land' || activityType === 'final log') {
-      this.underScheduledByActivityAndTimeSlot('land', '9am', schedule);
-      this.underScheduledByActivityAndTimeSlot('land', '10am', schedule);
-    }
+    this.underScheduledByActivityAndTimeSlot('water', '9am', schedule);
+    this.underScheduledByActivityAndTimeSlot('water', '10am', schedule);
+    this.underScheduledByActivityAndTimeSlot('land', '9am', schedule);
+    this.underScheduledByActivityAndTimeSlot('land', '10am', schedule);
   }
 
   /**
@@ -360,7 +351,7 @@ export class PrintLogs {
     const activityTypeTimeSlot = schedule.getActivityTypeTimeSlot(activityType, timeSlot);
     const typedActivityTypeTimeSlot = activityTypeTimeSlot as Record<string, string[]>;
     const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
-    console.log(`${activityType.toUpperCase()} ${timeSlot.toUpperCase()} OVERSCHEDULED`);
+    console.log(`${activityType.toUpperCase()} ${timeSlot.toUpperCase()} OVERSCHEDULED:`);
     let overScheduled = false;
     for (const activity of Object.keys(typedActivityTypeTimeSlot)) {
       const activityCount = typedActivityTypeTimeSlot[activity].length;
@@ -371,7 +362,7 @@ export class PrintLogs {
       }
     }
     if (!overScheduled) {
-      console.log('No activities over scheduled');
+      console.log(' NONE');
     }
   }
 
@@ -381,21 +372,15 @@ export class PrintLogs {
    * @param schedule
    */
   static overScheduled(
-    activityType: AllowedActivityTypes | 'final log',
     schedule: Schedule
   ): void {
     console.log("\n=========================")
     console.log("OVERSCHEDULED ACTIVITIES")
     console.log("=========================")
-
-    if (activityType === 'water' || activityType === 'final log') {
-      this.overScheduledByActivityAndTimeSlot('water', '9am', schedule);
-      this.overScheduledByActivityAndTimeSlot('water', '10am', schedule);
-    }
-    if (activityType === 'land' || activityType === 'final log') {
-      this.overScheduledByActivityAndTimeSlot('land', '9am', schedule);
-      this.overScheduledByActivityAndTimeSlot('land', '10am', schedule);
-    }
+    this.overScheduledByActivityAndTimeSlot('water', '9am', schedule);
+    this.overScheduledByActivityAndTimeSlot('water', '10am', schedule);
+    this.overScheduledByActivityAndTimeSlot('land', '9am', schedule);
+    this.overScheduledByActivityAndTimeSlot('land', '10am', schedule);
   }
 
   /**
@@ -535,6 +520,9 @@ export class PrintLogs {
     PrintLogs.unscheduledDataSwitch(schedule)
     PrintLogs.equalObjects('water', equalObjects9amWater, equalObjects10amWater, equalObjects9amLand, equalObjects10amLand)
     PrintLogs.equalObjects('land', equalObjects9amWater, equalObjects10amWater, equalObjects9amLand, equalObjects10amLand)
+    PrintLogs.nameCounts(schedule)
+    PrintLogs.overScheduled(schedule)
+    PrintLogs.underScheduled(schedule)
     PrintLogs.endStatement(func_name)
   }
 }
