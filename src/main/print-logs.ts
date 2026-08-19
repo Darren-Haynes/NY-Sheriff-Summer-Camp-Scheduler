@@ -1,6 +1,6 @@
 import { Activities } from './activities';
-import { AllActivities, AllowedActivityTypes, AllowedTimes } from "../types/schedule-types";
-import { KidsData, UnscheduledKids } from "../types/kids-types"
+import type { AllActivities, AllowedActivityTypes, AllowedTimes } from "../types/schedule-types";
+import type { UnscheduledKids } from "../types/kids-types"
 import type { Schedule } from "./schedule"
 
 /**
@@ -544,8 +544,6 @@ export class PrintLogs {
     oppositiesEqualWater10amTo9am: boolean,
     equalWater9amToLand10am: boolean,
     equalWater10amToLand9am: boolean,
-
-
   ): void {
     PrintLogs.initialStatement(func_name);
     PrintLogs.unscheduledDataSwitch(schedule)

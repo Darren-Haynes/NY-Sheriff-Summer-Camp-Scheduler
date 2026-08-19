@@ -1,3 +1,4 @@
+import { ERROR_LOGS, SUCCESS_LOGS, INFO_LOGS } from '../sheriff.config'
 import { Activities } from './activities';
 import { Kids } from './kids';
 import { PrintLogs } from './print-logs'
@@ -42,6 +43,7 @@ import {
   WaterRanges,
   WaterKids,
 } from '../types/camp-types';
+import type { PrintAllLogs } from '../types/log-types';
 
 const ZEROINT = 0 as Int;
 const MINUSONEINT = -1 as Int;
@@ -1274,7 +1276,7 @@ export class Schedule {
       timeSlot
     );
     if (activitiesAboveSingleMin.length > 0) {
-      if (process.env.NODE_ENV !== 'production') {
+      if (process.env.NODE_ENV !== 'production' && INFO_LOGS) {
         console.log('Activities above single minimum:', activitiesAboveSingleMin);
       }
       this.scheduleSingleActivities(
@@ -1311,7 +1313,7 @@ export class Schedule {
       timeSlot
     );
     if (activitiesAboveDoubleMin.length > 0) {
-      if (process.env.NODE_ENV !== 'production') {
+      if (process.env.NODE_ENV !== 'production' && INFO_LOGS) {
         console.log('Activities above double minimum:', activitiesAboveDoubleMin);
       }
       this.scheduleDoubleActivities(
@@ -1348,8 +1350,8 @@ export class Schedule {
       timeSlot
     );
     if (activitiesAboveSingleMax.length > 0) {
-      if (process.env.NODE_ENV !== 'production') {
-      console.log('Activities above single maximum:', activitiesAboveSingleMax);
+      if (process.env.NODE_ENV !== 'production' && INFO_LOGS) {
+        console.log('Activities above single maximum:', activitiesAboveSingleMax);
       }
       this.scheduleSingleActivities(
         activitiesAboveSingleMax,
@@ -1384,8 +1386,8 @@ export class Schedule {
       timeSlot
     );
     if (activitiesAboveDoubleMax.length > 0) {
-      if (process.env.NODE_ENV !== 'production') {
-      console.log('Activities above doulbe maximum:', activitiesAboveDoubleMax);
+      if (process.env.NODE_ENV !== 'production' && INFO_LOGS) {
+        console.log('Activities above doulbe maximum:', activitiesAboveDoubleMax);
       }
       this.scheduleDoubleActivities(
         activitiesAboveDoubleMax,
@@ -1422,14 +1424,14 @@ export class Schedule {
       switch (maxOrMinSched) {
         case 'maxOnly':
           caseSuccess = this.scheduleDoubleMax(typedActivityType, currentChoices, 'max', timeSlot);
-          if (caseSuccess && process.env.NODE_ENV !== 'production') {
+          if (caseSuccess && process.env.NODE_ENV !== 'production' && SUCCESS_LOGS) {
             console.log(`scheduleDoubleMax ran successfully`);
           }
           break;
 
         case 'minOnly':
           caseSuccess = this.scheduleDoubleMin(typedActivityType, currentChoices, 'min', timeSlot);
-          if (caseSuccess && process.env.NODE_ENV !== 'production') {
+          if (caseSuccess && process.env.NODE_ENV !== 'production' && SUCCESS_LOGS) {
             console.log(`scheduleDoubleMin ran successfully`);
           }
           break;
@@ -1483,14 +1485,14 @@ export class Schedule {
       switch (maxOrMinSched) {
         case 'maxOnly':
           caseSuccess = this.scheduleSingleMax(typedActivityType, currentChoices, 'max', timeSlot);
-          if (caseSuccess && process.env.NODE_ENV !== 'production') {
+          if (caseSuccess && process.env.NODE_ENV !== 'production' && SUCCESS_LOGS) {
             console.log(`scheduleSingleMax ran successfully`);
           }
           break;
 
         case 'minOnly':
           caseSuccess = this.scheduleSingleMin(typedActivityType, currentChoices, 'min', timeSlot);
-          if (caseSuccess && process.env.NODE_ENV !== 'production') {
+          if (caseSuccess && process.env.NODE_ENV !== 'production' && SUCCESS_LOGS) {
             console.log(`scheduleSingleMin ran successfully`);
           }
           break;
@@ -2555,28 +2557,35 @@ export class Schedule {
       equalWater10amToLand9am,
     ].every(element => element === true);
 
+    const logsArgs: PrintAllLogs = [
+      'FINAL LOG',
+      this,
+      equalObjects9amWater,
+      equalObjects10amWater,
+      equalObjects9amLand,
+      equalObjects10amLand,
+      waterToKidsCount,
+      landToKidsCount,
+      totalKidsCountWater,
+      totalKidsCountLand,
+      scheduleChecker.waterTotalCount,
+      scheduleChecker.landTotalCount,
+      scheduleChecker.unscheduledKids,
+      allNotInTarget,
+      allNamesEmpty,
+      oppositesEqualWater9amTo10am,
+      oppositiesEqualWater10amTo9am,
+      equalWater9amToLand10am,
+      equalWater10amToLand9am,
+    ]
+
     if (process.env.NODE_ENV !== 'production' && !allTrue) {
-      PrintLogs.printAll(
-        'FINAL LOG',
-        this,
-        equalObjects9amWater,
-        equalObjects10amWater,
-        equalObjects9amLand,
-        equalObjects10amLand,
-        waterToKidsCount,
-        landToKidsCount,
-        totalKidsCountWater,
-        totalKidsCountLand,
-        scheduleChecker.waterTotalCount,
-        scheduleChecker.landTotalCount,
-        scheduleChecker.unscheduledKids,
-        allNotInTarget,
-        allNamesEmpty,
-        oppositesEqualWater9amTo10am,
-        oppositiesEqualWater10amTo9am,
-        equalWater9amToLand10am,
-        equalWater10amToLand9am,
-      );
+      if (!allTrue && ERROR_LOGS) {
+        PrintLogs.printAll(...logsArgs);
+      }
+      if (allTrue && SUCCESS_LOGS) {
+        PrintLogs.printAll(...logsArgs);
+      }
     }
 
     return allTrue;
@@ -2609,7 +2618,7 @@ export class Schedule {
 
       for (let i = 0; i < waterMethods.length; i++) {
 
-        if (process.env.NODE_ENV !== 'production') {
+        if (process.env.NODE_ENV !== 'production' && INFO_LOGS) {
           console.log('ENTERING: ' + waterMethods[i].name + '()');
         }
         (waterMethods[i] as Function).apply(this, waterMethodArgs[i]);
@@ -2651,7 +2660,7 @@ export class Schedule {
     ];
 
     for (let i = 0; i < landMethods.length; i++) {
-      if (process.env.NODE_ENV !== 'production') {
+      if (process.env.NODE_ENV !== 'production' && INFO_LOGS) {
         console.log('ENTERING: ' + landMethods[i].name + '()');
       }
       (landMethods[i] as Function).apply(this, landMethodArgs[i]);
@@ -2665,7 +2674,7 @@ export class Schedule {
   runAlgo(): boolean {
     this.isLandFirst = false;
 
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV !== 'production' && INFO_LOGS) {
       console.log("\n-----------------------------------------------");
       console.log(`***${this.algo.toUpperCase()} ALGORITHM INITIATED***`);
     }

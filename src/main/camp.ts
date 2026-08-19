@@ -1,6 +1,6 @@
 import { Kids } from './kids';
 import { Schedule } from './schedule';
-import { Activities } from './activities';
+import { ERROR_LOGS, SUCCESS_LOGS, INFO_LOGS } from '../sheriff.config'
 
 export class Camp {
   kids: Kids;
@@ -81,14 +81,14 @@ export class Camp {
       const validResult = this.run.runAlgo();
       if (validResult) {
         validCount++;
-        if (process.env.NODE_ENV !== 'production') {
+        if (process.env.NODE_ENV !== 'production' && SUCCESS_LOGS) {
           const totalCount = validCount + invalidCount;
           console.log(`RUN #${totalCount} SUCCESSFULL`)
         }
         this.allRuns.push(this.run);
       } else {
         invalidCount++;
-        if (process.env.NODE_ENV !== 'production') {
+        if (process.env.NODE_ENV !== 'production' && ERROR_LOGS) {
           const totalCount = validCount + invalidCount;
           console.log(`RUN #${totalCount} FAILED`)
         }
@@ -107,7 +107,7 @@ export class Camp {
     } else {
       this.bestSchedule = this.bestPercentagesSchedule();
     }
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV !== 'production' && INFO_LOGS) {
       console.log(`\n=======RUN COUNTS=======`);
       console.log(`TOTAL RUNS COUNT: ${validCount + invalidCount}`);
       console.log(`VALID RUNS COUNT: ${validCount}`);
