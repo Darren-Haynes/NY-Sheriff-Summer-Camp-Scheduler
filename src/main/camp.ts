@@ -1,6 +1,6 @@
 import { Kids } from './kids';
 import { Schedule } from './schedule';
-import { Activities } from './activities';
+import { ERROR_LOGS, SUCCESS_LOGS, INFO_LOGS } from '../sheriff.config'
 
 export class Camp {
   kids: Kids;
@@ -69,6 +69,7 @@ export class Camp {
    * @returns {void}
    */
   public scheduleTheKids(numOfRuns: number): void {
+
     if (numOfRuns < 1 || numOfRuns > 1000) {
       throw new RangeError('Value must be between 1 and 1000');
     }
@@ -77,12 +78,20 @@ export class Camp {
     let invalidCount = 0;
     while (this.allRuns.length < numOfRuns) {
       this.run = new Schedule(this.kids, 'waterFirst');
-      const validResult = this.run.runAlgo();
+      const validResult = this.run.runAlgo(validCount + invalidCount);
       if (validResult) {
         validCount++;
+        if (process.env.NODE_ENV !== 'production' && SUCCESS_LOGS) {
+          const totalCount = validCount + invalidCount;
+          console.log(`RUN #${totalCount} SUCCESSFULL`)
+        }
         this.allRuns.push(this.run);
       } else {
         invalidCount++;
+        if (process.env.NODE_ENV !== 'production' && ERROR_LOGS) {
+          const totalCount = validCount + invalidCount;
+          console.log(`RUN #${totalCount} FAILED`)
+        }
       }
       if (invalidCount > numOfRuns) {
         validResults = false;
@@ -97,6 +106,12 @@ export class Camp {
       }
     } else {
       this.bestSchedule = this.bestPercentagesSchedule();
+    }
+    if (process.env.NODE_ENV !== 'production' && INFO_LOGS) {
+      console.log(`\n=======RUN COUNTS=======`);
+      console.log(`TOTAL RUNS COUNT: ${validCount + invalidCount}`);
+      console.log(`VALID RUNS COUNT: ${validCount}`);
+      console.log(`INVALID RUNS COUNT: ${invalidCount}`);
     }
   }
 }

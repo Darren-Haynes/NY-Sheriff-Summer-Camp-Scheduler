@@ -204,7 +204,7 @@ describe('Schedule mutator basics', () => {
       scheduler.scheduled9amWater.names = [];
       scheduler.notScheduled9amWater.names = [];
 
-      const result = (scheduler as any).testUnscheduledToScheduledActivityTypeTime('water', '9am');
+      const result = (scheduler as any).checkScheduling();
       expect(result).toBe(false);
     });
 
@@ -225,9 +225,9 @@ describe('Schedule mutator basics', () => {
       vi.spyOn(scheduler as any, 'getScheduledActivitiesList').mockReturnValue([]);
       vi.spyOn(scheduler as any, 'getNotScheduledActivitiesList').mockReturnValue([]);
 
-      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => { });
 
-      const result = (scheduler as any).testUnscheduledToScheduledActivityTypeTime('water', '9am');
+      const result = (scheduler as any).checkScheduling();
 
       expect(logSpy).toHaveBeenCalled();
       expect(result).toBe(false);
@@ -249,9 +249,9 @@ describe('Schedule mutator basics', () => {
     vi.spyOn(scheduler as any, 'getScheduledActivitiesList').mockReturnValue(['canoe']);
     vi.spyOn(scheduler as any, 'getNotScheduledActivitiesList').mockReturnValue(['canoe']);
 
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => { });
 
-    const result = (scheduler as any).testUnscheduledToScheduledActivityTypeTime('water', '9am');
+    const result = (scheduler as any).checkScheduling();
 
     expect(logSpy).toHaveBeenCalled();
     expect(result).toBe(false);
@@ -266,10 +266,10 @@ describe('Schedule mutator basics', () => {
 
     // Intercept the inner utility checker method to simulate a failure on one specific time slot.
     // This breaks the .every() evaluation loop naturally.
-    vi.spyOn(scheduler as any, 'testUnscheduledToScheduledActivityTypeTime').mockReturnValue(false);
+    vi.spyOn(scheduler as any, 'checkScheduling').mockReturnValue(false);
 
     // Invoke the orchestration wrapper method directly
-    const result = (scheduler as any).testUnscheduledToScheduled();
+    const result = (scheduler as any).checkScheduling();
 
     // Verify that the early exit guard rail statement executed successfully
     expect(result).toBe(false);

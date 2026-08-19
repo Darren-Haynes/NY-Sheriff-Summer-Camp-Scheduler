@@ -1,4 +1,5 @@
 import { WaterActivityCounts, LandActivityCounts } from '../types/kids-types';
+import { LandCount9am, LandCount10am } from '../types/schedule-types';
 
 export type CampActivities = {
   landActs: Array<string>;
@@ -15,6 +16,9 @@ export type CampActivities = {
   waterRanges: WaterRanges;
   waterActivitiesChoiceCount: WaterActivityCounts;
   landActivitiesChoiceCount: LandActivityCounts;
+  waterActivities0Count: WaterActivities0Count;
+  land9amActivities0Count: LandCount9am;
+  land10amActivities0Count: LandCount10am;
 };
 
 type LandRangeType = [number, number, number];
@@ -123,3 +127,37 @@ export type AllLandWaterKids9am10am = {
   lax?: Array<string>;
   yoga?: Array<string>;
 };
+
+export interface WaterActivities0Count {
+  [key: string]: number;
+  fish: number;
+  pboard: number;
+  snork: number;
+  canoe: number;
+  kayak: number;
+  sail: number;
+  swim: number;
+}
+
+export interface LandActivities9am0Count {
+  [key: string]: number;
+  art: number;
+  hike: number;
+  bball: number;
+  cheer: number;
+  soc: number;
+  vball: number;
+  arch: number;
+}
+
+export interface LandActivities10am0Count {
+  [key: string]: number;
+  fris: number;
+  art: number;
+  hike: number;
+  pball: number;
+  fball: number;
+  lax: number;
+  yoga: number;
+  arch: number;
+}

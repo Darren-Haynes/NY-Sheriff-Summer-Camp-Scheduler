@@ -7,7 +7,7 @@ describe('Scheduler Algorithmic Fuzzing & Stress Tests', () => {
 
   test('unlocked randomness loops execute fallback branches and retry pathways natively', () => {
     // 1. Mute console outputs during execution to keep the test terminal clean
-    vi.spyOn(console, 'log').mockImplementation(() => {});
+    vi.spyOn(console, 'log').mockImplementation(() => { });
 
     // Collect all valid choices to pick from dynamically
     const landOptions = Activities.landActs;

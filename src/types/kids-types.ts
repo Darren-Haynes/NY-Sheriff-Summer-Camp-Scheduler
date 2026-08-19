@@ -3,14 +3,21 @@ import { LandActivities, WaterActivities } from './schedule-types';
 export type KidsData = Map<
   string,
   {
-    timeSlots: {
-      land9am: LandActivities | null;
-      land10am: LandActivities | null;
-      water9am: WaterActivities | null;
-      water10am: WaterActivities | null;
-    };
+    timeSlots: TimeSlots
   }
 >;
+
+export interface TimeSlots {
+  land9am: LandActivities | null;
+  land10am: LandActivities | null;
+  water9am: WaterActivities | null;
+  water10am: WaterActivities | null;
+}
+
+export interface UnscheduledKids {
+  name: string;
+  timeSlot: TimeSlots
+}
 
 export interface KidsChoices {
   [key: string]: string;
