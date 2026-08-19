@@ -2356,34 +2356,6 @@ export class Schedule {
   }
 
   /**
-   * Print activities that have been scheduled to the wrong activity and time slot, if any.
-   * @param {string} activityType - only 2 options: 'land' or 'water'.
-   * @param {string} timeSlot - only 2 options -'9am' or '10am'
-   * @returns {void}
-   */
-  private printCorrectActivities(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): void {
-    const activityTypeTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
-    const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
-    console.log(`\nCORRECT ${activityType.toUpperCase()} ${timeSlot.toUpperCase()} ACTIVITIES`);
-    const incorrectActivities: AllActivities[] = [];
-    for (const activity of Object.keys(activityTypeTimeSlot)) {
-      if (!Object.keys(ranges).includes(activity))
-        incorrectActivities.push(activity as AllActivities);
-    }
-    if (incorrectActivities.length > 0)
-      console.log(`Incorrect ${activityType} activities: ${incorrectActivities}`);
-    else {
-      console.log('All correct');
-    }
-  }
-
-  schedulingLog(func_name: string, when: string): void {
-    console.log(`\n${when} ${func_name}`);
-    PrintLogs.unscheduledData('water', this);
-    PrintLogs.unscheduledData('land', this);
-  }
-
-  /**
    * Remove duplicate choices from the second and third choices arrays, based on the first choices array.
    * Why? This is only necessary when a kid makes the same choice more than once.
    * @param {string[]} firstChoices - the first choices for each kid.

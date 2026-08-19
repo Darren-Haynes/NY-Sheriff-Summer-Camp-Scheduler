@@ -481,6 +481,46 @@ export class PrintLogs {
       this.equalObjectsByActivityType(objectsEqual9amLand, objectsEqual10amLand, 'land')
     }
   }
+
+  /**
+   * Print activities that have been scheduled to the wrong activity and time slot, if any.
+   * @param {string} activityType - only 2 options: 'land' or 'water'.
+   * @param {string} timeSlot - only 2 options -'9am' or '10am'
+   * @param {Schedule} schedule - the schedule object
+   * @returns {void}
+   */
+  static inCorrectScheduledActivitiesByActivityType(
+    activityType: AllowedActivityTypes,
+    timeSlot: AllowedTimes,
+    schedule: Schedule
+  ): void {
+    console.log("\n================================================")
+    console.log(`INCORRECTLY SCHEDULED ACTIVITIES ${activityType.toUpperCase()} ${timeSlot.toUpperCase()} `);
+    console.log("================================================")
+    const activityTypeTimeSlot = schedule.getActivityTypeTimeSlot(activityType, timeSlot);
+    const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
+    console.log(`\nINCORRECT ${activityType.toUpperCase()} ${timeSlot.toUpperCase()} ACTIVITIES:`);
+    const incorrectActivities: AllActivities[] = [];
+    for (const activity of Object.keys(activityTypeTimeSlot)) {
+      if (!Object.keys(ranges).includes(activity))
+        incorrectActivities.push(activity as AllActivities);
+    }
+    if (incorrectActivities.length > 0)
+      console.log(`Incorrect ${activityType} activities: ${incorrectActivities}`);
+    else {
+      console.log('All correct');
+    }
+  }
+  /**
+   * Wrapper for inCorrectScheduledActivitiesByActivityType()
+   * @param schedule - the Schedule object
+   */
+  static inCorrectScheduledActivities(schedule: Schedule): void {
+    PrintLogs.inCorrectScheduledActivitiesByActivityType('water', '9am', schedule)
+    PrintLogs.inCorrectScheduledActivitiesByActivityType('water', '10am', schedule)
+    PrintLogs.inCorrectScheduledActivitiesByActivityType('land', '9am', schedule)
+    PrintLogs.inCorrectScheduledActivitiesByActivityType('land', '10am', schedule)
+  }
   /**
    * Catch all the runs all the other logs in this method
    * @param func_name - can be the func printlogs are called from of "Final log"
@@ -520,6 +560,7 @@ export class PrintLogs {
     PrintLogs.notFullyScheduledActivities(schedule)
     PrintLogs.namesComparisonWater9amTo10am(oppositesEqualWater9amTo10am, oppositiesEqualWater10amTo9am)
     PrintLogs.namesComparisonWaterToLand(equalWater9amToLand10am, equalWater10amToLand9am)
+    PrintLogs.inCorrectScheduledActivities(schedule)
     PrintLogs.endStatement(func_name)
   }
 }
