@@ -2671,12 +2671,13 @@ export class Schedule {
    * Main algo running entry point for scheduling kids
    * @returns {boolean} if scheduling checks pass
    */
-  runAlgo(): boolean {
+  runAlgo(runNumber: number): boolean {
     this.isLandFirst = false;
 
     if (process.env.NODE_ENV !== 'production' && INFO_LOGS) {
       console.log("\n-----------------------------------------------");
       console.log(`***${this.algo.toUpperCase()} ALGORITHM INITIATED***`);
+      console.log(`\t<<<RUN NUMBER #${runNumber}>>>`)
     }
 
     this.scheduleWater();

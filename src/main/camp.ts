@@ -78,7 +78,7 @@ export class Camp {
     let invalidCount = 0;
     while (this.allRuns.length < numOfRuns) {
       this.run = new Schedule(this.kids, 'waterFirst');
-      const validResult = this.run.runAlgo();
+      const validResult = this.run.runAlgo(validCount + invalidCount);
       if (validResult) {
         validCount++;
         if (process.env.NODE_ENV !== 'production' && SUCCESS_LOGS) {
