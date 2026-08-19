@@ -83,7 +83,10 @@
     "tar": "^7.4.3",
     "tmp": "^0.2.3",
     "webpack-dev-server": "^5.2.4",
-    "js-yaml": "^4.1.2"
+    "js-yaml": "^4.1.2",
+    "extract-zip": {
+      "yauzl": "^3.3.1"
+    }
   },
   "allowScripts": {
     "electron-winstaller@5.4.0": true,
