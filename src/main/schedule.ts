@@ -2631,16 +2631,16 @@ export class Schedule {
     const testSchedulingWater = this.testScheduling('final log', 'no func', printLogs, scheduleChecker);
     const underScheduled = scheduleChecker.checkUnderScheduled()
 
-    if (process.env.NODE_ENV !== 'production') {
-      PrintLogs.runAll('FINAL LOG');
-    }
-
     const allTrue = [
       checkPercentage,
       notScheduledToScheduled,
       testSchedulingWater,
       underScheduled
     ].every(element => element === true);
+
+    if (process.env.NODE_ENV !== 'production') {
+      PrintLogs.runAll('FINAL LOG');
+    }
 
     return allTrue;
   }

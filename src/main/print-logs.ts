@@ -34,11 +34,10 @@ export class PrintLogs {
    * @param func_name  - name of scheduling function being called.
    */
   static endStatement(
-    activityType: AllowedActivityTypes | 'final log',
     func_name: string,
   ): void {
     console.log('______________________________________');
-    console.log(`\tEXITING LOGS -- ${activityType}`);
+    console.log(`\tEXITING LOGGING`);
     console.log('\tAfter calling', func_name);
     console.log('______________________________________');
     console.log('______________________________________');
@@ -525,8 +524,12 @@ export class PrintLogs {
       this.equalObjectsByActivityType(objectsEqual9amLand, objectsEqual10amLand, 'land')
     }
   }
-
+  /**
+   * Catch all the runs all the other logs in this method
+   * @param func_name - can be the func printlogs are called from of "Final log"
+   */
   static runAll(func_name: string): void {
-    PrintLogs.initialStatement(func_name)
+    PrintLogs.initialStatement(func_name);
+    PrintLogs.endStatement(func_name)
   }
 }
