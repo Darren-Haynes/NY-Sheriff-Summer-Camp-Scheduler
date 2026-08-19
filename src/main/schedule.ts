@@ -2392,14 +2392,6 @@ export class Schedule {
     scheduleChecker.createActivityAndTimeData();
     const totalKidsCountWater = this.kids.count - this.notScheduledAllNamesWater.length;
     const totalKidsCountLand = this.kids.count - this.notScheduledAllNamesLand.length;
-    const equalObjects9amWater = scheduleChecker.compareEqualObjects('water', '9am');
-    const equalObjects10amWater = scheduleChecker.compareEqualObjects('water', '10am');
-    const equalObjects9amLand = scheduleChecker.compareEqualObjectsKeys('9am')
-    const equalObjects10amLand = scheduleChecker.compareEqualObjectsKeys('10am')
-
-    if (logging) {
-      PrintLogs.equalObjects(activityType, equalObjects9amWater, equalObjects10amWater, equalObjects9amLand, equalObjects10amLand)
-    }
 
     if (logging) {
       PrintLogs.nameCounts(activityType, this)
@@ -2449,10 +2441,6 @@ export class Schedule {
     }
 
     const allTrue = [
-      equalObjects9amWater,
-      equalObjects10amWater,
-      equalObjects9amLand,
-      equalObjects10amLand,
       !waterToKidsCount,
       !landToKidsCount,
       allNotInTarget,
@@ -2614,6 +2602,10 @@ export class Schedule {
     const scheduleChecker = new ScheduleChecker(this)
     const checkPercentage = scheduleChecker.checkPercentages()
     const notScheduledToScheduled = scheduleChecker.checkUnscheduledToScheduled();
+    const equalObjects9amWater = scheduleChecker.compareEqualObjects('water', '9am');
+    const equalObjects10amWater = scheduleChecker.compareEqualObjects('water', '10am');
+    const equalObjects9amLand = scheduleChecker.compareEqualObjectsKeys('9am')
+    const equalObjects10amLand = scheduleChecker.compareEqualObjectsKeys('10am')
 
     // Only print testscheduling logs during development.
     let printLogs = false;
@@ -2624,6 +2616,10 @@ export class Schedule {
     const underScheduled = scheduleChecker.checkUnderScheduled()
 
     const allTrue = [
+      equalObjects9amWater,
+      equalObjects10amWater,
+      equalObjects9amLand,
+      equalObjects10amLand,
       checkPercentage,
       notScheduledToScheduled,
       testSchedulingWater,
@@ -2631,7 +2627,14 @@ export class Schedule {
     ].every(element => element === true);
 
     if (process.env.NODE_ENV !== 'production') {
-      PrintLogs.runAll('FINAL LOG', this);
+      PrintLogs.runAll(
+        'FINAL LOG',
+        this,
+        equalObjects9amWater,
+        equalObjects10amWater,
+        equalObjects9amLand,
+        equalObjects10amLand
+      );
     }
 
     return allTrue;

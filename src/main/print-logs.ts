@@ -523,9 +523,18 @@ export class PrintLogs {
    * Catch all the runs all the other logs in this method
    * @param func_name - can be the func printlogs are called from of "Final log"
    */
-  static runAll(func_name: string, schedule: Schedule): void {
+  static runAll(
+    func_name: string,
+    schedule: Schedule,
+    equalObjects9amWater: boolean,
+    equalObjects10amWater: boolean,
+    equalObjects9amLand: boolean,
+    equalObjects10amLand: boolean
+  ): void {
     PrintLogs.initialStatement(func_name);
     PrintLogs.unscheduledDataSwitch(schedule)
+    PrintLogs.equalObjects('water', equalObjects9amWater, equalObjects10amWater, equalObjects9amLand, equalObjects10amLand)
+    PrintLogs.equalObjects('land', equalObjects9amWater, equalObjects10amWater, equalObjects9amLand, equalObjects10amLand)
     PrintLogs.endStatement(func_name)
   }
 }
