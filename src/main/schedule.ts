@@ -502,34 +502,6 @@ export class Schedule {
   }
 
   /**
-   * Count how many kids have chosen a specific activity as one of their choices.
-   * @param {string} activityType - only 2 options: 'land' or 'water'.
-   * @param {string} activity - activity such as 'canoe', 'pboard' or 'bball;
-   * @returns {number} - simple int of the count
-   */
-  private howManyToSpareHaveActivityAsAChoice(
-    activityType: AllowedActivityTypes,
-    activity: LandActivities | WaterActivities,
-    kidsToSpare: Map<string, [number, string[]]>
-  ): number {
-    const ACTIVITY_TYPES = activityType === 'water' ? Schedule.WATERTYPES : Schedule.LANDTYPES;
-    let count = 0;
-    kidsToSpare.forEach(kids => {
-      kids[1].forEach(kid => {
-        const theKid = this.kids.choices[kid];
-        for (const [kidActivityType, kidActivity] of Object.entries(theKid.choices)) {
-          if (ACTIVITY_TYPES.includes(kidActivityType)) {
-            if (kidActivity === activity) {
-              count += 1;
-            }
-          }
-        }
-      });
-    });
-    return count;
-  }
-
-  /**
    * Sorts activities by shortfall from minimum requirement.
    * @param {Map<string,number>} notScheduledActivites - num of choices to count between 1 - 3.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
