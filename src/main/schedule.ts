@@ -1016,14 +1016,14 @@ export class Schedule {
    * Add Kids to the schedule for activities that more kids have chosen than there are openings for both 9am and 10am timeslots
    * @param {string[]} doubleMaxActivities - The actvities that more kids have chosen than there are timeslots.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
-   * @param {number[]} ChoiceNum - kids land or water choice 1st, 2nd or 3rd
+   * @param {number[]} choiceNum - kids land or water choice 1st, 2nd or 3rd
+   * @param {AllowedTimes} timeSlot - '9am', '10am' or 'both'
    * @returns {void}
    */
   private scheduleDoubleActivities(
     doubleMaxActivities: string[],
     activityType: AllowedActivityTypes,
     choiceNum: AllowedChoices,
-    maxOrMin: AllowedMaxMin,
     timeSlot: AllowedTimes
   ): void {
     doubleMaxActivities.forEach(activity => {
@@ -1050,41 +1050,25 @@ export class Schedule {
         );
       }
 
-      const activityValue = maxOrMin === 'max' ? 1 : 0;
       const waterActivity = activity as WaterActivities;
-      const activityMaxOrMin = Activities.waterRanges[waterActivity][activityValue];
+      const activityMaxOrMin = Activities.waterRanges[waterActivity][1];
 
       let kidsNineAM: string[] = [];
       let kidsTenAM: string[] = [];
 
-      if (maxOrMin === 'max') {
-        const randomKids = this.randomChoices(kidsByActivityChoice, activityMaxOrMin * 2);
-        kidsNineAM = randomKids.slice(0, activityMaxOrMin);
-        kidsTenAM = randomKids.slice(activityMaxOrMin);
-      } else if (maxOrMin === 'min') {
-        let halfTheKids = Math.ceil(kidsByActivityChoice.length / 2);
-        if (
-          activityType === 'water' &&
-          this.scheduled10amWater.names.length > this.scheduled9amWater.names.length
-        ) {
-          halfTheKids = Math.ceil(halfTheKids);
-        }
-        kidsNineAM = kidsByActivityChoice.slice(0, halfTheKids);
-        kidsTenAM = kidsByActivityChoice.slice(halfTheKids);
-      }
+      const randomKids = this.randomChoices(kidsByActivityChoice, activityMaxOrMin * 2);
+      kidsNineAM = randomKids.slice(0, activityMaxOrMin);
+      kidsTenAM = randomKids.slice(activityMaxOrMin);
 
       this.removeFromNotScheduled(kidsNineAM, activityType, typedActivity, '9am');
       this.AddToScheduled(kidsNineAM, activityType, typedActivity, '9am');
       this.removeFromNotScheduled(kidsTenAM, activityType, typedActivity, '10am');
       this.AddToScheduled(kidsTenAM, activityType, typedActivity, '10am');
 
-      if (activityType === 'water') {
-        const waterActivity = activity as WaterActivities;
-        this.water9am[waterActivity] = kidsNineAM;
-        this.water10am[waterActivity] = kidsTenAM;
-        this.setKidsTimeSlot(kidsNineAM, waterActivity, 'water9am');
-        this.setKidsTimeSlot(kidsTenAM, waterActivity, 'water10am');
-      }
+      this.water9am[waterActivity] = kidsNineAM;
+      this.water10am[waterActivity] = kidsTenAM;
+      this.setKidsTimeSlot(kidsNineAM, waterActivity, 'water9am');
+      this.setKidsTimeSlot(kidsTenAM, waterActivity, 'water10am');
     });
   }
 
@@ -1253,7 +1237,6 @@ export class Schedule {
         activitiesAboveDoubleMin,
         activityType,
         choices,
-        maxOrMin,
         timeSlot
       );
       return true;
@@ -1326,7 +1309,6 @@ export class Schedule {
         activitiesAboveDoubleMax,
         activityType,
         choices,
-        maxOrMin,
         timeSlot
       );
       return true;
