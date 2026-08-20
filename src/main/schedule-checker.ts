@@ -138,10 +138,6 @@ export class ScheduleChecker {
         } else {
           return this.water9amActivityTimeSlotsCount
         }
-      } else {
-        if (objectType === 'activityCount') {
-          return "tbd"
-        }
       }
     }
 
@@ -151,10 +147,6 @@ export class ScheduleChecker {
           return this.water10amWaterActivityCount
         } else {
           return this.water10amActivityTimeSlotsCount
-        }
-      } else {
-        if (objectType === 'activityCount') {
-          return "tbd"
         }
       }
     }
