@@ -1320,23 +1320,28 @@ export class Schedule {
    * Precursor to scheduleDoubleMax and scheduleDoubleMin methods.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {number[]} choices - num of choices to count in any combo of 1 thru 3: [[1], [2], [3], [1, 2], [1, 2], [1, 3], [1, 2, 3]]
-   * @returns {boolean} true if 1 or more activities were scheduled, false if not activity is schedule.
+   * @returns {void}
    */
   private scheduleDoubles(
     activityType: WaterOnly,
     choices: AllowedChoices,
     timeSlot: AllowedTimes
-  ): boolean {
-    let caseSuccess = false
+  ): void {
+    const typedActivityType = activityType as AllowedActivityTypes;
     for (let i = 1; i <= choices.length; i++) {
       const currentChoices = choices.slice(0, i) as unknown as AllowedChoices;
-      const typedActivityType = activityType as AllowedActivityTypes;
-      caseSuccess = this.scheduleDoubleMax(typedActivityType, currentChoices, 'max', timeSlot);
-      if (caseSuccess && process.env.NODE_ENV !== 'production' && SUCCESS_LOGS) {
+      const doubleMaxCaseSuccess = this.scheduleDoubleMax(typedActivityType, currentChoices, 'max', timeSlot);
+      if (doubleMaxCaseSuccess && process.env.NODE_ENV !== 'production' && SUCCESS_LOGS) {
         console.log(`scheduleDoubleMax ran successfully`);
       }
     }
-    return caseSuccess;
+    for (let i = 1; i <= choices.length; i++) {
+      const currentChoices = choices.slice(0, i) as unknown as AllowedChoices;
+      const doubleMinCaseSuccess = this.scheduleDoubleMin(typedActivityType, currentChoices, 'max', timeSlot);
+      if (doubleMinCaseSuccess && process.env.NODE_ENV !== 'production' && SUCCESS_LOGS) {
+        console.log(`scheduleDoubleMin ran successfully`);
+      }
+    }
   }
 
   /**
