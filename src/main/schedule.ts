@@ -1104,15 +1104,8 @@ export class Schedule {
       }
 
       const activityValue = maxOrMin === 'max' ? 1 : 0;
-      let activityMaxOrMin: number;
-
-      if (activityType === 'land') {
-        const landActivity = activity as LandActivities;
-        activityMaxOrMin = Activities.landRanges[landActivity][activityValue];
-      } else {
-        const waterActivity = activity as WaterActivities;
-        activityMaxOrMin = Activities.waterRanges[waterActivity][activityValue];
-      }
+      const waterActivity = activity as WaterActivities;
+      const activityMaxOrMin = Activities.waterRanges[waterActivity][activityValue];
 
       let kidsNineAM: string[] = [];
       let kidsTenAM: string[] = [];
@@ -1144,13 +1137,6 @@ export class Schedule {
         this.water10am[waterActivity] = kidsTenAM;
         this.setKidsTimeSlot(kidsNineAM, waterActivity, 'water9am');
         this.setKidsTimeSlot(kidsTenAM, waterActivity, 'water10am');
-      } else {
-        const landActivity9am = activity as LandActivities9am;
-        const landActivity10am = activity as LandActivities10am;
-        this.land9am[landActivity9am] = kidsNineAM;
-        this.land10am[landActivity10am] = kidsTenAM;
-        this.setKidsTimeSlot(kidsNineAM, landActivity9am, 'land9am');
-        this.setKidsTimeSlot(kidsTenAM, landActivity10am, 'land10am');
       }
     });
   }
