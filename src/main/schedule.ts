@@ -1338,60 +1338,23 @@ export class Schedule {
    * Precursor to scheduleDoubleMax and scheduleDoubleMin methods.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {number[]} choices - num of choices to count in any combo of 1 thru 3: [[1], [2], [3], [1, 2], [1, 2], [1, 3], [1, 2, 3]]
-   * @param {string}  maxOrMinSched - 3 options: 'maxOnly', 'minOnly', 'bothMinAndMax'
    * @returns {boolean} true if 1 or more activities were scheduled, false if not activity is schedule.
    */
   private scheduleDoubles(
     activityType: WaterOnly,
     choices: AllowedChoices,
-    maxOrMinSched: AllowedMaxMinSched,
     timeSlot: AllowedTimes
   ): boolean {
-    let overallSuccess = false;
-
+    let caseSuccess = false
     for (let i = 1; i <= choices.length; i++) {
       const currentChoices = choices.slice(0, i) as unknown as AllowedChoices;
-      let caseSuccess = false;
       const typedActivityType = activityType as AllowedActivityTypes;
-
-      switch (maxOrMinSched) {
-        case 'maxOnly':
-          caseSuccess = this.scheduleDoubleMax(typedActivityType, currentChoices, 'max', timeSlot);
-          if (caseSuccess && process.env.NODE_ENV !== 'production' && SUCCESS_LOGS) {
-            console.log(`scheduleDoubleMax ran successfully`);
-          }
-          break;
-
-        case 'minOnly':
-          caseSuccess = this.scheduleDoubleMin(typedActivityType, currentChoices, 'min', timeSlot);
-          if (caseSuccess && process.env.NODE_ENV !== 'production' && SUCCESS_LOGS) {
-            console.log(`scheduleDoubleMin ran successfully`);
-          }
-          break;
-
-        case 'bothMinAndMax': {
-          // Fix: Wrap this block in curly braces {}
-          const maxSuccess = this.scheduleDoubleMax(
-            typedActivityType,
-            currentChoices,
-            'max',
-            timeSlot
-          );
-          const minSuccess = this.scheduleDoubleMin(
-            typedActivityType,
-            currentChoices,
-            'min',
-            timeSlot
-          );
-          caseSuccess = maxSuccess && minSuccess; // Usually you want BOTH to succeed for "both"
-          break;
-        }
+      caseSuccess = this.scheduleDoubleMax(typedActivityType, currentChoices, 'max', timeSlot);
+      if (caseSuccess && process.env.NODE_ENV !== 'production' && SUCCESS_LOGS) {
+        console.log(`scheduleDoubleMax ran successfully`);
       }
-
-      if (caseSuccess) overallSuccess = true;
     }
-
-    return overallSuccess;
+    return caseSuccess;
   }
 
   /**
@@ -2517,7 +2480,7 @@ export class Schedule {
       ];
 
       const waterMethodArgs = [
-        ['water', [1, 2, 3], 'maxOnly', 'both'],
+        ['water', [1, 2, 3], 'both'],
         ['water', [1, 2, 3], 'both'],
         ['water', 'both'],
         ['water'],
