@@ -1398,13 +1398,11 @@ export class Schedule {
    * Precursor to scheduleSingleMax and scheduleSinlgeMin methods.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {number[]} choices - num of choices to count in any combo of 1 thru 3: [[1], [2], [3], [1, 2], [1, 2], [1, 3], [1, 2, 3]]
-   * @param {string}  maxOrMinSched - 3 options: 'maxOnly', 'minOnly', 'bothMinAndMax'
    * @returns {boolean} true if 1 or more activities were scheduled, false if not activity is schedule.
    */
   private scheduleSingles(
     activityType: AllowedActivityTypes,
     choices: AllowedChoices,
-    maxOrMinSched: AllowedMaxMinSched,
     timeSlot: AllowedTimes
   ): boolean {
     let overallSuccess = false;
@@ -1415,42 +1413,21 @@ export class Schedule {
       let caseSuccess = false;
       const typedActivityType = activityType as AllowedActivityTypes;
 
-      switch (maxOrMinSched) {
-        case 'maxOnly':
-          caseSuccess = this.scheduleSingleMax(typedActivityType, currentChoices, 'max', timeSlot);
-          if (caseSuccess && process.env.NODE_ENV !== 'production' && SUCCESS_LOGS) {
-            console.log(`scheduleSingleMax ran successfully`);
-          }
-          break;
-
-        case 'minOnly':
-          caseSuccess = this.scheduleSingleMin(typedActivityType, currentChoices, 'min', timeSlot);
-          if (caseSuccess && process.env.NODE_ENV !== 'production' && SUCCESS_LOGS) {
-            console.log(`scheduleSingleMin ran successfully`);
-          }
-          break;
-
-        case 'bothMinAndMax': {
-          const maxSuccess = this.scheduleSingleMax(
-            typedActivityType,
-            currentChoices,
-            'max',
-            timeSlot
-          );
-          const minSuccess = this.scheduleSingleMin(
-            typedActivityType,
-            currentChoices,
-            'min',
-            timeSlot
-          );
-          caseSuccess = maxSuccess || minSuccess;
-          break;
-        }
-      }
-
+      const maxSuccess = this.scheduleSingleMax(
+        typedActivityType,
+        currentChoices,
+        'max',
+        timeSlot
+      );
+      const minSuccess = this.scheduleSingleMin(
+        typedActivityType,
+        currentChoices,
+        'min',
+        timeSlot
+      );
+      caseSuccess = maxSuccess || minSuccess;
       if (caseSuccess) overallSuccess = true;
     }
-
     return overallSuccess;
   }
 
@@ -2541,7 +2518,7 @@ export class Schedule {
 
       const waterMethodArgs = [
         ['water', [1, 2, 3], 'maxOnly', 'both'],
-        ['water', [1, 2, 3], 'bothMinAndMax', 'both'],
+        ['water', [1, 2, 3], 'both'],
         ['water', 'both'],
         ['water'],
         ['water'],
@@ -2580,8 +2557,8 @@ export class Schedule {
     ];
 
     const landMethodArgs = [
-      ['land', [1, 2, 3], 'bothMinAndMax', '9am'],
-      ['land', [1, 2, 3], 'bothMinAndMax', '10am'],
+      ['land', [1, 2, 3], '9am'],
+      ['land', [1, 2, 3], '10am'],
       ['land', '9am'],
       ['land'],
       ['land', '9am'],
