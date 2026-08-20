@@ -11,7 +11,8 @@
     ".webpack/**",
     "test/e2e/**",
     "**/*.d.ts",
-    "src/renderer/renderer.ts"
+    "src/renderer/renderer.ts",
+    "src/main/print-logs.ts"
   ],
   "reporter": [
     "html",
