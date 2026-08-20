@@ -2439,7 +2439,7 @@ export class Schedule {
       equalWater10amToLand9am,
     ]
 
-    if (process.env.NODE_ENV !== 'production' && !allTrue) {
+    if (process.env.NODE_ENV !== 'production') {
       if (!allTrue && ERROR_LOGS) {
         PrintLogs.printAll(...logsArgs);
       }
