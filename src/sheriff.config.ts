@@ -2,4 +2,4 @@
 // Setting error logs true can be very useful for debugging.
 export const ERROR_LOGS: boolean = false
 export const SUCCESS_LOGS: boolean = false
-export const INFO_LOGS: boolean = true
+export const INFO_LOGS: boolean = false
