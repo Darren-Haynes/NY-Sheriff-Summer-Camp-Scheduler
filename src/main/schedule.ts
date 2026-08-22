@@ -523,14 +523,6 @@ export class Schedule {
         } else {
           return this.notScheduledAllNamesWater;
         }
-      } else {
-        if (activityType === 'water') {
-          return timeSlot === '9am'
-            ? this.notScheduled9amWater.names
-            : this.notScheduled10amWater.names;
-        } else {
-          return this.notScheduledAllNamesLand;
-        }
       }
     }
     if (activityType === 'land') {
