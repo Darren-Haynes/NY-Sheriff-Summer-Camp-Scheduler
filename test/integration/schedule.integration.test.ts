@@ -1,6 +1,6 @@
-import { vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
 import { Kids } from '../../src/main/kids';
-import { Schedule } from '../../src/main/schedule';
+import { Camp  } from '../../src/main/camp';
 
 describe('Schedule integration (small dataset)', () => {
   beforeAll(() => {
@@ -22,14 +22,19 @@ describe('Schedule integration (small dataset)', () => {
     ];
 
     const kids = new Kids(rows);
-    const scheduler = new Schedule(kids, 'waterFirst');
-    const statsOk = scheduler.runAlgo();
-    expect(typeof statsOk).toBe('boolean');
+    const camp = new Camp(kids)
+    const numOfRuns = 1000;
+    camp.scheduleTheKids(numOfRuns);
 
-    expect(scheduler.schedule.size).toBe(kids.count);
+    // If not null than then the scheduler ran successfully
+    expect(camp.bestSchedule).toBeDefined();
+    expect(typeof camp.bestSchedule).toBe('object');
+
+    const scheduler = camp.bestSchedule;
+    expect(scheduler?.schedule.size).toBe(kids.count);
 
     for (const name of kids.names) {
-      const kd = scheduler.schedule.get(name);
+      const kd = scheduler?.schedule.get(name);
       expect(kd).toBeDefined();
       expect(kd!.timeSlots).toBeDefined();
       expect(Object.prototype.hasOwnProperty.call(kd!.timeSlots, 'water9am')).toBe(true);

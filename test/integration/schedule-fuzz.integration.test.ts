@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from 'vitest';
+import { Camp } from '../../src/main/camp';
 import { Kids } from '../../src/main/kids';
-import { Schedule } from '../../src/main/schedule';
 import { Activities } from '../../src/main/activities';
 
 describe('Scheduler Algorithmic Fuzzing & Stress Tests', () => {
@@ -33,25 +33,14 @@ describe('Scheduler Algorithmic Fuzzing & Stress Tests', () => {
 
         return [`First${i}`, `Last${i}`, l1, l2, l3, w1, w2, w3];
       });
-
       const kids = new Kids(chaoticRoster);
-      const scheduler = new Schedule(kids, 'waterFirst');
+      const camp = new Camp(kids);
+      const numOfRuns = 20;
+      camp.scheduleTheKids(numOfRuns);
 
-      // Execute the native algorithm solver run
-      scheduler.runAlgo();
-
-      // Force the diagnostic logging block to evaluate under this unique size constraint
-      try {
-        (scheduler as any).testScheduling('water', 'end log', true);
-        (scheduler as any).testScheduling('land', 'end log', true);
-        (scheduler as any).testScheduling('final log', 'end log', true);
-      } catch (e) {
-        // Safe catch-all
-      }
-
-      expect(scheduler).toBeDefined();
+      expect(camp.bestSchedule).toBeDefined();
+      expect(typeof camp.bestSchedule).toBe('object');
     }
-
     vi.restoreAllMocks();
   });
 });
