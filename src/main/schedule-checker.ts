@@ -1,3 +1,4 @@
+import { ERROR_LOGS, SUCCESS_LOGS, INFO_LOGS } from '../sheriff.config'
 import { Activities } from './activities';
 import { AllActivities, AllowedActivityTimes, AllowedActivityTypes, AllowedTimes, Allowed9and10Only, WaterActivities, LandActivities9am, LandActivities10am } from '../types/schedule-types'
 import { WaterActivities0Count, LandActivities9am0Count, LandActivities10am0Count } from '../types/camp-types';
@@ -137,10 +138,6 @@ export class ScheduleChecker {
         } else {
           return this.water9amActivityTimeSlotsCount
         }
-      } else {
-        if (objectType === 'activityCount') {
-          return "tbd"
-        }
       }
     }
 
@@ -150,10 +147,6 @@ export class ScheduleChecker {
           return this.water10amWaterActivityCount
         } else {
           return this.water10amActivityTimeSlotsCount
-        }
-      } else {
-        if (objectType === 'activityCount') {
-          return "tbd"
         }
       }
     }
@@ -266,7 +259,7 @@ export class ScheduleChecker {
       const scheduledAndNotScheduledCompareToAllNames =
         scheduledTimeNames.length + notScheduledTimeNames.length === this.schedule.kids.count;
       if (!scheduledAndNotScheduledCompareToAllNames) {
-        if (process.env.NODE_ENV !== 'production') {
+        if (process.env.NODE_ENV !== 'production' && ERROR_LOGS) {
           console.log(
             `Water scheduled names (${scheduledTimeNames.length}) + not scheduled names (${notScheduledTimeNames.length}) does not equal total kids count (${this.schedule.kids.count})`
           );
@@ -281,9 +274,11 @@ export class ScheduleChecker {
       notScheduledTimeNames.includes(name)
     );
     if (scheduledKidsInUnscheduleKidsList) {
-      console.log(
-        `At least one Scheduled kid (${scheduledTimeNames.length}) is in the unscheduled kids list (${notScheduledTimeNames.length})`
-      );
+      if (process.env.NODE_ENV !== 'production' && ERROR_LOGS) {
+        console.log(
+          `At least one Scheduled kid (${scheduledTimeNames.length}) is in the unscheduled kids list (${notScheduledTimeNames.length})`
+        );
+      }
       return false;
     }
 
@@ -292,9 +287,11 @@ export class ScheduleChecker {
       notScheduledActivities.includes(name)
     );
     if (scheduledActivitiesNotInUnscheduleActivitiesList) {
-      console.log(
-        `At least one Scheduled activity (${scheduledActivities.length}) is in the unscheduled activities list (${notScheduledActivities.length})`
+      if (process.env.NODE_ENV !== 'production' && ERROR_LOGS) {
+        console.log(
+          `At least one Scheduled activity (${scheduledActivities.length}) is in the unscheduled activities list (${notScheduledActivities.length})`
       );
+    }
       return false;
     }
     return true;
@@ -310,7 +307,7 @@ export class ScheduleChecker {
 
     const result = allScheduleChecks.every(check => check === true);
 
-    if (!result && process.env.NODE_ENV !== 'production') {
+    if (!result && process.env.NODE_ENV !== 'production' && ERROR_LOGS) {
       console.log('Unscheduled kids & activities count to scheduled kids & activities mismatch.');
     }
 

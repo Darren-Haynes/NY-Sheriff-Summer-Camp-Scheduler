@@ -13,8 +13,8 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './test/e2e',
-  /* ADDED: Ensures Playwright ignores Vitest files and helper scripts */
-  testMatch: '**/*.spec.ts',
+  /* UPDATED: Matches files directly inside test/e2e AND any nested subfolders */
+  testMatch: ['*.spec.ts', '**/*.spec.ts'],
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */

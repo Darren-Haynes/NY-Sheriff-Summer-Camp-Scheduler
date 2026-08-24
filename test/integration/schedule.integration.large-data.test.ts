@@ -1,8 +1,8 @@
 import { vi, describe, beforeAll, afterAll, test, expect } from 'vitest';
 import path from 'path';
 import fs from 'fs';
+import { Camp } from '../../src/main/camp';
 import { Kids } from '../../src/main/kids';
-import { Schedule } from '../../src/main/schedule';
 
 // 1. FIXED: Corrected "tests" to "test" to perfectly align with your actual directory layout
 const FIXTURE_GROUPS = [
@@ -53,18 +53,25 @@ describe('Schedule integration (Dynamic Dataset Suites)', () => {
       const rows = moduleData[rowsKey] as string[][];
 
       const kids = new Kids(rows);
-      const scheduler = new Schedule(kids, 'waterFirst');
-      const statsOk = scheduler.runAlgo();
+      const camp = new Camp(kids);
+      const numOfRuns = 1000;
+      camp.scheduleTheKids(numOfRuns);
 
-      expect(typeof statsOk).toBe('boolean');
-      expect(scheduler.schedule.size).toBe(kids.count);
+      // If not null than then the scheduler ran successfully
+      expect(camp.bestSchedule).toBeDefined();
+      expect(typeof camp.bestSchedule).toBe('object');
+      // Total number of runs should be at minumum equal to numOfRuns we passed.
+      // If any of those 20 are unsuccessfully than an additional run will occur
+      expect(camp.allRuns.length).toBeGreaterThanOrEqual(numOfRuns);
 
       if (expectedKidCount !== null) {
         expect(kids.count).toBe(expectedKidCount);
       }
 
+      const scheduler = camp.bestSchedule;
+
       for (const name of kids.names) {
-        const kd = scheduler.schedule.get(name);
+        const kd = scheduler?.schedule.get(name);
 
         expect(kd).toBeDefined();
         expect(kd!.timeSlots).toBeDefined();
@@ -74,10 +81,10 @@ describe('Schedule integration (Dynamic Dataset Suites)', () => {
         expect(Object.prototype.hasOwnProperty.call(kd!.timeSlots, 'land10am')).toBe(true);
       }
 
-      expect(scheduler.landPercentages.length).toBe(4)
-      expect(scheduler.waterPercentages.length).toBe(4)
-      const landSum = scheduler.landPercentages.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-      const waterSum = scheduler.waterPercentages.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+      expect(scheduler?.landPercentages.length).toBe(4)
+      expect(scheduler?.waterPercentages.length).toBe(4)
+      const landSum = scheduler?.landPercentages.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+      const waterSum = scheduler?.waterPercentages.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
       expect(landSum).toBe(100)
       expect(waterSum).toBe(100)
     });

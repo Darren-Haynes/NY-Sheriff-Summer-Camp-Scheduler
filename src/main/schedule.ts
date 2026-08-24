@@ -266,31 +266,6 @@ export class Schedule {
   }
 
   /**
-   * Get Map of scheduled activities that have more kids than the minimum required.
-   * @param {string} activityType - only 2 options: 'land' or 'water'.
-   * @param {string} timeSlot - only 2 options: '9am' or '10am'.
-   * @returns {Map} - activity plus the number of kids scheduled above the min threshold: e.g {'swim': 3, 'fish': 8, ...}
-   */
-  private getKidsScheduleAboveMin(
-    activityType: AllowedActivityTypes,
-    timeSlot: AllowedTimes
-  ): Map<string, [number, string[]]> {
-    const scheduledAboveMin = new Map<string, [number, string[]]>();
-    const activityRange = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
-    const activityTimeSlot = this.getActivityTypeTimeSlot(activityType, timeSlot);
-    for (const [activity, names] of Object.entries(activityTimeSlot) as [
-      keyof typeof activityTimeSlot,
-      string[],
-    ][]) {
-      if (names.length > activityRange[activity][0]) {
-        const aboveMinCount = names.length - activityRange[activity][0];
-        scheduledAboveMin.set(activity, [aboveMinCount, names]);
-      }
-    }
-    return scheduledAboveMin;
-  }
-
-  /**
    * Get correct range for a given activity type and time slot.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {string} timeSlot - only 2 options: '9am' or '10am'.
@@ -502,34 +477,6 @@ export class Schedule {
   }
 
   /**
-   * Count how many kids have chosen a specific activity as one of their choices.
-   * @param {string} activityType - only 2 options: 'land' or 'water'.
-   * @param {string} activity - activity such as 'canoe', 'pboard' or 'bball;
-   * @returns {number} - simple int of the count
-   */
-  private howManyToSpareHaveActivityAsAChoice(
-    activityType: AllowedActivityTypes,
-    activity: LandActivities | WaterActivities,
-    kidsToSpare: Map<string, [number, string[]]>
-  ): number {
-    const ACTIVITY_TYPES = activityType === 'water' ? Schedule.WATERTYPES : Schedule.LANDTYPES;
-    let count = 0;
-    kidsToSpare.forEach(kids => {
-      kids[1].forEach(kid => {
-        const theKid = this.kids.choices[kid];
-        for (const [kidActivityType, kidActivity] of Object.entries(theKid.choices)) {
-          if (ACTIVITY_TYPES.includes(kidActivityType)) {
-            if (kidActivity === activity) {
-              count += 1;
-            }
-          }
-        }
-      });
-    });
-    return count;
-  }
-
-  /**
    * Sorts activities by shortfall from minimum requirement.
    * @param {Map<string,number>} notScheduledActivites - num of choices to count between 1 - 3.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
@@ -575,14 +522,6 @@ export class Schedule {
             : this.notScheduled10amLand.names;
         } else {
           return this.notScheduledAllNamesWater;
-        }
-      } else {
-        if (activityType === 'water') {
-          return timeSlot === '9am'
-            ? this.notScheduled9amWater.names
-            : this.notScheduled10amWater.names;
-        } else {
-          return this.notScheduledAllNamesLand;
         }
       }
     }
@@ -1069,14 +1008,14 @@ export class Schedule {
    * Add Kids to the schedule for activities that more kids have chosen than there are openings for both 9am and 10am timeslots
    * @param {string[]} doubleMaxActivities - The actvities that more kids have chosen than there are timeslots.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
-   * @param {number[]} ChoiceNum - kids land or water choice 1st, 2nd or 3rd
+   * @param {number[]} choiceNum - kids land or water choice 1st, 2nd or 3rd
+   * @param {AllowedTimes} timeSlot - '9am', '10am' or 'both'
    * @returns {void}
    */
   private scheduleDoubleActivities(
     doubleMaxActivities: string[],
     activityType: AllowedActivityTypes,
     choiceNum: AllowedChoices,
-    maxOrMin: AllowedMaxMin,
     timeSlot: AllowedTimes
   ): void {
     doubleMaxActivities.forEach(activity => {
@@ -1103,55 +1042,25 @@ export class Schedule {
         );
       }
 
-      const activityValue = maxOrMin === 'max' ? 1 : 0;
-      let activityMaxOrMin: number;
-
-      if (activityType === 'land') {
-        const landActivity = activity as LandActivities;
-        activityMaxOrMin = Activities.landRanges[landActivity][activityValue];
-      } else {
-        const waterActivity = activity as WaterActivities;
-        activityMaxOrMin = Activities.waterRanges[waterActivity][activityValue];
-      }
+      const waterActivity = activity as WaterActivities;
+      const activityMaxOrMin = Activities.waterRanges[waterActivity][1];
 
       let kidsNineAM: string[] = [];
       let kidsTenAM: string[] = [];
 
-      if (maxOrMin === 'max') {
-        const randomKids = this.randomChoices(kidsByActivityChoice, activityMaxOrMin * 2);
-        kidsNineAM = randomKids.slice(0, activityMaxOrMin);
-        kidsTenAM = randomKids.slice(activityMaxOrMin);
-      } else if (maxOrMin === 'min') {
-        let halfTheKids = Math.ceil(kidsByActivityChoice.length / 2);
-        if (
-          activityType === 'water' &&
-          this.scheduled10amWater.names.length > this.scheduled9amWater.names.length
-        ) {
-          halfTheKids = Math.ceil(halfTheKids);
-        }
-        kidsNineAM = kidsByActivityChoice.slice(0, halfTheKids);
-        kidsTenAM = kidsByActivityChoice.slice(halfTheKids);
-      }
+      const randomKids = this.randomChoices(kidsByActivityChoice, activityMaxOrMin * 2);
+      kidsNineAM = randomKids.slice(0, activityMaxOrMin);
+      kidsTenAM = randomKids.slice(activityMaxOrMin);
 
       this.removeFromNotScheduled(kidsNineAM, activityType, typedActivity, '9am');
       this.AddToScheduled(kidsNineAM, activityType, typedActivity, '9am');
       this.removeFromNotScheduled(kidsTenAM, activityType, typedActivity, '10am');
       this.AddToScheduled(kidsTenAM, activityType, typedActivity, '10am');
 
-      if (activityType === 'water') {
-        const waterActivity = activity as WaterActivities;
-        this.water9am[waterActivity] = kidsNineAM;
-        this.water10am[waterActivity] = kidsTenAM;
-        this.setKidsTimeSlot(kidsNineAM, waterActivity, 'water9am');
-        this.setKidsTimeSlot(kidsTenAM, waterActivity, 'water10am');
-      } else {
-        const landActivity9am = activity as LandActivities9am;
-        const landActivity10am = activity as LandActivities10am;
-        this.land9am[landActivity9am] = kidsNineAM;
-        this.land10am[landActivity10am] = kidsTenAM;
-        this.setKidsTimeSlot(kidsNineAM, landActivity9am, 'land9am');
-        this.setKidsTimeSlot(kidsTenAM, landActivity10am, 'land10am');
-      }
+      this.water9am[waterActivity] = kidsNineAM;
+      this.water10am[waterActivity] = kidsTenAM;
+      this.setKidsTimeSlot(kidsNineAM, waterActivity, 'water9am');
+      this.setKidsTimeSlot(kidsTenAM, waterActivity, 'water10am');
     });
   }
 
@@ -1320,7 +1229,6 @@ export class Schedule {
         activitiesAboveDoubleMin,
         activityType,
         choices,
-        maxOrMin,
         timeSlot
       );
       return true;
@@ -1393,7 +1301,6 @@ export class Schedule {
         activitiesAboveDoubleMax,
         activityType,
         choices,
-        maxOrMin,
         timeSlot
       );
       return true;
@@ -1405,73 +1312,39 @@ export class Schedule {
    * Precursor to scheduleDoubleMax and scheduleDoubleMin methods.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {number[]} choices - num of choices to count in any combo of 1 thru 3: [[1], [2], [3], [1, 2], [1, 2], [1, 3], [1, 2, 3]]
-   * @param {string}  maxOrMinSched - 3 options: 'maxOnly', 'minOnly', 'bothMinAndMax'
-   * @returns {boolean} true if 1 or more activities were scheduled, false if not activity is schedule.
+   * @returns {void}
    */
   private scheduleDoubles(
     activityType: WaterOnly,
     choices: AllowedChoices,
-    maxOrMinSched: AllowedMaxMinSched,
     timeSlot: AllowedTimes
-  ): boolean {
-    let overallSuccess = false;
-
+  ): void {
+    const typedActivityType = activityType as AllowedActivityTypes;
     for (let i = 1; i <= choices.length; i++) {
       const currentChoices = choices.slice(0, i) as unknown as AllowedChoices;
-      let caseSuccess = false;
-      const typedActivityType = activityType as AllowedActivityTypes;
-
-      switch (maxOrMinSched) {
-        case 'maxOnly':
-          caseSuccess = this.scheduleDoubleMax(typedActivityType, currentChoices, 'max', timeSlot);
-          if (caseSuccess && process.env.NODE_ENV !== 'production' && SUCCESS_LOGS) {
-            console.log(`scheduleDoubleMax ran successfully`);
-          }
-          break;
-
-        case 'minOnly':
-          caseSuccess = this.scheduleDoubleMin(typedActivityType, currentChoices, 'min', timeSlot);
-          if (caseSuccess && process.env.NODE_ENV !== 'production' && SUCCESS_LOGS) {
-            console.log(`scheduleDoubleMin ran successfully`);
-          }
-          break;
-
-        case 'bothMinAndMax': {
-          // Fix: Wrap this block in curly braces {}
-          const maxSuccess = this.scheduleDoubleMax(
-            typedActivityType,
-            currentChoices,
-            'max',
-            timeSlot
-          );
-          const minSuccess = this.scheduleDoubleMin(
-            typedActivityType,
-            currentChoices,
-            'min',
-            timeSlot
-          );
-          caseSuccess = maxSuccess && minSuccess; // Usually you want BOTH to succeed for "both"
-          break;
-        }
+      const doubleMaxCaseSuccess = this.scheduleDoubleMax(typedActivityType, currentChoices, 'max', timeSlot);
+      if (doubleMaxCaseSuccess && process.env.NODE_ENV !== 'production' && SUCCESS_LOGS) {
+        console.log(`scheduleDoubleMax ran successfully`);
       }
-
-      if (caseSuccess) overallSuccess = true;
     }
-
-    return overallSuccess;
+    for (let i = 1; i <= choices.length; i++) {
+      const currentChoices = choices.slice(0, i) as unknown as AllowedChoices;
+      const doubleMinCaseSuccess = this.scheduleDoubleMin(typedActivityType, currentChoices, 'max', timeSlot);
+      if (doubleMinCaseSuccess && process.env.NODE_ENV !== 'production' && SUCCESS_LOGS) {
+        console.log(`scheduleDoubleMin ran successfully`);
+      }
+    }
   }
 
   /**
    * Precursor to scheduleSingleMax and scheduleSinlgeMin methods.
    * @param {string} activityType - only 2 options: 'land' or 'water'.
    * @param {number[]} choices - num of choices to count in any combo of 1 thru 3: [[1], [2], [3], [1, 2], [1, 2], [1, 3], [1, 2, 3]]
-   * @param {string}  maxOrMinSched - 3 options: 'maxOnly', 'minOnly', 'bothMinAndMax'
    * @returns {boolean} true if 1 or more activities were scheduled, false if not activity is schedule.
    */
   private scheduleSingles(
     activityType: AllowedActivityTypes,
     choices: AllowedChoices,
-    maxOrMinSched: AllowedMaxMinSched,
     timeSlot: AllowedTimes
   ): boolean {
     let overallSuccess = false;
@@ -1482,42 +1355,21 @@ export class Schedule {
       let caseSuccess = false;
       const typedActivityType = activityType as AllowedActivityTypes;
 
-      switch (maxOrMinSched) {
-        case 'maxOnly':
-          caseSuccess = this.scheduleSingleMax(typedActivityType, currentChoices, 'max', timeSlot);
-          if (caseSuccess && process.env.NODE_ENV !== 'production' && SUCCESS_LOGS) {
-            console.log(`scheduleSingleMax ran successfully`);
-          }
-          break;
-
-        case 'minOnly':
-          caseSuccess = this.scheduleSingleMin(typedActivityType, currentChoices, 'min', timeSlot);
-          if (caseSuccess && process.env.NODE_ENV !== 'production' && SUCCESS_LOGS) {
-            console.log(`scheduleSingleMin ran successfully`);
-          }
-          break;
-
-        case 'bothMinAndMax': {
-          const maxSuccess = this.scheduleSingleMax(
-            typedActivityType,
-            currentChoices,
-            'max',
-            timeSlot
-          );
-          const minSuccess = this.scheduleSingleMin(
-            typedActivityType,
-            currentChoices,
-            'min',
-            timeSlot
-          );
-          caseSuccess = maxSuccess || minSuccess;
-          break;
-        }
-      }
-
+      const maxSuccess = this.scheduleSingleMax(
+        typedActivityType,
+        currentChoices,
+        'max',
+        timeSlot
+      );
+      const minSuccess = this.scheduleSingleMin(
+        typedActivityType,
+        currentChoices,
+        'min',
+        timeSlot
+      );
+      caseSuccess = maxSuccess || minSuccess;
       if (caseSuccess) overallSuccess = true;
     }
-
     return overallSuccess;
   }
 
@@ -2579,7 +2431,7 @@ export class Schedule {
       equalWater10amToLand9am,
     ]
 
-    if (process.env.NODE_ENV !== 'production' && !allTrue) {
+    if (process.env.NODE_ENV !== 'production') {
       if (!allTrue && ERROR_LOGS) {
         PrintLogs.printAll(...logsArgs);
       }
@@ -2607,8 +2459,8 @@ export class Schedule {
       ];
 
       const waterMethodArgs = [
-        ['water', [1, 2, 3], 'maxOnly', 'both'],
-        ['water', [1, 2, 3], 'bothMinAndMax', 'both'],
+        ['water', [1, 2, 3], 'both'],
+        ['water', [1, 2, 3], 'both'],
         ['water', 'both'],
         ['water'],
         ['water'],
@@ -2647,8 +2499,8 @@ export class Schedule {
     ];
 
     const landMethodArgs = [
-      ['land', [1, 2, 3], 'bothMinAndMax', '9am'],
-      ['land', [1, 2, 3], 'bothMinAndMax', '10am'],
+      ['land', [1, 2, 3], '9am'],
+      ['land', [1, 2, 3], '10am'],
       ['land', '9am'],
       ['land'],
       ['land', '9am'],

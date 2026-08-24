@@ -5,8 +5,8 @@ import fs from 'fs';
 test.describe.configure({ mode: 'serial' });
 
 const FIXTURE_GROUPS = [
-  { dirPath: 'e2e/fixtures/original-format', label: 'ORIGINAL_FORMAT' },
-  { dirPath: 'e2e/fixtures/new-format', label: 'NEW_FORMAT' }
+  { dirPath: './fixtures/original-format', label: 'ORIGINAL_FORMAT' },
+  { dirPath: './fixtures/new-format', label: 'NEW_FORMAT' }
 ];
 
 function parseAllCampersBySlot(text: string): Record<string, Set<string>> {
@@ -57,8 +57,12 @@ function parseAllCampersBySlot(text: string): Record<string, Set<string>> {
 }
 
 FIXTURE_GROUPS.forEach(({ dirPath, label }) => {
-  const resolvedDir = path.resolve(process.cwd(), dirPath);
-  if (!fs.existsSync(resolvedDir)) return;
+  const resolvedDir = path.resolve(__dirname, dirPath);
+
+  if (!fs.existsSync(resolvedDir)) {
+    console.warn(`⚠️ Warning: Path not found during scan: ${resolvedDir}`);
+    return;
+  }
 
   const excelFiles = fs.readdirSync(resolvedDir).filter(file => file.startsWith('success') && file.endsWith('.xlsx'));
 

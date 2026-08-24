@@ -18,6 +18,8 @@ flags:
     carryforward: true
     paths:
       - src/main/          # STRICTLY track the main process here
+    ignore:
+      - src/main/print-logs.ts
   renderer-process:
     carryforward: true
     paths:

@@ -4,18 +4,23 @@ import fs from 'fs';
 
 test.describe.configure({ mode: 'serial' });
 
+// UPDATED: Use relative steps from this file's position inside test/e2e/
 const FIXTURE_GROUPS = [
-  { dirPath: 'e2e/fixtures/original-format', label: 'ORIGINAL_FORMAT' },
-  { dirPath: 'e2e/fixtures/new-format', label: 'NEW_FORMAT' }
+  { dirPath: './fixtures/original-format', label: 'ORIGINAL_FORMAT' },
+  { dirPath: './fixtures/new-format', label: 'NEW_FORMAT' }
 ];
 
 FIXTURE_GROUPS.forEach(({ dirPath, label }) => {
-  const resolvedDir = path.resolve(process.cwd(), dirPath);
-  if (!fs.existsSync(resolvedDir)) return;
+  // FIXED: Resolves paths reliably relative to this spec file
+  const resolvedDir = path.resolve(__dirname, dirPath);
+
+  if (!fs.existsSync(resolvedDir)) {
+    console.warn(`⚠️ Warning: Path not found during scan: ${resolvedDir}`);
+    return;
+  }
 
   // STRICT FILTER: Grab only files that start with "error"
   const excelFiles = fs.readdirSync(resolvedDir).filter(file => file.startsWith('error') && file.endsWith('.xlsx'));
-
   excelFiles.forEach(file => {
     test(`Excel Error Matrix [${label}] -> ${file}`, async ({ appContext }) => {
       test.setTimeout(30000);
