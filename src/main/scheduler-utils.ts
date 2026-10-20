@@ -1,9 +1,18 @@
 // Pure helper utilities extracted from Schedule
+
+/**
+ * Pick `numOfItems` random elements from `arr`, giving every element the same chance.
+ *
+ * Uses a Fisher-Yates shuffle on a copy, so the input array is never modified. The list is always
+ * shuffled, even when `numOfItems` >= `arr.length`: callers such as the double-activity scheduler
+ * split the returned list into 9am and 10am groups, so its order must be random too.
+ *
+ * Do not replace this with `arr.sort(() => Math.random() - 0.5)`. That comparator is inconsistent,
+ * which makes the result non-uniform and favors elements that start near the front of the list.
+ */
 export function randomChoices<T>(arr: T[], numOfItems: number): T[] {
   if (numOfItems <= 0) return [];
-  if (numOfItems >= arr.length) return [...arr];
 
-  // Fisher-Yates shuffle (non-destructive)
   const copy = [...arr];
   for (let i = copy.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
