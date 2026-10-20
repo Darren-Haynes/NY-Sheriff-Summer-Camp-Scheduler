@@ -1,26 +1,48 @@
+import type { ElectronApplication, Page } from '@playwright/test';
 import { test, expect } from './fixtures';
 
+/**
+ * Resize the app window and wait until the page's viewport really is that size.
+ *
+ * A fixed sleep after `setBounds` is not reliable: tiling window managers (e.g. sway, i3)
+ * can override the first resize request. Re-sending the request until the renderer reports
+ * the expected viewport keeps the test deterministic on any window manager, and on CI (xvfb).
+ */
+const resizeWindow = async (
+  electronApp: ElectronApplication,
+  electronWindow: Page,
+  width: number,
+  height: number
+) => {
+  await expect
+    .poll(
+      async () => {
+        await electronApp.evaluate(
+          async ({ BrowserWindow }, size) => {
+            BrowserWindow.getAllWindows()[0]?.setContentSize(size.width, size.height);
+          },
+          { width, height }
+        );
+        await electronWindow.waitForTimeout(150);
+        return electronWindow.evaluate(() => ({
+          width: window.innerWidth,
+          height: window.innerHeight,
+        }));
+      },
+      { message: `window should resize to ${width}x${height}`, timeout: 15000 }
+    )
+    .toEqual({ width, height });
+};
+
 test.describe('Responsive Media Queries Tests', () => {
-
-  test.use({
-    viewport: { width: 1200, height: 660 }
-  });
-
   test('header check responsive width and height metrics', async ({ appContext }) => {
     const { electronApp, electronWindow } = appContext;
 
-    // 1. Install a fast clock wrapper over the browser page instance context
+    // Install a fast clock wrapper over the page so the background slider can be fast-forwarded.
     await electronWindow.clock.install();
 
-    // FIX: Added [0] index array accessor to prevent the TypeError crash
-    await electronApp.evaluate(async ({ BrowserWindow }) => {
-      const mainWindow = BrowserWindow.getAllWindows()[0];
-      if (mainWindow) mainWindow.setBounds({ width: 1200, height: 660 });
-    });
-    await electronWindow.waitForTimeout(400);
-
     const getLayoutStyles = async (selector: string) => {
-      return await electronWindow.locator(selector).evaluate((el) => {
+      return await electronWindow.locator(selector).evaluate(el => {
         const style = window.getComputedStyle(el);
         return {
           marginLeft: style.marginLeft,
@@ -36,39 +58,25 @@ test.describe('Responsive Media Queries Tests', () => {
     // ==========================================
     // PHASE 1: HEIGHT MEDIA QUERY BREAKPOINTS
     // ==========================================
+    await resizeWindow(electronApp, electronWindow, 1200, 660);
     let inputStyles = await getLayoutStyles('#input-options');
     expect(inputStyles.height).toBe('300px');
     expect(inputStyles.marginTop).toBe('0px');
     await expect(campSign).toBeHidden();
 
-    // FIX: Added [0] index array accessor
-    await electronApp.evaluate(async ({ BrowserWindow }, { width, height }) => {
-      BrowserWindow.getAllWindows()[0].setBounds({ width, height });
-    }, { width: 1200, height: 900 });
-    await electronWindow.waitForTimeout(400);
-
+    await resizeWindow(electronApp, electronWindow, 1200, 900);
     inputStyles = await getLayoutStyles('#input-options');
     expect(inputStyles.height).toBe('500px');
     expect(inputStyles.marginTop).toBe('0px');
     await expect(campSign).toBeVisible();
 
-    // FIX: Added [0] index array accessor
-    await electronApp.evaluate(async ({ BrowserWindow }, { width, height }) => {
-      BrowserWindow.getAllWindows()[0].setBounds({ width, height });
-    }, { width: 1200, height: 1100 });
-    await electronWindow.waitForTimeout(400);
-
+    await resizeWindow(electronApp, electronWindow, 1200, 1100);
     inputStyles = await getLayoutStyles('#input-options');
     expect(inputStyles.height).toBe('500px');
     expect(inputStyles.marginTop).toBe('-100px');
     await expect(campSign).toBeVisible();
 
-    // FIX: Added [0] index array accessor
-    await electronApp.evaluate(async ({ BrowserWindow }, { width, height }) => {
-      BrowserWindow.getAllWindows()[0].setBounds({ width, height });
-    }, { width: 1200, height: 1300 });
-    await electronWindow.waitForTimeout(400);
-
+    await resizeWindow(electronApp, electronWindow, 1200, 1300);
     inputStyles = await getLayoutStyles('#input-options');
     expect(inputStyles.height).toBe('500px');
     expect(inputStyles.marginTop).toBe('-200px');
@@ -77,35 +85,19 @@ test.describe('Responsive Media Queries Tests', () => {
     // ==========================================
     // PHASE 2: WIDTH MEDIA QUERY BREAKPOINTS
     // ==========================================
-
-    // FIX: Added [0] index array accessor
-    await electronApp.evaluate(async ({ BrowserWindow }, { width, height }) => {
-      BrowserWindow.getAllWindows()[0].setBounds({ width, height });
-    }, { width: 1200, height: 850 });
-    await electronWindow.waitForTimeout(300);
-
+    await resizeWindow(electronApp, electronWindow, 1200, 850);
     let leftStyles = await getLayoutStyles('#navbar-left');
     let rightStyles = await getLayoutStyles('#navbar-right');
     expect(leftStyles.marginRight).toBe('150px');
     expect(rightStyles.marginLeft).toBe('150px');
 
-    // FIX: Added [0] index array accessor
-    await electronApp.evaluate(async ({ BrowserWindow }, { width, height }) => {
-      BrowserWindow.getAllWindows()[0].setBounds({ width, height });
-    }, { width: 800, height: 850 });
-    await electronWindow.waitForTimeout(300);
-
+    await resizeWindow(electronApp, electronWindow, 800, 850);
     leftStyles = await getLayoutStyles('#navbar-left');
     rightStyles = await getLayoutStyles('#navbar-right');
     expect(leftStyles.marginRight).toBe('120px');
     expect(rightStyles.marginLeft).toBe('120px');
 
-    // FIX: Added [0] index array accessor
-    await electronApp.evaluate(async ({ BrowserWindow }, { width, height }) => {
-      BrowserWindow.getAllWindows()[0].setBounds({ width, height });
-    }, { width: 660, height: 850 });
-    await electronWindow.waitForTimeout(300);
-
+    await resizeWindow(electronApp, electronWindow, 660, 850);
     leftStyles = await getLayoutStyles('#navbar-left');
     rightStyles = await getLayoutStyles('#navbar-right');
     expect(leftStyles.marginRight).toBe('109px');
