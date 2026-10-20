@@ -19,46 +19,26 @@ export class Camp {
   }
 
   /**
-   * Find the schedule that has scheduled kids with the least amount of no choices.
+   * Find the run that leaves the fewest kids with no choice, counting water and land equally.
+   * Ties are broken by the highest combined first-choice percentage, then by the earliest run.
    * @returns {Schedule}
    */
   private bestPercentagesSchedule(): Schedule {
-    let currBestWaterSchedule = this.allRuns[0];
-    let currBestLandSchedule = this.allRuns[0];
+    const noChoice = (run: Schedule): number =>
+      run.waterPercentages[3] + run.landPercentages[3];
+    const firstChoice = (run: Schedule): number =>
+      run.waterPercentages[0] + run.landPercentages[0];
 
-    for (let i = 0; i < this.allRuns.length; i++) {
-      if (this.allRuns[i].waterPercentages[3] < currBestWaterSchedule.waterPercentages[3]) {
-        currBestWaterSchedule = this.allRuns[i];
-        continue;
-      }
+    let best = this.allRuns[0];
+    for (const run of this.allRuns) {
       if (
-        this.allRuns[i].waterPercentages[3] === currBestWaterSchedule.waterPercentages[3] &&
-        this.allRuns[i].landPercentages[3] < currBestWaterSchedule.landPercentages[3]
+        noChoice(run) < noChoice(best) ||
+        (noChoice(run) === noChoice(best) && firstChoice(run) > firstChoice(best))
       ) {
-        currBestWaterSchedule = this.allRuns[i];
+        best = run;
       }
     }
-
-    for (let i = 0; i < this.allRuns.length; i++) {
-      if (this.allRuns[i].landPercentages[3] < currBestLandSchedule.landPercentages[3]) {
-        currBestLandSchedule = this.allRuns[i];
-        continue;
-      }
-      if (
-        this.allRuns[i].landPercentages[3] === currBestLandSchedule.landPercentages[3] &&
-        this.allRuns[i].waterPercentages[3] < currBestLandSchedule.waterPercentages[3]
-      ) {
-        currBestLandSchedule = this.allRuns[i];
-      }
-    }
-
-    const totalWaterFirstNoChoicePercentage =
-      currBestWaterSchedule.waterPercentages[3] + currBestLandSchedule.landPercentages[3];
-    const totalLandFirstNoChoicePercentage =
-      currBestLandSchedule.landPercentages[3] + currBestWaterSchedule.waterPercentages[3];
-    return totalLandFirstNoChoicePercentage < totalWaterFirstNoChoicePercentage
-      ? currBestLandSchedule
-      : currBestWaterSchedule;
+    return best;
   }
 
   /**
