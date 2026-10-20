@@ -1,3 +1,4 @@
+import path from 'path';
 import type { ForgeConfig } from '@electron-forge/shared-types';
 import MakerMSI from '@electron-forge/maker-wix';
 import { MakerSquirrel } from '@electron-forge/maker-squirrel';
@@ -34,8 +35,7 @@ const config: ForgeConfig = {
         icon: './assets/icons/sheriff-badge-msi.ico',
         ui: {
           images: {
-            banner:
-              'C:/Users/darre/Projects/NY-Sheriff-Summer-Camp-Scheduler/assets/banner-msi.jpeg',
+            banner: path.resolve(__dirname, 'assets/banner-msi.jpeg'),
           },
           chooseDirectory: true,
         },
