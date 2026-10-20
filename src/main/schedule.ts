@@ -3,6 +3,7 @@ import { Activities } from './activities';
 import { Kids } from './kids';
 import { PrintLogs } from './print-logs'
 import { ScheduleChecker } from './schedule-checker';
+import { randomChoices as randomChoicesFairly } from './scheduler-utils';
 import {
   NotScheduledLand,
   NotScheduledWater,
@@ -739,14 +740,14 @@ export class Schedule {
   /**
    * Get random selection of elements from an Array.
    * If more kids want to attend an activity than there are slots, we need to randomly choose from them to
-   * to avoid any selection bias.
+   * to avoid any selection bias. Delegates to the Fisher-Yates helper, which gives every kid an equal
+   * chance and does not modify `arr`.
    * @param {string[]} arr - the Array to take a random selection from
    * @param {number} numOfItems - the total number of random elements to return
    * @returns {string[]} - the Array of random selected elements
    */
   private randomChoices(arr: string[], numOfItems: number): string[] {
-    const randomSort = arr.sort(() => Math.random() - 0.5);
-    return randomSort.slice(0, numOfItems);
+    return randomChoicesFairly(arr, numOfItems);
   }
 
   /**
@@ -2313,7 +2314,7 @@ export class Schedule {
         }
         index++;
       }
-      let currPercent = AllPercentages[greatestRemainder];
+      let currPercent = AllPercentages[greatestRemainderIndex];
       currPercent = currPercent + 1 as Int;
       AllPercentages[greatestRemainderIndex] = currPercent;
     }

@@ -20,9 +20,12 @@ describe('scheduler-utils', () => {
       expect(arr).toContain(item);
     }
 
-    // Request >= length returns full copy
+    // Requesting >= length returns every element exactly once. The order is shuffled on purpose
+    // (callers split this list into 9am/10am groups), so compare as a set, not in order.
     const all = randomChoices(arr, arr.length + 5);
-    expect(all).toEqual(arr);
+    expect([...all].sort()).toEqual([...arr].sort());
+    // ...and the input array is left untouched.
+    expect(arr).toEqual(['a', 'b', 'c', 'd', 'e']);
 
     rnd.mockRestore();
   });
