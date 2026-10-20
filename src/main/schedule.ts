@@ -2313,7 +2313,7 @@ export class Schedule {
         }
         index++;
       }
-      let currPercent = AllPercentages[greatestRemainder];
+      let currPercent = AllPercentages[greatestRemainderIndex];
       currPercent = currPercent + 1 as Int;
       AllPercentages[greatestRemainderIndex] = currPercent;
     }
