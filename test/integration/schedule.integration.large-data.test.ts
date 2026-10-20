@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { Camp } from '../../src/main/camp';
 import { Kids } from '../../src/main/kids';
+import { Schedule } from '../../src/main/schedule';
 import { seededRandom } from '../helpers/seeded-random';
 
 // 1. FIXED: Corrected "tests" to "test" to perfectly align with your actual directory layout
@@ -65,6 +66,12 @@ describe('Schedule integration (Dynamic Dataset Suites)', () => {
       expect(camp.bestSchedule).not.toBeNull();
       expect(camp.allRuns.length).toBeGreaterThan(0);
       expect(camp.allRuns.length).toBeLessThanOrEqual(numOfRuns);
+
+      // The chosen schedule must be as good as any run that was available.
+      const noChoiceTotal = (run: Schedule): number =>
+        run.waterPercentages[3] + run.landPercentages[3];
+      const lowestAvailable = Math.min(...camp.allRuns.map(noChoiceTotal));
+      expect(noChoiceTotal(camp.bestSchedule as Schedule)).toBe(lowestAvailable);
 
       if (expectedKidCount !== null) {
         expect(kids.count).toBe(expectedKidCount);
