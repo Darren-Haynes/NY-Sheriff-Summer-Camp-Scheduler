@@ -1,0 +1,9 @@
+{
+  // Type-checks the tests too. The main tsconfig.json only covers src/ (the webpack build).
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true
+  },
+  "include": ["src/**/*", "test/**/*"]
+}
