@@ -11,8 +11,8 @@ const preload = {
   // send_error: (errorData: []) => ipcRenderer.on('error-list', errorData),
   send_error: (callback: IpcStringCallback) =>
     ipcRenderer.on('error-list', (_event, value) => callback(value)),
-  send_no_paste_content: (callback: IpcStringCallback) =>
-    ipcRenderer.on('paste-box-no-content', (_event, value) => callback(value)),
+  send_no_paste_content: (callback: () => void) =>
+    ipcRenderer.on('paste-box-no-content', () => callback()),
   send_result: (callback: IpcStringCallback) =>
     ipcRenderer.on('result-list', (_event, value) => callback(value)),
   send_clipboard: (callback: IpcStringCallback) => {
