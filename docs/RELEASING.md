@@ -56,17 +56,26 @@ npm run make        # output in out/make/
 
 ## What users will see: the installers are not signed
 
-The installers are not code-signed, because signing needs paid certificates. Each OS warns
-about that on first launch.
+The Windows and macOS installers are not signed with a paid certificate, so each OS warns on
+first launch. (The macOS app does carry a free ad-hoc signature, which keeps it from being
+reported as damaged.)
 
 - **Windows:** SmartScreen says "Windows protected your PC". Choose **More info**, then
   **Run anyway**.
-- **macOS:** Gatekeeper may refuse to open the app. Control-click the app and choose
-  **Open**, or remove the download quarantine flag:
+- **macOS:** the app is signed ad-hoc (no certificate), so Gatekeeper blocks the first launch
+  with a message that it cannot verify the developer. Try to open the app once, then go to
+  **System Settings → Privacy & Security**, scroll to the Security section, and click
+  **Open Anyway** next to the app's name. After that it opens normally.
+
+  If macOS says the app is **damaged**, the signature is broken (this happened with builds
+  made before the ad-hoc signing fix). Removing the download quarantine flag works around it:
 
   ```bash
   xattr -cr "/Applications/NY Sheriff Summer Camp Scheduler.app"
   ```
+
+  To check a build's signature, run `codesign --verify --deep --strict` on the app. No output
+  means it is valid.
 
 - **Linux:** no warning.
 
