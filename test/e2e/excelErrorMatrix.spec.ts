@@ -30,19 +30,14 @@ FIXTURE_GROUPS.forEach(({ dirPath, label }) => {
 
       await electronWindow.waitForTimeout(700);
 
-      // 1. Intercept Dialog prompts
+      // 1. Answer the file picker with the fixture file. This is the only call into the
+      // main process: it is idle here. Once the upload starts, the main process can be busy
+      // for ~1.5s running the scheduler (error-50-kids files get past validation), and
+      // calling into it while it is blocked made this test flaky
+      // ("electronApplication.evaluate: Resulting promise was garbage collected").
       await electronApp.evaluate(async ({ dialog }, filePath) => {
-        (global as any).nativeErrorCaught = false;
-
         dialog.showOpenDialog = async () => {
           return { canceled: false, filePaths: [filePath] };
-        };
-        dialog.showErrorBox = () => {
-          (global as any).nativeErrorCaught = true;
-        };
-        dialog.showMessageBox = async () => {
-          (global as any).nativeErrorCaught = true;
-          return { response: 0, checkboxChecked: false };
         };
       }, fullSpreadsheetPath);
 
@@ -51,21 +46,15 @@ FIXTURE_GROUPS.forEach(({ dirPath, label }) => {
       await expect(uploadButton).toBeAttached();
       await uploadButton.click({ force: true });
 
-      // 3. Dynamic Resolution: Look for UI Error boxes or Native Dialog triggers
-      const errorBoxContainer = electronWindow.locator('#error-box, .error-box-container');
-
-      await expect.poll(async () => {
-        const uiErrorVisible = await errorBoxContainer.isVisible().catch(() => false);
-        const nativeErrorVisible = await electronApp.evaluate(() => (global as any).nativeErrorCaught);
-        return uiErrorVisible || nativeErrorVisible;
-      }, {
-        message: 'Waiting for application error handlers to catch constraint anomalies',
-        timeout: 15000
-      }).toBe(true);
+      // 3. Every rejected spreadsheet is reported in the UI error box (the app never uses
+      // native error dialogs). Wait on the renderer only, which retries by itself.
+      await expect(
+        electronWindow.locator('#error-box'),
+        'the app should report the bad spreadsheet in the error box'
+      ).toBeVisible({ timeout: 15000 });
 
       // 4. Invariant: Ensure the successful dashboard view was never mounted
-      const timetableContainer = electronWindow.locator('#text-box');
-      expect(await timetableContainer.isVisible()).toBe(false);
+      await expect(electronWindow.locator('#text-box')).toBeHidden();
     });
   });
 });
