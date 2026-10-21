@@ -44,9 +44,8 @@ describe('Schedule integration (Dynamic Dataset Suites)', () => {
     const countMatch = file.match(/\b(\d{2,3})\b/);
     const expectedKidCount = countMatch ? parseInt(countMatch[1], 10) : null;
 
-    test(`Algorithm Run [${label}] -> ${file}`, () => {
-      // 2. FIXED: Use standard native require for synchronous runtime file processing inside Vitest
-      const moduleData = require(fullModulePath);
+    test(`Algorithm Run [${label}] -> ${file}`, async () => {
+      const moduleData = await import(fullModulePath);
 
       const rowsKey = Object.keys(moduleData).find(key => Array.isArray(moduleData[key]));
       if (!rowsKey) {

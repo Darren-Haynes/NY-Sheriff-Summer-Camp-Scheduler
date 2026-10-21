@@ -22,7 +22,7 @@ describe('Activities constants', () => {
 
   test('water ranges entries have expected length and numeric values', () => {
     // waterRanges values should be arrays (length 5: min, max, slotFlag, doubleMin, doubleMax)
-    for (const [activity, range] of Object.entries(Activities.waterRanges)) {
+    for (const range of Object.values(Activities.waterRanges)) {
       expect(Array.isArray(range)).toBe(true);
       expect(range.length).toBeGreaterThanOrEqual(3);
       range.forEach(value => expect(typeof value).toBe('number'));
@@ -30,7 +30,7 @@ describe('Activities constants', () => {
   });
 
   test('land ranges entries have expected structure (min/max/... )', () => {
-    for (const [activity, range] of Object.entries(Activities.landRanges)) {
+    for (const range of Object.values(Activities.landRanges)) {
       expect(Array.isArray(range)).toBe(true);
       expect(range.length).toBeGreaterThanOrEqual(3);
       expect(typeof range[0]).toBe('number'); // min
@@ -38,12 +38,12 @@ describe('Activities constants', () => {
     }
 
     // spot check 9am/10am specific maps exist and contain numeric ranges
-    for (const [activity, range] of Object.entries(Activities.landRanges9am)) {
+    for (const range of Object.values(Activities.landRanges9am)) {
       expect(Array.isArray(range)).toBe(true);
       expect(range.length).toBeGreaterThanOrEqual(2);
       range.forEach(v => expect(typeof v).toBe('number'));
     }
-    for (const [activity, range] of Object.entries(Activities.landRanges10am)) {
+    for (const range of Object.values(Activities.landRanges10am)) {
       expect(Array.isArray(range)).toBe(true);
       expect(range.length).toBeGreaterThanOrEqual(2);
       range.forEach(v => expect(typeof v).toBe('number'));

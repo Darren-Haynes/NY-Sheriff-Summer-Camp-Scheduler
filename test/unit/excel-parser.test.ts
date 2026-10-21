@@ -1,7 +1,7 @@
 import * as Excel from 'exceljs';
 import path from 'path';
 import fs from 'fs';
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import extractKidsChoicesData from '../../src/main/excel-parser';
 
 describe('extractKidsChoicesData', () => {

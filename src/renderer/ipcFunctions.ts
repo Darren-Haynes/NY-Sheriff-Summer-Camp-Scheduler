@@ -1,6 +1,5 @@
 import { Schedule } from '../main/schedule';
 import { LandActivities9am, LandActivities10am, WaterActivities } from '../types/schedule-types';
-import StatsData from './Stats';
 
 // Get contents of textarea box
 export const submitTextboxContent = () => {

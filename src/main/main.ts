@@ -19,6 +19,7 @@ declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 let CAMP_BEST_SCHEDULE: Schedule | null = null;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 if (require('electron-squirrel-startup')) {
   app.quit();
 }
@@ -297,7 +298,7 @@ app.whenReady().then(() => {
   if (process.env.DEBUG_DEVTOOLS === 'true') {
     globalShortcut.register('CommandOrControl+Alt+I', () => {
       // Get all managed windows instead of relying on active focus
-      const windows = require('electron').BrowserWindow.getAllWindows();
+      const windows = BrowserWindow.getAllWindows();
 
       if (windows.length > 0) {
         // Target the first/main window directly

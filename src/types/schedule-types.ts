@@ -122,34 +122,37 @@ export interface ScheduledActivities {
 
 export type ActivityPercentages = [Int, Int, Int, Int]
 
-const AllowedTimes = ['9am', '10am', 'both'] as const;
+export const AllowedTimes = ['9am', '10am', 'both'] as const;
 export type AllowedTimes = (typeof AllowedTimes)[number];
 
-const Allowed9and10Only = ['9am', '10am'] as const;
+export const Allowed9and10Only = ['9am', '10am'] as const;
+// TODO: this is intentionally as wide as AllowedTimes. Water scheduling passes 'both' through helpers
+// typed with this alias, and they work only because they ignore the slot on that path. Narrowing it
+// to '9am' | '10am' (typeof Allowed9and10Only) needs those helpers reworked first.
 export type Allowed9and10Only = (typeof AllowedTimes)[number];
 
-const AllowedActivityTypes = ['land', 'water'] as const;
+export const AllowedActivityTypes = ['land', 'water'] as const;
 export type AllowedActivityTypes = (typeof AllowedActivityTypes)[number];
 
-const WaterOnly = 'water' as const;
-export type WaterOnly = (typeof WaterOnly)[number];
+export const WaterOnly = 'water' as const;
+export type WaterOnly = typeof WaterOnly;
 
-const AllowedChoices = [[1], [2], [3], [1, 2], [1, 2], [1, 3], [1, 2, 3]] as const;
+export const AllowedChoices = [[1], [2], [3], [1, 2], [1, 2], [1, 3], [1, 2, 3]] as const;
 export type AllowedChoices = (typeof AllowedChoices)[number];
 
-const AllowedMaxMin = ['max', 'min'] as const;
+export const AllowedMaxMin = ['max', 'min'] as const;
 export type AllowedMaxMin = (typeof AllowedMaxMin)[number];
 
-const AllowedMaxMinSched = ['maxOnly', 'minOnly', 'bothMinAndMax'] as const;
+export const AllowedMaxMinSched = ['maxOnly', 'minOnly', 'bothMinAndMax'] as const;
 export type AllowedMaxMinSched = (typeof AllowedMaxMinSched)[number];
 
-const AllowedDoubleSingle = ['double', 'single'] as const;
+export const AllowedDoubleSingle = ['double', 'single'] as const;
 export type AllowedDoubleSingle = (typeof AllowedDoubleSingle)[number];
 
 export type AllowedChoiceNums = 1 | 2 | 3;
 
-const AllowedActivities = ['swim', 'fish', 'canoe', 'snork', 'sail', 'pboard', 'kayak'] as const;
+export const AllowedActivities = ['swim', 'fish', 'canoe', 'snork', 'sail', 'pboard', 'kayak'] as const;
 export type AllowedActivities = (typeof AllowedActivities)[number];
 
-const AllowedActivityTimes = ['land9am', 'land10am', 'water9am', 'water10am'] as const;
+export const AllowedActivityTimes = ['land9am', 'land10am', 'water9am', 'water10am'] as const;
 export type AllowedActivityTimes = (typeof AllowedActivityTimes)[number];

@@ -1,6 +1,6 @@
-import { ERROR_LOGS, SUCCESS_LOGS, INFO_LOGS } from '../sheriff.config'
+import { ERROR_LOGS } from '../sheriff.config'
 import { Activities } from './activities';
-import { AllActivities, AllowedActivityTimes, AllowedActivityTypes, AllowedTimes, Allowed9and10Only, WaterActivities, LandActivities9am, LandActivities10am } from '../types/schedule-types'
+import { AllActivities, AllowedActivityTypes, AllowedTimes, Allowed9and10Only, WaterActivities, LandActivities9am, LandActivities10am } from '../types/schedule-types'
 import { WaterActivities0Count, LandActivities9am0Count, LandActivities10am0Count } from '../types/camp-types';
 import type { Schedule } from './schedule'
 import { UnscheduledKids } from '../types/kids-types';
@@ -89,8 +89,7 @@ export class ScheduleChecker {
           }
         }
         if (timeSlotActivityType10am) {
-          timeSlotsCount10am
-            [timeSlotActivityType10am] += 1;
+          timeSlotsCount10am[timeSlotActivityType10am] += 1;
           if (activityType === 'water') {
             this.waterTotalCount += 1;
           }

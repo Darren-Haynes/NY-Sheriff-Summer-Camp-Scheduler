@@ -296,12 +296,14 @@ export class PrintLogs {
     const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
     let resultText = "NONE"
 
-    let underscheduledActivities: string[] = [];
+    const underscheduledActivities: string[] = [];
     for (const activity of Object.keys(typedActivityTypeTimeSlot)) {
       const activityCount = typedActivityTypeTimeSlot[activity].length;
       const minRange = ranges[activity as AllActivities][0];
       if (activityCount < minRange && activityCount > 0) {
-        `${activity}, 'has', ${activityCount}, 'kids scheduled, min is', ${minRange}`;
+        underscheduledActivities.push(
+          `${activity} has ${activityCount} kids scheduled, min is ${minRange}`
+        );
       }
     }
     if (underscheduledActivities.length > 0) {

@@ -1,4 +1,4 @@
-import { submitTextboxContent, fileUpload } from './ipcFunctions';
+import { submitTextboxContent } from './ipcFunctions';
 
 interface ToggleProps {
   isVisible: string;

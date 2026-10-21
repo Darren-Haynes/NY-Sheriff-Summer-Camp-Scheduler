@@ -21,9 +21,11 @@ const scheduleWithChoices = (
   const rows = Array.from({ length: totalKids }, (_, i) => row(`Kid${i}`, 'X'));
   const schedule = new Schedule(new Kids(rows), 'waterFirst');
   const byChoice = [chosen.first, chosen.second, chosen.third];
-  vi.spyOn(schedule as any, 'getScheduledChoicesNames').mockImplementation(
-    (_type: string, timeSlot: string, choiceNum: number) =>
-      timeSlot === '9am' ? [...byChoice[choiceNum - 1]] : []
+  const internals = schedule as unknown as {
+    getScheduledChoicesNames: (type: string, timeSlot: string, choiceNum: number) => string[];
+  };
+  vi.spyOn(internals, 'getScheduledChoicesNames').mockImplementation(
+    (_type, timeSlot, choiceNum) => (timeSlot === '9am' ? [...byChoice[choiceNum - 1]] : [])
   );
   return schedule;
 };

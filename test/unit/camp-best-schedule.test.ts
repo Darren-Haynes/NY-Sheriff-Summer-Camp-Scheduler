@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { Camp } from '../../src/main/camp';
 import { Kids } from '../../src/main/kids';
 import { Schedule } from '../../src/main/schedule';

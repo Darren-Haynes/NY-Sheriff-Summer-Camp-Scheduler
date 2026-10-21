@@ -54,7 +54,7 @@ FIXTURE_GROUPS.forEach(({ dirPath, label }) => {
       // 3. Dynamic Resolution: Look for UI Error boxes or Native Dialog triggers
       const errorBoxContainer = electronWindow.locator('#error-box, .error-box-container');
 
-      const isErrorHandled = await expect.poll(async () => {
+      await expect.poll(async () => {
         const uiErrorVisible = await errorBoxContainer.isVisible().catch(() => false);
         const nativeErrorVisible = await electronApp.evaluate(() => (global as any).nativeErrorCaught);
         return uiErrorVisible || nativeErrorVisible;
