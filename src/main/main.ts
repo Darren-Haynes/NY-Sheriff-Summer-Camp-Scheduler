@@ -78,6 +78,11 @@ const createWindow = (): void => {
       filters: [{ name: 'Sheets', extensions: ['xlsx'] }],
     });
 
+    // The user pressed Cancel: there is no file to read, so leave the UI as it was.
+    if (result.canceled || result.filePaths.length === 0) {
+      return;
+    }
+
     const kidsActivityData = await extractKidsChoicesData(result.filePaths[0]);
     const { allErrors, dataErrors } = handleErrors(kidsActivityData);
     if (!allErrors.every(item => item === false)) {
