@@ -71,8 +71,17 @@ const createWindow = (): void => {
     });
   }
 
+  // Open the DevTools.
+  // mainWindow.webContents.openDevTools();
+};
+
+// IPC handlers are registered once for the whole app. Registering them inside createWindow()
+// would throw "Attempted to register a second handler" the next time a window is created
+// (e.g. clicking the dock icon on macOS after closing the window). Each handler answers the
+// window that sent the request, via event.sender, so it works for any window.
+const registerIpcHandlers = (): void => {
   // Open file Dialog for user to pick file.
-  ipcMain.handle('open-file-dialog', async () => {
+  ipcMain.handle('open-file-dialog', async event => {
     const result = await dialog.showOpenDialog({
       properties: ['openFile'],
       filters: [{ name: 'Sheets', extensions: ['xlsx'] }],
@@ -86,13 +95,13 @@ const createWindow = (): void => {
     const kidsActivityData = await extractKidsChoicesData(result.filePaths[0]);
     const { allErrors, dataErrors } = handleErrors(kidsActivityData);
     if (!allErrors.every(item => item === false)) {
-      mainWindow.webContents.send('error-list', JSON.stringify(dataErrors.getErrorList()));
+      event.sender.send('error-list', JSON.stringify(dataErrors.getErrorList()));
     } else {
       const result = scheduleKids(kidsActivityData);
       if (result) {
-        mainWindow.webContents.send('result-list', JSON.stringify(result));
+        event.sender.send('result-list', JSON.stringify(result));
       } else {
-        mainWindow.webContents.send(
+        event.sender.send(
           'error-list',
           JSON.stringify([
             {
@@ -112,27 +121,27 @@ const createWindow = (): void => {
     // Handle case when there is no input data
     const noWhiteSpace = data.replace(/\s/g, '')
     if (noWhiteSpace === '' || noWhiteSpace === "Pastetexthere...") {
-      mainWindow.webContents.send('paste-box-no-content');
+      event.sender.send('paste-box-no-content');
       return
     }
 
     // Handle case where there is not the correct column headings.
     const headerErrors = checkHeaderData(data)
     if (headerErrors.length > 0) {
-      mainWindow.webContents.send('error-list', JSON.stringify(headerErrors));
+      event.sender.send('error-list', JSON.stringify(headerErrors));
       return
     }
 
     const kidsActivityData = parsePastedText(data);
     const { allErrors, dataErrors } = handleErrors(kidsActivityData);
     if (!allErrors.every(item => item === false)) {
-      mainWindow.webContents.send('error-list', JSON.stringify(dataErrors.getErrorList()));
+      event.sender.send('error-list', JSON.stringify(dataErrors.getErrorList()));
     } else {
       const result = scheduleKids(kidsActivityData);
       if (result) {
-        mainWindow.webContents.send('result-list', JSON.stringify(result));
+        event.sender.send('result-list', JSON.stringify(result));
       } else {
-        mainWindow.webContents.send(
+        event.sender.send(
           'error-list',
           JSON.stringify([
             {
@@ -149,7 +158,7 @@ const createWindow = (): void => {
 
   ipcMain.handle('copy-schedule', async (event, data) => {
     clipboard.writeText(data);
-    mainWindow.webContents.send('clipboard-content', 'notification-box');
+    event.sender.send('clipboard-content', 'notification-box');
   });
 
   ipcMain.handle(
@@ -235,8 +244,6 @@ const createWindow = (): void => {
       }
     }
   );
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
 };
 
 const joinNames = (names: string[]): string => {
@@ -320,7 +327,10 @@ app.on('will-quit', () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+app.on('ready', () => {
+  registerIpcHandlers();
+  createWindow();
+});
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
