@@ -107,7 +107,7 @@ const createWindow = (): void => {
     // Handle case when there is no input data
     const noWhiteSpace = data.replace(/\s/g, '')
     if (noWhiteSpace === '' || noWhiteSpace === "Pastetexthere...") {
-      mainWindow.webContents.send('send_no_paste_content');
+      mainWindow.webContents.send('paste-box-no-content');
       return
     }
 
