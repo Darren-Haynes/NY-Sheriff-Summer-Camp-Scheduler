@@ -1,0 +1,163 @@
+name: Release
+
+# Pushing a version tag (for example v1.0.1) builds installers on Windows, macOS and Linux
+# and publishes them as a GitHub Release. See docs/RELEASING.md for the full procedure.
+#
+# The build jobs also run, without publishing, in two other situations:
+#   - a pull request that changes this workflow or the Forge config, so a broken
+#     release pipeline is caught before it reaches main
+#   - a manual run from the Actions tab (workflow_dispatch), for a dry run
+on:
+  push:
+    tags:
+      - 'v*'
+  pull_request:
+    paths:
+      - '.github/workflows/release.yml'
+      - 'forge.config.ts'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-version:
+    name: Verify tag matches package.json
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # A release built from tag v1.2.3 must contain app version 1.2.3, otherwise the
+      # installers and the release would disagree about what they are.
+      - name: Compare tag with package.json version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          pkg_version="$(node -p "require('./package.json').version")"
+          tag_version="${GITHUB_REF_NAME#v}"
+          echo "package.json: ${pkg_version}  tag: ${tag_version}"
+          if [ "${pkg_version}" != "${tag_version}" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match package.json version ${pkg_version}"
+            exit 1
+          fi
+
+  build:
+    name: Build (${{ matrix.name }})
+    needs: verify-version
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux (deb, rpm)
+            os: ubuntu-latest
+            artifact: linux
+          - name: Windows (msi)
+            os: windows-latest
+            artifact: windows
+          - name: macOS (dmg, zip)
+            os: macos-latest
+            artifact: macos
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      # The deb maker needs dpkg and fakeroot, which ubuntu runners already have.
+      # The rpm maker needs rpmbuild, which they do not.
+      - name: Install rpm tooling (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y rpm
+
+      # The MSI maker shells out to WiX's candle.exe and light.exe and fails if they are not
+      # on PATH. Windows runners ship with WiX 3.x, but not always on PATH, so find it here
+      # and fall back to installing it. Failing early gives a clear message.
+      - name: Make WiX available (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          if (-not (Get-Command candle.exe -ErrorAction SilentlyContinue)) {
+            $wix = Get-ChildItem "${env:ProgramFiles(x86)}" -Filter "WiX Toolset v3*" -Directory -ErrorAction SilentlyContinue |
+              Select-Object -First 1
+            if ($wix) {
+              "$($wix.FullName)\bin" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+              $env:PATH = "$($wix.FullName)\bin;$env:PATH"
+            } else {
+              choco install wixtoolset --no-progress -y
+              "C:\Program Files (x86)\WiX Toolset v3.14\bin" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+              $env:PATH = "C:\Program Files (x86)\WiX Toolset v3.14\bin;$env:PATH"
+            }
+          }
+          candle.exe -? | Select-Object -First 1
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      # NODE_ENV is deliberately not set to "test": the webpack config adds coverage
+      # instrumentation in that mode, and installers must ship a clean production build.
+      - name: Build installers
+        run: npm run make
+
+      - name: List built files
+        shell: bash
+        run: find out/make -type f | sort
+
+      - name: Upload installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: installers-${{ matrix.artifact }}
+          path: |
+            out/make/**/*.deb
+            out/make/**/*.rpm
+            out/make/**/*.msi
+            out/make/**/*.dmg
+            out/make/**/*.zip
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish GitHub Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download installers
+        uses: actions/download-artifact@v4
+        with:
+          pattern: installers-*
+          path: installers
+          merge-multiple: true
+
+      # Installer names contain spaces. Replace them so download links and the checksum
+      # file are easy to use from a terminal.
+      - name: Collect files and write checksums
+        run: |
+          mkdir release
+          find installers -type f | while read -r file; do
+            cp "$file" "release/$(basename "$file" | tr ' ' '-')"
+          done
+          cd release
+          sha256sum * > SHA256SUMS.txt
+          ls -l
+          cat SHA256SUMS.txt
+
+      # Tags with a hyphen (v1.1.0-rc.1) are published as pre-releases.
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          flags=""
+          case "$TAG" in *-*) flags="--prerelease" ;; esac
+          gh release create "$TAG" release/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "$TAG" \
+            --generate-notes \
+            $flags

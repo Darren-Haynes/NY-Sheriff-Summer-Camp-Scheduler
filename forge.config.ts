@@ -1,6 +1,7 @@
 import path from 'path';
 import type { ForgeConfig } from '@electron-forge/shared-types';
 import MakerMSI from '@electron-forge/maker-wix';
+import { MakerDMG } from '@electron-forge/maker-dmg';
 import { MakerZIP } from '@electron-forge/maker-zip';
 import { MakerDeb } from '@electron-forge/maker-deb';
 import { MakerRpm } from '@electron-forge/maker-rpm';
@@ -24,7 +25,6 @@ const config: ForgeConfig = {
     icon: './assets/icons/sheriff-badge-msi.ico',
   },
   rebuildConfig: {},
-  // ... rest of your existing makers config remains untouched
   makers: [
     new MakerMSI(
       {
@@ -39,10 +39,12 @@ const config: ForgeConfig = {
         },
         manufacturer: 'Darren Haynes',
         programFilesFolderName: 'NY Summer Camp',
-        version: '1.0.0',
+        // No `version` here: the MSI maker takes it from package.json. A hard-coded value
+        // here would override it, and every release would ship an MSI labelled 1.0.0.
       },
       ['win32']
     ),
+    new MakerDMG({}, ['darwin']),
     new MakerZIP({}, ['darwin']),
     new MakerRpm({}, ['linux']),
     new MakerDeb({}, ['linux']),
