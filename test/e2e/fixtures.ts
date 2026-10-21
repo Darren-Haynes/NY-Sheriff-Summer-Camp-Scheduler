@@ -11,8 +11,10 @@ type ElectronFixtures = {
 };
 
 export const test = base.extend<ElectronFixtures>({
+  // Playwright requires fixtures to destructure their first argument, even when it is empty.
+  // eslint-disable-next-line no-empty-pattern
   appContext: async ({}, use, testInfo) => {
-    let electronExecutablePath = '';
+    let electronExecutablePath: string;
 
     // SAFE ROOT: Always resolves to your project workspace root
     const projectRoot = process.cwd();

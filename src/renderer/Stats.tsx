@@ -8,13 +8,7 @@ interface ScheduleDataProps {
   land10amActs: string[];
 }
 
-const StatsData: React.FC<ScheduleDataProps> = ({
-  stats,
-  result,
-  waterActs,
-  land9amActs,
-  land10amActs,
-}) => {
+const StatsData: React.FC<ScheduleDataProps> = ({ stats, result }) => {
   if (!stats) {
     return null;
   }

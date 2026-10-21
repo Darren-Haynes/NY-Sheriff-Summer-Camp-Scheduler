@@ -2,9 +2,6 @@ import { describe, expect, test, vi, beforeAll, afterAll } from 'vitest';
 import { Kids } from '../../src/main/kids';
 import { Schedule } from '../../src/main/schedule';
 
-const HEADER =
-  ['First', 'Last', 'X', 'Land1', 'Land2', 'Land3', 'Water1', 'Water2', 'Water3'].join('\t') + '\n';
-
 describe('Schedule mutator basics', () => {
   beforeAll(() => {
     // Keep randomness deterministic if any helper uses it

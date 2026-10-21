@@ -47,7 +47,7 @@ export default function MainContent() {
   }, []);
 
   useEffect(() => {
-    window.textAPI.send_no_paste_content(noPasteData => {
+    window.textAPI.send_no_paste_content(() => {
       setShowInputOptions('paste-box');
     });
   }, []);

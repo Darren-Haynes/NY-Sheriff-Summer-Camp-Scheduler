@@ -1,7 +1,6 @@
 import { test, expect } from './fixtures';
 import * as fs from 'fs';
 import * as path from 'path';
-import parsePastedText from '../src/main/text-parser'
 
 test.describe('PasteBox Testing Real-World Dataset With Errors', () => {
   test('Gracefully captures and verifies data with wrong activities data', async ({
@@ -71,7 +70,7 @@ test.describe('PasteBox Testing Real-World Dataset With Errors', () => {
     const fileSpecPath = path.join(__dirname, 'fixtures/mock-data/success-104-kids.txt');
     const productionData= fs.readFileSync(fileSpecPath, 'utf8');
 
-    let textarea = electronWindow.locator('#paste-textarea');
+    const textarea = electronWindow.locator('#paste-textarea');
     await textarea.focus();
     await textarea.clear();
     await textarea.fill(productionData);
@@ -126,7 +125,7 @@ test.describe('PasteBox Testing Real-World Dataset Without Errors', () => {
         await copyBtn.click({ force: true, timeout: 1000 });
         await electronWindow.waitForTimeout(300);
       }
-    } catch (e) {
+    } catch {
       console.log('Skipping copy shortcut.');
     }
 
@@ -149,7 +148,7 @@ test.describe('PasteBox Testing Real-World Dataset Without Errors', () => {
         // Give the exceljs writeBuffer loop an extra moment to execute lines 113-117!
         await electronWindow.waitForTimeout(1000);
       }
-    } catch (e) {
+    } catch {
       console.log('Handled native save file dialog callback loop smoothly.');
     }
 
@@ -167,7 +166,7 @@ test.describe('PasteBox Testing Real-World Dataset Without Errors', () => {
           await electronWindow.waitForTimeout(300);
         }
       }
-    } catch (e) {
+    } catch {
       console.log('Safely handled stats viewing page toggles.');
     }
 
@@ -180,7 +179,7 @@ test.describe('PasteBox Testing Real-World Dataset Without Errors', () => {
         await backToOptionsBtn.click({ force: true, timeout: 1000 });
         await electronWindow.waitForTimeout(500);
       }
-    } catch (e) {
+    } catch {
       console.log('Safely handled dashboard navigation reset step.');
     }
 
@@ -194,9 +193,6 @@ test.describe('PasteBox test close button functionality',  () => {
   }) => {
     const { electronWindow } = appContext;
     await electronWindow.waitForTimeout(700);
-
-    const fileSpecPath = path.join(__dirname, 'fixtures/mock-data/error-wrong-activities.txt');
-    const malformedData = fs.readFileSync(fileSpecPath, 'utf8');
 
     const pasteNavBtn = electronWindow.locator('#paste-btn');
     await pasteNavBtn.click({ force: true });

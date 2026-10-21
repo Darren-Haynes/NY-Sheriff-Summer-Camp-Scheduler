@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import { Kids } from '../../src/main/kids';
 
 describe('Kids class parsing and counts', () => {

@@ -103,8 +103,7 @@ export class DataErrorHandler {
     for (let i = 0; i < this.campData.length; i++) {
       //TODO: Add info to user which cells are in excess of 9 in a row
       if (this.campData[i].length != 9) {
-        let s = JSON.stringify(this.campData[i]);
-        s = this.campData[i].join(',').replace(/[[]?null/g, 'Empty Cell');
+        const s = this.campData[i].join(',').replace(/[[]?null/g, 'Empty Cell');
         this.numOfFieldsError.push(`Line ${i + 1}: ${s}`);
       }
     }
