@@ -27,6 +27,20 @@ const config: ForgeConfig = {
     name: APP_NAME,
     asar: true,
     icon: './assets/icons/sheriff-badge-msi.ico',
+    // macOS only; ignored on other platforms.
+    //
+    // Electron ships ad-hoc signed, but the packager then renames the app and rewrites
+    // Info.plist, which leaves a stale signature. On Apple Silicon macOS reports an app with a
+    // broken signature as "damaged and can't be opened". Signing again here, after those edits,
+    // gives a valid ad-hoc signature. It is not a Developer ID signature, so users still get a
+    // first-launch prompt, but the app is no longer reported as damaged.
+    osxSign: {
+      identity: '-', // ad-hoc: no certificate needed
+      identityValidation: false, // '-' is not a keychain identity, so skip the lookup
+      // The hardened runtime is only needed for notarization. With an ad-hoc signature it can
+      // stop Electron from loading its own frameworks (library validation), so leave it off.
+      optionsForFile: () => ({ hardenedRuntime: false }),
+    },
   },
   rebuildConfig: {},
   makers: [
