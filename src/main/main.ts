@@ -75,6 +75,26 @@ const createWindow = (): void => {
   // mainWindow.webContents.openDevTools();
 };
 
+// Shown when a file or pasted text cannot be turned into a roster at all: an unexpected
+// exception while reading or scheduling it, such as a workbook with no camper-choice columns
+// or a file that is not really Excel. Without this the handler would reject, nothing would be
+// sent to the window, and the user would see nothing happen.
+const unrecognizedInputErrors = [
+  {
+    header: 'Unrecognized spreadsheet format or data',
+    errorList: [
+      'The data could not be read as a list of campers.',
+      'Check that the file is an Excel (.xlsx) workbook whose first row has First Name, Last Name, L1, L2, L3, W1, W2 and W3 columns.',
+      'A schedule exported from this app cannot be loaded back in as a roster.',
+    ],
+  },
+];
+
+const reportUnrecognizedInput = (sender: Electron.WebContents, error: unknown): void => {
+  console.error('Could not process the input data:', error);
+  sender.send('error-list', JSON.stringify(unrecognizedInputErrors));
+};
+
 // IPC handlers are registered once for the whole app. Registering them inside createWindow()
 // would throw "Attempted to register a second handler" the next time a window is created
 // (e.g. clicking the dock icon on macOS after closing the window). Each handler answers the
@@ -92,27 +112,31 @@ const registerIpcHandlers = (): void => {
       return;
     }
 
-    const kidsActivityData = await extractKidsChoicesData(result.filePaths[0]);
-    const { allErrors, dataErrors } = handleErrors(kidsActivityData);
-    if (!allErrors.every(item => item === false)) {
-      event.sender.send('error-list', JSON.stringify(dataErrors.getErrorList()));
-    } else {
-      const result = scheduleKids(kidsActivityData);
-      if (result) {
-        event.sender.send('result-list', JSON.stringify(result));
+    try {
+      const kidsActivityData = await extractKidsChoicesData(result.filePaths[0]);
+      const { allErrors, dataErrors } = handleErrors(kidsActivityData);
+      if (!allErrors.every(item => item === false)) {
+        event.sender.send('error-list', JSON.stringify(dataErrors.getErrorList()));
       } else {
-        event.sender.send(
-          'error-list',
-          JSON.stringify([
-            {
-              header: 'Unable to schedule kids',
-              errorList: [
-                'This is most likely due to way too many kids making the same choice or there are not enough total kids attending.',
-              ],
-            },
-          ])
-        );
+        const result = scheduleKids(kidsActivityData);
+        if (result) {
+          event.sender.send('result-list', JSON.stringify(result));
+        } else {
+          event.sender.send(
+            'error-list',
+            JSON.stringify([
+              {
+                header: 'Unable to schedule kids',
+                errorList: [
+                  'This is most likely due to way too many kids making the same choice or there are not enough total kids attending.',
+                ],
+              },
+            ])
+          );
+        }
       }
+    } catch (error) {
+      reportUnrecognizedInput(event.sender, error);
     }
   });
 
@@ -132,27 +156,31 @@ const registerIpcHandlers = (): void => {
       return
     }
 
-    const kidsActivityData = parsePastedText(data);
-    const { allErrors, dataErrors } = handleErrors(kidsActivityData);
-    if (!allErrors.every(item => item === false)) {
-      event.sender.send('error-list', JSON.stringify(dataErrors.getErrorList()));
-    } else {
-      const result = scheduleKids(kidsActivityData);
-      if (result) {
-        event.sender.send('result-list', JSON.stringify(result));
+    try {
+      const kidsActivityData = parsePastedText(data);
+      const { allErrors, dataErrors } = handleErrors(kidsActivityData);
+      if (!allErrors.every(item => item === false)) {
+        event.sender.send('error-list', JSON.stringify(dataErrors.getErrorList()));
       } else {
-        event.sender.send(
-          'error-list',
-          JSON.stringify([
-            {
-              header: 'Unable to schedule kids',
-              errorList: [
-                'This is most likely due to way too many kids making the same choice or there are not enough total kids attending.',
-              ],
-            },
-          ])
-        );
+        const result = scheduleKids(kidsActivityData);
+        if (result) {
+          event.sender.send('result-list', JSON.stringify(result));
+        } else {
+          event.sender.send(
+            'error-list',
+            JSON.stringify([
+              {
+                header: 'Unable to schedule kids',
+                errorList: [
+                  'This is most likely due to way too many kids making the same choice or there are not enough total kids attending.',
+                ],
+              },
+            ])
+          );
+        }
       }
+    } catch (error) {
+      reportUnrecognizedInput(event.sender, error);
     }
   });
 
