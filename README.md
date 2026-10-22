@@ -313,4 +313,4 @@ The first end-to-end run needs the Playwright browsers: `npx playwright install 
 
 ## License
 
-Copyright © 2025 New York State Sheriffs' Institute. All rights reserved. See [LICENSE](LICENSE).
+Copyright © 2026 New York State Sheriffs' Institute. All rights reserved. See [LICENSE](LICENSE).
