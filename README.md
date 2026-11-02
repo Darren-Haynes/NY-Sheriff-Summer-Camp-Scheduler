@@ -41,11 +41,11 @@ The Windows and macOS installers are **not signed with a paid certificate**, so 
 
 ---
 
-## Screenshots / Demo
+## Demo
 
-*A demo GIF is coming: load a roster, view the schedule and choice statistics, export to Excel.*
+[![Watch the demo on YouTube](https://img.youtube.com/vi/krJ2EAcqs-0/maxresdefault.jpg)](https://youtu.be/krJ2EAcqs-0)
 
-<!-- When docs/demo.gif exists, replace the line above with: ![Demo](docs/demo.gif) -->
+*Click the image to watch the demo on YouTube.*
 
 ---
 
