@@ -2374,6 +2374,7 @@ export class Schedule {
       JSON.stringify(this.scheduled9amLand.names.sort());
 
     const underScheduled = scheduleChecker.checkUnderScheduled()
+    const overScheduled = scheduleChecker.checkOverScheduled()
 
     const allTrue = [
       equalObjects9amWater,
@@ -2383,6 +2384,7 @@ export class Schedule {
       checkPercentage,
       notScheduledToScheduled,
       underScheduled,
+      overScheduled,
       !waterToKidsCount,
       !landToKidsCount,
       allNotInTarget,
