@@ -206,6 +206,42 @@ export class ScheduleChecker {
     }
 
     /**
+     * Check if any activity has more kids scheduled than its maximum allows.
+     * E.g if "hike" allows a maximum of 6 kids, and 7 are scheduled, this is a false result.
+     * The maximum is per time slot (index 1 of the range), not the doubled both-slot water maximum.
+     * @param {string} activityType - only 2 options: 'land' or 'water'.
+     * @param {string} timeSlot - only 2 options -'9am' or '10am'
+     * @returns {boolean} - true if no activity is over its maximum.
+     */
+    checkOverScheduledByActivityTypeAndTime(activityType: AllowedActivityTypes, timeSlot: AllowedTimes): boolean {
+      const activityTypeTimeSlot = this.schedule.getActivityTypeTimeSlot(activityType, timeSlot);
+      const typedActivityTypeTimeSlot = activityTypeTimeSlot as Record<string, string[]>;
+      const ranges = activityType === 'land' ? Activities.landRanges : Activities.waterRanges;
+      for (const activity of Object.keys(typedActivityTypeTimeSlot)) {
+        const activityCount = typedActivityTypeTimeSlot[activity].length;
+        const maxRange = ranges[activity as AllActivities][1];
+        if (activityCount > maxRange) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    /**
+     * Checks that no activity for land and water, at both 9am and 10am,
+     * has more kids scheduled to it than its maximum.
+     * @returns {boolean}
+     */
+  checkOverScheduled(): boolean {
+    return [
+      this.checkOverScheduledByActivityTypeAndTime('water', '9am'),
+      this.checkOverScheduledByActivityTypeAndTime('land', '9am'),
+      this.checkOverScheduledByActivityTypeAndTime('water', '10am'),
+      this.checkOverScheduledByActivityTypeAndTime('land', '10am'),
+    ].every(element => element === true);
+  }
+
+    /**
      * Checks if all activities for land and water and both at 9am and 10am has
      * enough kids scheduled to them to meet the bare minumum numbers requirement.
      * @returns {boolean}
