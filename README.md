@@ -70,13 +70,15 @@ flowchart TD
         PARSE["excel-parser / text-parser<br/>kidsColumnMapper / activityAliases"]
         VALIDATE["DataErrorHandler<br/>(validation)"]
         ENGINE["Camp -> Schedule x N runs<br/>ScheduleChecker"]
-        OUT["ExcelJS export<br/>clipboard / dialogs"]
+        OUT["Export and copy<br/>ExcelJS + save dialog, clipboard"]
         IPC --> PARSE --> VALIDATE
         VALIDATE -- valid --> ENGINE
-        IPC --> OUT
+        ENGINE -. "best schedule kept in memory<br/>(used by export)" .-> OUT
+        IPC -- "copy-schedule / export-excel<br/>(result view only)" --> OUT
     end
 
-    IPCFN -- "invoke(submit-text, open-file-dialog,<br/>copy-schedule, export-excel)" --> API
+    IPCFN -- "invoke(submit-text, open-file-dialog)" --> API
+    IPCFN -- "invoke(copy-schedule, export-excel)<br/>after a result is shown" --> API
     API -- "ipcRenderer.invoke" --> IPC
     VALIDATE -. "send(error-list)" .-> API
     ENGINE -. "send(result-list)" .-> API
@@ -91,6 +93,7 @@ flowchart TD
 4. `DataErrorHandler` validates the data: unknown activities, duplicate names, and roster size (50 to 146 kids).
 5. On failure, the main process sends an `error-list` message with row-level details. On success, `Camp` runs the scheduling algorithm and sends a `result-list` message.
 6. The renderer subscribes to these channels in `MainContent.tsx` and switches between the error view and the result view.
+7. Copy and export are a second round trip that only exists once a result is showing. The result view calls `copy-schedule` (the main process writes the text it receives to the clipboard) or `export-excel` (the main process builds the workbook with ExcelJS from the best schedule it kept from the run, then asks where to save it with a native save dialog).
 
 Handlers find the window that sent a request through `BrowserWindow.fromWebContents(event.sender)` and are registered once at startup. Registering them inside `createWindow()` threw "Attempted to register a second handler" when a macOS user closed the window and clicked the dock icon. I reproduced that on a real Mac, fixed it, and added a regression test.
 
@@ -225,10 +228,10 @@ I measured it instead of eyeballing a few runs. For each roster I ran the full a
 | Layer | Tooling | What it covers |
 |---|---|---|
 | **Unit** | Vitest | Excel and text parsers, header detection, aliases, validation rules, activity ranges, the best-schedule selection rule, percentage rounding, randomness fairness |
-| **Integration** (74 Vitest tests in total, unit + integration) | Vitest | Full `Camp` runs on rosters from 50 to 146 kids, including worst cases such as every kid choosing canoe or football first. A **fuzz test** sweeps every roster size from 50 to 150 with deliberately duplicated choices to exercise rounding and fallback branches. |
-| **End-to-end** (42 tests) | Playwright (`_electron`) | Launches the *packaged* app and drives it like a user: file upload, paste box, a matrix of valid and invalid Excel files in both formats, cancelled dialogs, responsive layout, and re-opening the window after closing it |
+| **Integration** (80 Vitest tests in total, unit + integration) | Vitest | Full `Camp` runs on rosters from 50 to 146 kids, including worst cases such as every kid choosing canoe or football first. A **fuzz test** sweeps every roster size from 50 to 150 with deliberately duplicated choices to exercise rounding and fallback branches. |
+| **End-to-end** (44 tests) | Playwright (`_electron`) | Launches the *packaged* app and drives it like a user: file upload, paste box, a matrix of valid and invalid Excel files in both formats, cancelled dialogs, responsive layout, and re-opening the window after closing it |
 
-- **Self-verifying algorithm.** After each run, `ScheduleChecker` recounts the finished schedule from scratch and cross-checks it against the algorithm's own bookkeeping: every kid is scheduled once per activity type, no activity is under its minimum, percentages add up, and each kid's water and land slots are opposite. A run that fails is thrown away.
+- **Self-verifying algorithm.** After each run, `ScheduleChecker` recounts the finished schedule from scratch and cross-checks it against the algorithm's own bookkeeping: every kid is scheduled once per activity type, no activity is under its minimum or over its maximum, percentages add up, and each kid's water and land slots are opposite. A run that fails is thrown away.
 - **Deterministic randomness.** Tests use a seeded generator (`test/helpers/seeded-random.ts`) so randomized code is reproducible in CI without being pinned to a constant.
 - **Flaky tests are fixed, not retried.** An intermittent end-to-end failure (3 failures in 30 runs) was traced to a test that polled the app while its main process was busy scheduling. It was reworked, and I confirmed 0 failures in 90 consecutive runs against 3 in 30 before.
 - **Split coverage.** Main-process coverage (about 98% of statements) comes from Vitest (V8). Renderer coverage comes from the Playwright run, with `babel-plugin-istanbul` instrumenting the packaged build. Each is uploaded to Codecov under its own flag.
