@@ -17,7 +17,7 @@ It is my first large software project. The scheduling engine, parsers and valida
 
 **Highlights**
 
-- A constraint-based scheduling engine with an independent checker that verifies every candidate schedule
+- A rule-based scheduling engine (a randomized greedy heuristic with random restarts) and a checker that validates every candidate schedule
 - On the rosters I measured, **87-99% of kids get one of their top three choices** (details and caveats in [How good are the schedules?](#how-good-are-the-schedules))
 - Two real-world spreadsheet layouts plus pasted text, with tolerant header and activity-name matching
 - Human-readable validation errors that point at the offending row and column
@@ -112,7 +112,9 @@ flowchart LR
 
 Each kid gets one water activity and one land activity, and the two must fall in *opposite* time slots (water at 9am means land at 10am). Every activity has a minimum and maximum group size, and some run in only one slot.
 
-The algorithm is a **randomized multi-phase greedy heuristic with random restarts**. When an activity has more takers than spots, the kids who are moved or dropped are chosen at random, so no camper is favored or penalized by name or by position in the list. Each finished run is validated by an independent `ScheduleChecker`, and only valid runs are eligible to be chosen.
+The algorithm is a **randomized multi-phase greedy heuristic with repair steps and random restarts**. Each phase places the kids it can, and later phases repair what is left, for example by moving a kid to free a spot or topping up an activity that is under its minimum. When an activity has more takers than spots, the kids who are moved or dropped are chosen at random, so no camper is favored or penalized by name or by position in the list. Each finished run is validated by `ScheduleChecker`, and only valid runs are eligible to be chosen.
+
+This is a heuristic, not an exact solver. It does not guarantee the best possible schedule (an integer-programming model could), and a single run is not guaranteed to be valid. That is why every run is checked and the best of many valid runs is kept.
 
 **How the best run is chosen** (`Camp.bestPercentagesSchedule`):
 
@@ -160,7 +162,7 @@ I measured it instead of eyeballing a few runs. For each roster I ran the full a
 | **Electron** | The users are volunteers on ordinary laptops with no IT support. A double-click installer, native file dialogs, clipboard access and offline use matter more than a hosted web app. Camper names also stay on the local machine and never reach a server, which suits data about minors. |
 | **TypeScript everywhere** | The scheduler manipulates many parallel structures keyed by activity and time slot. Branded and union types (`Int`, `WaterActivities`, `LandActivities9am`, ...) catch whole classes of slot and activity mix-ups at compile time. |
 | **Electron Forge + Webpack** | One tool for the dev server, packaging and installers. The Webpack config is test-aware: it swaps `ts-loader` for `babel-loader` + `babel-plugin-istanbul` so renderer coverage can be collected from the packaged app. |
-| **Randomized search over one deterministic pass** | Group-size minimums and maximums make a single greedy pass brittle. Many cheap randomized attempts, each independently verified, reliably find a feasible schedule, and keeping the best one measurably reduces the number of kids with no choice (see above). |
+| **Randomized search over one deterministic pass** | Group-size minimums and maximums make a single greedy pass brittle. Many cheap randomized attempts, each checked by `ScheduleChecker`, reliably find a feasible schedule, and keeping the best one measurably reduces the number of kids with no choice (see above). |
 | **Random selection, not list order** | When an activity is oversubscribed, someone has to be moved. Choosing who at random (a Fisher-Yates selection, so every kid has an equal chance), instead of by name or position, removes alphabetical and list-order bias. Unit tests check that kids at the start of a long list are not favored. |
 | **Tolerant input handling** | Real spreadsheets are messy. Columns are found by header keyword (any order), the right worksheet is auto-detected in multi-sheet workbooks, and aliases such as `football`, `hiking` and `arts & crafts` map to canonical codes. Anything unrecognized is *rejected with a precise message*, never guessed. |
 | **Vitest for logic, Playwright for the shell** | Fast, deterministic unit and integration tests cover the engine. Playwright drives the real packaged Electron app. |
@@ -193,7 +195,7 @@ I measured it instead of eyeballing a few runs. For each roster I ran the full a
 │   │   ├── kids.ts               # Camper model built from normalized rows
 │   │   ├── camp.ts               # Runs N randomized attempts and selects the best
 │   │   ├── schedule.ts           # The scheduling algorithm (one randomized run)
-│   │   ├── schedule-checker.ts   # Independent verification of a finished schedule
+│   │   ├── schedule-checker.ts   # Validation of a finished schedule
 │   │   └── scheduler-utils.ts    # Shared helpers
 │   ├── renderer/                 # React UI (no Node access)
 │   │   ├── App.tsx / MainContent.tsx   # Top-level view state, IPC subscriptions
