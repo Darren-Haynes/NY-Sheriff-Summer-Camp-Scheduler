@@ -69,7 +69,7 @@ flowchart TD
         IPC["ipcMain.handle(...)<br/>registered once at app ready"]
         PARSE["excel-parser / text-parser<br/>kidsColumnMapper / activityAliases"]
         VALIDATE["DataErrorHandler<br/>(validation)"]
-        ENGINE["Camp -> Schedule x N runs<br/>ScheduleChecker"]
+        ENGINE["Camp runs Schedule up to N times<br/>ScheduleChecker validates each run"]
         OUT["Export and copy<br/>ExcelJS + save dialog, clipboard"]
         IPC --> PARSE --> VALIDATE
         VALIDATE -- valid --> ENGINE
